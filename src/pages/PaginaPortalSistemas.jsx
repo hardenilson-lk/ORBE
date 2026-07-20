@@ -1,0 +1,6 @@
+import { Link } from "react-router";
+import PortalLayout from "../components/portal/PortalLayout.jsx";
+
+export default function PaginaPortalSistemas() {
+  return <PortalLayout titulo="Sistemas de RPG" subtitulo="Cada sistema vive em seu próprio módulo. Neste projeto, o Arquivos é o sistema ativo."><section className="portal-painel"><div className="portal-grade"><article className="portal-card" style={{ borderColor: "#4d815e", background: "linear-gradient(145deg,rgba(20,55,37,.72),rgba(8,12,10,.82))" }}><span className="portal-etiqueta">ARQ · ativo</span><h2>Arquivos</h2><p>Mistério, investigação, horror, fichas por NEX, rituais, missões e mapa tático.</p><Link className="portal-botao" to="/arquivos">Selecionar</Link></article><article className="portal-card"><span className="portal-etiqueta">Arquitetura modular</span><h2>Outros sistemas</h2><p>Os demais sistemas não foram importados para evitar misturar regras e dados com o Arquivos atual.</p><button className="portal-botao" type="button" disabled>Em preparação</button></article><article className="portal-card"><span className="portal-etiqueta">Personalização</span><h2>Sistema próprio</h2><p>Espaço reservado para uma futura estrutura de regras personalizadas.</p><button className="portal-botao" type="button" disabled>Planejar depois</button></article></div></section></PortalLayout>;
+}

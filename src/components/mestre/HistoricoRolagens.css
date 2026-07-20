@@ -1,0 +1,355 @@
+.historico-rolagens {
+  --historico-papel: #d8c39f;
+  --historico-papel-claro: #e4d2ae;
+  --historico-papel-escuro: #b99663;
+  --historico-tinta: #21150e;
+  --historico-vermelho: #8b1f1f;
+  --historico-dourado: #c49a3a;
+
+  position: relative;
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid rgba(36, 24, 18, 0.72);
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(79, 54, 30, 0.045) 0 1px,
+      transparent 1px 8px
+    ),
+    linear-gradient(
+      135deg,
+      var(--historico-papel-claro),
+      var(--historico-papel),
+      var(--historico-papel-escuro)
+    );
+  color: var(--historico-tinta);
+  box-shadow:
+    0 18px 38px rgba(0, 0, 0, 0.36),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+}
+
+.historico-rolagens::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      circle at 80% 14%,
+      rgba(139, 31, 31, 0.1),
+      transparent 16%
+    ),
+    radial-gradient(
+      circle at 18% 82%,
+      rgba(69, 45, 22, 0.12),
+      transparent 12%
+    );
+}
+
+.historico-rolagens > * {
+  position: relative;
+  z-index: 1;
+}
+
+.historico-rolagens__cabecalho {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed rgba(38, 27, 18, 0.46);
+}
+
+.historico-rolagens__cabecalho span {
+  color: var(--historico-vermelho);
+  font-family:
+    "Courier Prime",
+    "Courier New",
+    monospace;
+  font-size: 0.66rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.historico-rolagens__cabecalho h2 {
+  margin: 4px 0 0;
+  color: #1f140d;
+  font-family:
+    "Cinzel",
+    Georgia,
+    serif;
+  font-size: 1.05rem;
+  text-transform: uppercase;
+}
+
+.historico-rolagens__cabecalho button {
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid rgba(91, 31, 23, 0.7);
+  border-radius: 0;
+  background:
+    linear-gradient(
+      #7d332b,
+      #3d1713
+    );
+  color: #ffe8d5;
+  box-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  font-family:
+    "Courier Prime",
+    "Courier New",
+    monospace;
+  font-size: 0.7rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.historico-rolagens__cabecalho button:hover {
+  border-color: var(--historico-dourado);
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.historico-rolagens__ultima {
+  display: grid;
+  place-items: center;
+  min-height: 128px;
+  padding: 16px;
+  border: 2px solid rgba(139, 31, 31, 0.62);
+  background:
+    radial-gradient(
+      circle at 50% 42%,
+      rgba(139, 31, 31, 0.16),
+      transparent 50%
+    ),
+    rgba(255, 248, 225, 0.18);
+  text-align: center;
+  transform: rotate(-0.4deg);
+}
+
+.historico-rolagens__ultima span {
+  color: var(--historico-vermelho);
+  font-family:
+    "Courier Prime",
+    "Courier New",
+    monospace;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.historico-rolagens__ultima strong {
+  color: #24160e;
+  font-family:
+    "Special Elite",
+    "Courier New",
+    monospace;
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.historico-rolagens__ultima p {
+  margin: 5px 0 0;
+  color: #4b3827;
+  font-family:
+    "Courier Prime",
+    "Courier New",
+    monospace;
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.historico-rolagens__vazio {
+  display: grid;
+  place-items: center;
+  gap: 8px;
+  min-height: 130px;
+  padding: 18px;
+  border: 1px dashed rgba(54, 38, 25, 0.46);
+  background: rgba(255, 255, 255, 0.12);
+  text-align: center;
+}
+
+.historico-rolagens__vazio span {
+  color: var(--historico-vermelho);
+  font-size: 2rem;
+}
+
+.historico-rolagens__vazio p {
+  margin: 0;
+  color: #5d4b36;
+  font-family:
+    "Courier Prime",
+    "Courier New",
+    monospace;
+  font-size: 0.78rem;
+}
+
+.historico-rolagens__lista {
+  display: grid;
+  gap: 9px;
+  max-height: 520px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.historico-rolagens__lista::-webkit-scrollbar {
+  width: 8px;
+}
+
+.historico-rolagens__lista::-webkit-scrollbar-track {
+  background: rgba(46, 30, 18, 0.15);
+}
+
+.historico-rolagens__lista::-webkit-scrollbar-thumb {
+  background: rgba(91, 55, 31, 0.65);
+}
+
+.historico-rolagens__item {
+  display: grid;
+  grid-template-columns:
+    66px minmax(0, 1fr) 76px;
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid rgba(54, 38, 25, 0.38);
+  background:
+    linear-gradient(
+      90deg,
+      rgba(139, 31, 31, 0.07),
+      transparent 34%
+    ),
+    rgba(255, 255, 255, 0.14);
+}
+
+.historico-rolagens__dado {
+  display: grid;
+  place-items: center;
+  min-height: 58px;
+  padding: 6px;
+  border: 1px solid rgba(54, 38, 25, 0.54);
+  background:
+    linear-gradient(
+      145deg,
+      #493523,
+      #21170f
+    );
+  color: #f0d696;
+  text-align: center;
+}
+
+.historico-rolagens__dado span {
+  font-size: 0.64rem;
+}
+
+.historico-rolagens__dado strong {
+  font-family:
+    "Special Elite",
+    "Courier New",
+    monospace;
+  font-size: 0.92rem;
+  text-transform: uppercase;
+}
+
+.historico-rolagens__informacoes {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.historico-rolagens__informacoes > strong {
+  overflow: hidden;
+  color: #28190f;
+  font-family:
+    "Courier Prime",
+    "Courier New",
+    monospace;
+  font-size: 0.78rem;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.historico-rolagens__informacoes small {
+  overflow: hidden;
+  color: #5b4935;
+  font-family:
+    "Courier Prime",
+    "Courier New",
+    monospace;
+  font-size: 0.66rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.historico-rolagens__resultado {
+  display: grid;
+  justify-items: center;
+  padding-left: 8px;
+  border-left: 1px dashed rgba(54, 38, 25, 0.4);
+  text-align: center;
+}
+
+.historico-rolagens__resultado span {
+  color: #654d34;
+  font-family:
+    "Courier Prime",
+    "Courier New",
+    monospace;
+  font-size: 0.55rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.historico-rolagens__resultado strong {
+  color: var(--historico-vermelho);
+  font-family:
+    "Special Elite",
+    "Courier New",
+    monospace;
+  font-size: 1.65rem;
+  line-height: 1;
+}
+
+@media (max-width: 520px) {
+  .historico-rolagens {
+    padding: 14px;
+  }
+
+  .historico-rolagens__cabecalho {
+    flex-direction: column;
+  }
+
+  .historico-rolagens__cabecalho button {
+    width: 100%;
+  }
+
+  .historico-rolagens__item {
+    grid-template-columns:
+      58px minmax(0, 1fr);
+  }
+
+  .historico-rolagens__resultado {
+    grid-column: 1 / -1;
+    grid-template-columns:
+      1fr auto;
+    align-items: center;
+    justify-items: stretch;
+    padding: 8px 0 0;
+    border-top: 1px dashed rgba(54, 38, 25, 0.4);
+    border-left: 0;
+    text-align: left;
+  }
+
+  .historico-rolagens__resultado strong {
+    text-align: right;
+  }
+}

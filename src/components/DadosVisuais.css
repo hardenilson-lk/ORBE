@@ -1,0 +1,465 @@
+.dados-visuais {
+  position: fixed;
+  inset: 0;
+
+  width: 100vw;
+  height: 100vh;
+
+  overflow: hidden;
+
+  pointer-events: none;
+  z-index: 10000;
+}
+
+/* Caixa que se movimenta pela tela */
+
+.dado-animado {
+  --tamanho-dado: 112px;
+
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: var(--tamanho-dado);
+  height: var(--tamanho-dado);
+
+  background: transparent;
+  border: none;
+
+  transform-origin: center;
+
+  filter:
+    drop-shadow(
+      0 4px 2px rgba(0, 0, 0, 0.45)
+    )
+    drop-shadow(
+      0 13px 11px rgba(0, 0, 0, 0.5)
+    );
+
+  animation:
+    dado-lancado 1.25s
+    cubic-bezier(0.16, 0.72, 0.22, 1)
+    var(--atraso)
+    both;
+}
+
+.dado-animado::before,
+.dado-animado::after {
+  display: none;
+}
+
+/* Tamanho de cada tipo */
+
+.dado-animado--d4 {
+  --tamanho-dado: 104px;
+}
+
+.dado-animado--d6 {
+  --tamanho-dado: 100px;
+}
+
+.dado-animado--d8 {
+  --tamanho-dado: 108px;
+}
+
+.dado-animado--d10 {
+  --tamanho-dado: 112px;
+}
+
+.dado-animado--d12 {
+  --tamanho-dado: 116px;
+}
+
+.dado-animado--d20 {
+  --tamanho-dado: 120px;
+}
+
+/* Desenho SVG */
+
+.dado-poliedrico {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  overflow: visible;
+}
+
+/* Linhas que dividem as faces */
+
+.dado-poliedrico__face {
+  stroke: #3c2416;
+  stroke-width: 2.4;
+  stroke-linejoin: round;
+
+  vector-effect: non-scaling-stroke;
+}
+
+/* Faces iluminadas */
+
+.dado-poliedrico__face--clara {
+  fill: #f0ce83;
+}
+
+/* Faces médias */
+
+.dado-poliedrico__face--media {
+  fill: #c9964d;
+}
+
+/* Faces mais escuras */
+
+.dado-poliedrico__face--escura {
+  fill: #75441f;
+}
+
+/* Faces intermediárias escuras */
+
+.dado-poliedrico__face--media-escura {
+  fill: #9a642f;
+}
+
+/* Face que mostra o resultado principal */
+
+.dado-poliedrico__face--principal {
+  fill: #d9aa5b;
+}
+
+/* Linhas internas extras */
+
+.dado-poliedrico__linha {
+  fill: none;
+
+  stroke: #3c2416;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+
+  vector-effect: non-scaling-stroke;
+}
+
+/* Números das faces */
+
+.dado-poliedrico__numero {
+  fill: #fff1cb;
+
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+
+  font-weight: 700;
+
+  paint-order: stroke;
+  stroke: rgba(44, 23, 12, 0.7);
+  stroke-width: 1.2px;
+
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Número do resultado */
+
+.dado-poliedrico__numero--principal {
+  fill: #fff8e6;
+
+  font-weight: 900;
+
+  stroke: #4a2916;
+  stroke-width: 1.7px;
+}
+
+/* Dado crítico */
+
+.dados-visuais--critico
+.dado-poliedrico__face--clara {
+  fill: #fff09b;
+}
+
+.dados-visuais--critico
+.dado-poliedrico__face--media {
+  fill: #e4bd3b;
+}
+
+.dados-visuais--critico
+.dado-poliedrico__face--media-escura {
+  fill: #ae7713;
+}
+
+.dados-visuais--critico
+.dado-poliedrico__face--escura {
+  fill: #704307;
+}
+
+.dados-visuais--critico
+.dado-poliedrico__face--principal {
+  fill: #f3d34d;
+}
+
+.dados-visuais--critico .dado-animado {
+  filter:
+    drop-shadow(
+      0 0 9px rgba(255, 222, 78, 0.95)
+    )
+    drop-shadow(
+      0 15px 12px rgba(0, 0, 0, 0.55)
+    );
+}
+
+/* Falha crítica */
+
+.dados-visuais--falha
+.dado-poliedrico__face--clara {
+  fill: #cc6666;
+}
+
+.dados-visuais--falha
+.dado-poliedrico__face--media {
+  fill: #9a333b;
+}
+
+.dados-visuais--falha
+.dado-poliedrico__face--media-escura {
+  fill: #691e27;
+}
+
+.dados-visuais--falha
+.dado-poliedrico__face--escura {
+  fill: #3b0b11;
+}
+
+.dados-visuais--falha
+.dado-poliedrico__face--principal {
+  fill: #a22f38;
+}
+
+.dados-visuais--falha
+.dado-poliedrico__numero {
+  fill: #ffe7e7;
+
+  stroke: #3a080c;
+}
+
+.dados-visuais--falha .dado-animado {
+  filter:
+    drop-shadow(
+      0 0 10px rgba(177, 29, 40, 0.9)
+    )
+    drop-shadow(
+      0 15px 12px rgba(0, 0, 0, 0.65)
+    );
+}
+
+/* Caso apareçam 1 e 20 juntos futuramente */
+
+.dados-visuais--complicacao .dado-animado {
+  animation:
+    dado-lancado 1.25s
+    cubic-bezier(0.16, 0.72, 0.22, 1)
+    var(--atraso)
+    both,
+    dado-complicacao 0.28s
+    ease-in-out 1.25s 3;
+}
+
+/* Efeito de brilho */
+
+.dados-visuais__efeito {
+  position: absolute;
+  inset: 0;
+
+  overflow: hidden;
+}
+
+.dados-visuais__efeito i {
+  --angulo: calc(var(--indice) * 36deg);
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+
+  width: 5px;
+  height: 90px;
+
+  border-radius: 999px;
+
+  background: linear-gradient(
+    transparent,
+    rgba(232, 192, 93, 0.8),
+    transparent
+  );
+
+  opacity: 0;
+
+  transform:
+    translate(-50%, -50%)
+    rotate(var(--angulo))
+    translateY(-90px);
+
+  animation:
+    explosao-dado 0.8s
+    ease-out 1.05s both;
+}
+
+.dados-visuais--falha
+.dados-visuais__efeito i {
+  background: linear-gradient(
+    transparent,
+    rgba(168, 35, 43, 0.85),
+    transparent
+  );
+}
+
+.dados-visuais--complicacao
+.dados-visuais__efeito i {
+  background: linear-gradient(
+    transparent,
+    rgba(124, 57, 160, 0.85),
+    transparent
+  );
+}
+
+/* Movimento */
+
+@keyframes dado-lancado {
+  0% {
+    opacity: 0;
+
+    transform:
+      translate(
+        var(--inicio-x),
+        var(--inicio-y)
+      )
+      rotate(-120deg)
+      scale(0.5);
+  }
+
+  28% {
+    opacity: 1;
+
+    transform:
+      translate(
+        42vw,
+        20vh
+      )
+      rotate(var(--rotacao-meio))
+      scale(1.08);
+  }
+
+  58% {
+    transform:
+      translate(
+        calc(var(--final-x) - 7vw),
+        calc(var(--final-y) - 13vh)
+      )
+      rotate(
+        calc(
+          var(--rotacao-final) - 145deg
+        )
+      )
+      scale(0.93);
+  }
+
+  76% {
+    transform:
+      translate(
+        calc(var(--final-x) + 3vw),
+        calc(var(--final-y) + 3vh)
+      )
+      rotate(
+        calc(
+          var(--rotacao-final) - 35deg
+        )
+      )
+      scale(1.03);
+  }
+
+  89% {
+    transform:
+      translate(
+        calc(var(--final-x) - 1vw),
+        calc(var(--final-y) - 2vh)
+      )
+      rotate(
+        calc(
+          var(--rotacao-final) - 8deg
+        )
+      )
+      scale(0.98);
+  }
+
+  100% {
+    opacity: 1;
+
+    transform:
+      translate(
+        var(--final-x),
+        var(--final-y)
+      )
+      rotate(var(--rotacao-final))
+      scale(1);
+  }
+}
+
+@keyframes dado-complicacao {
+  0%,
+  100% {
+    filter:
+      drop-shadow(
+        0 4px 2px rgba(0, 0, 0, 0.45)
+      )
+      drop-shadow(
+        0 13px 11px rgba(0, 0, 0, 0.5)
+      );
+  }
+
+  50% {
+    filter:
+      brightness(1.45)
+      drop-shadow(
+        0 0 14px rgba(145, 64, 184, 0.9)
+      );
+  }
+}
+
+@keyframes explosao-dado {
+  0% {
+    opacity: 0;
+
+    transform:
+      translate(-50%, -50%)
+      rotate(var(--angulo))
+      translateY(-25px)
+      scaleY(0.2);
+  }
+
+  35% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+
+    transform:
+      translate(-50%, -50%)
+      rotate(var(--angulo))
+      translateY(-190px)
+      scaleY(1.1);
+  }
+}
+
+@media (max-width: 700px) {
+  .dado-animado {
+    --tamanho-dado: 82px;
+  }
+
+  .dado-animado--d4,
+  .dado-animado--d6 {
+    --tamanho-dado: 76px;
+  }
+
+  .dado-animado--d12,
+  .dado-animado--d20 {
+    --tamanho-dado: 88px;
+  }
+}

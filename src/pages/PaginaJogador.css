@@ -1,0 +1,125 @@
+.pagina-jogador {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  background: radial-gradient(circle at 48% 8%, rgba(115, 70, 34, 0.2), transparent 30rem), linear-gradient(145deg, #17110d, #080706 72%);
+}
+
+.pagina-jogador__conteudo { min-width: 0; padding: 18px; }
+
+.pagina-jogador__topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 22px;
+  min-height: 104px;
+  margin-bottom: 18px;
+  padding: 18px 22px;
+  border: 1px solid rgba(202, 158, 80, 0.38);
+  background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.02) 0 1px, transparent 1px 7px), linear-gradient(135deg, rgba(46, 33, 23, 0.98), rgba(16, 13, 11, 0.98));
+  color: #f3dfb3;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.42), inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+.pagina-jogador__topo span { color: #cfa65d; font: 900 0.65rem "Courier Prime", "Courier New", monospace; letter-spacing: 1px; text-transform: uppercase; }
+.pagina-jogador__topo h1 { margin: 5px 0; color: #fff0cb; font: 900 clamp(1.45rem, 3vw, 2.25rem) "Cinzel", Georgia, serif; line-height: 1.1; text-transform: uppercase; }
+.pagina-jogador__topo p { margin: 0; color: #c3b393; font: 0.75rem "Courier Prime", "Courier New", monospace; }
+.pagina-jogador__estado { display: grid; gap: 5px; min-width: 220px; max-width: 310px; padding: 12px 15px; border: 1px solid rgba(202, 158, 80, 0.38); background: rgba(0, 0, 0, 0.22); text-align: right; }
+.pagina-jogador__estado strong { color: #d9c39a; font: 900 0.65rem/1.4 "Courier Prime", "Courier New", monospace; }
+
+.pagina-jogador__corpo { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 18px; align-items: start; min-width: 0; }
+.pagina-jogador__principal { display: grid; gap: 18px; min-width: 0; }
+.pagina-jogador__lateral { position: sticky; top: 18px; display: grid; gap: 15px; max-height: calc(100vh - 36px); min-width: 0; overflow-y: auto; padding-right: 5px; }
+.pagina-jogador__lateral::-webkit-scrollbar { width: 7px; }
+.pagina-jogador__lateral::-webkit-scrollbar-thumb { background: rgba(174, 128, 67, 0.62); }
+
+.resumo-jogador {
+  display: grid;
+  gap: 11px;
+  padding: 15px;
+  border: 4px solid #130c08;
+  background: repeating-linear-gradient(0deg, transparent 0 24px, rgba(75, 47, 25, 0.055) 24px 25px), linear-gradient(#ead5a9, #d8bb84);
+  color: #2d1c13;
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.4);
+  font-family: "Courier Prime", "Courier New", monospace;
+}
+
+.resumo-jogador header { padding-bottom: 9px; border-bottom: 1px dashed rgba(78, 47, 24, 0.42); }
+.resumo-jogador header span, .transmissao-jogador > span { color: #92312b; font-size: 0.58rem; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; }
+.resumo-jogador header h2 { margin: 3px 0; font: 900 1.05rem "Special Elite", "Courier New", monospace; text-transform: uppercase; }
+.resumo-jogador header p { margin: 0; color: #725a3c; font-size: 0.6rem; }
+.resumo-jogador__recurso > div { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 0.58rem; }
+.resumo-jogador__recurso > i { display: block; height: 7px; border: 1px solid rgba(48, 29, 17, 0.4); background: rgba(48, 29, 17, 0.22); }
+.resumo-jogador__recurso > i > span { display: block; height: 100%; }
+.resumo-jogador__barra--pv { background: #9d332e; }
+.resumo-jogador__barra--pe { background: #406e9f; }
+.resumo-jogador__barra--san { background: #7449a3; }
+.resumo-jogador__dados { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.resumo-jogador__dados span { display: grid; gap: 3px; padding: 7px 3px; border: 1px solid rgba(83, 52, 28, 0.27); font-size: 0.51rem; text-align: center; text-transform: uppercase; }
+.resumo-jogador__dados strong { font-size: 0.68rem; }
+.resumo-jogador > button { min-height: 38px; border: 1px solid #8f6539; background: linear-gradient(#3e291d, #21140e); color: #f4ddb0; font: 900 0.61rem "Courier Prime", "Courier New", monospace; text-transform: uppercase; cursor: pointer; }
+
+.rolador-jogador { display: grid; gap: 12px; padding: 15px; border: 4px solid #130c08; background: linear-gradient(145deg, #563823, #27170f); color: #f2dfb4; box-shadow: 0 16px 34px rgba(0, 0, 0, 0.42); font-family: "Courier Prime", "Courier New", monospace; }
+.rolador-jogador header { padding-bottom: 8px; border-bottom: 1px dashed rgba(232, 207, 157, 0.35); }
+.rolador-jogador header span { color: #d1aa68; font-size: 0.58rem; font-weight: 900; text-transform: uppercase; }
+.rolador-jogador header h2 { margin: 3px 0 0; font: 900 0.95rem "Cinzel", Georgia, serif; text-transform: uppercase; }
+.rolador-jogador > div { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+.rolador-jogador label { display: grid; gap: 4px; color: #cdb98e; font-size: 0.53rem; font-weight: 900; text-transform: uppercase; }
+.rolador-jogador input, .rolador-jogador select { min-width: 0; width: 100%; min-height: 35px; padding: 6px; border: 1px solid rgba(209, 170, 104, 0.62); border-radius: 0; background: #17100b; color: #fff0ca; font: 900 0.66rem "Courier Prime", "Courier New", monospace; }
+.rolador-jogador > button { min-height: 40px; border: 1px solid #b27a43; background: linear-gradient(#7b3028, #3a1511); color: #ffe4d2; font: 900 0.67rem "Courier Prime", "Courier New", monospace; text-transform: uppercase; cursor: pointer; }
+.rolador-jogador > strong { min-height: 38px; padding: 10px; border: 1px dashed rgba(232, 207, 157, 0.35); background: rgba(0, 0, 0, 0.22); color: #ffe4a4; font-size: 0.75rem; text-align: center; }
+
+.transmissao-jogador { padding: 15px; border: 4px solid #130c08; background: linear-gradient(#ead5a9, #d7b980); color: #2d1c13; box-shadow: 0 15px 32px rgba(0, 0, 0, 0.38); font-family: "Courier Prime", "Courier New", monospace; }
+.transmissao-jogador h2 { margin: 5px 0 7px; font: 900 0.95rem "Special Elite", "Courier New", monospace; text-transform: uppercase; }
+.transmissao-jogador p { margin: 0; font-size: 0.66rem; line-height: 1.45; }
+.transmissao-jogador > div { display: grid; gap: 4px; margin-top: 12px; padding-top: 10px; border-top: 1px dashed #967248; }
+.transmissao-jogador small { color: #8e3029; font-size: 0.55rem; font-weight: 900; text-transform: uppercase; }
+.transmissao-jogador strong { font-size: 0.65rem; }
+.transmissao-jogador a { color: #73342b; font-size: 0.59rem; font-weight: 900; }
+
+.pagina-jogador__mapa-oculto { display: grid; place-items: center; min-height: 650px; padding: 30px; border: 1px solid #765536; background: radial-gradient(circle, rgba(133, 44, 37, 0.16), transparent 25rem), #160f0b; color: #d9c39b; text-align: center; }
+.pagina-jogador__mapa-oculto span { color: #a94a40; font: 900 0.68rem "Courier Prime", monospace; letter-spacing: 1px; text-transform: uppercase; }
+.pagina-jogador__mapa-oculto h2 { margin: 10px 0; color: #f0ddb8; font: 900 1.5rem "Cinzel", Georgia, serif; text-transform: uppercase; }
+.pagina-jogador__mapa-oculto p { max-width: 420px; font: 0.78rem/1.5 "Courier Prime", monospace; }
+.pagina-jogador__mapa-oculto button { margin-top: 10px; padding: 11px 16px; border: 1px solid #a4743d; background: #6e2b25; color: #ffe4ba; font: 900 0.67rem "Courier Prime", monospace; text-transform: uppercase; cursor: pointer; }
+
+.selecao-agente { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; overflow-y: auto; padding: 22px; background: rgba(8, 6, 4, 0.86); backdrop-filter: blur(5px); }
+.selecao-agente > section { width: min(760px, 100%); padding: 22px; border: 1px solid #a57a45; background: repeating-linear-gradient(0deg, transparent 0 25px, rgba(79, 49, 27, 0.05) 25px 26px), linear-gradient(#ead5aa, #d5b77e); color: #2c1b12; box-shadow: 0 28px 80px rgba(0, 0, 0, 0.72), inset 0 0 0 9px rgba(255, 247, 220, 0.2); font-family: "Courier Prime", "Courier New", monospace; }
+.selecao-agente > section > header { margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px dashed #88633d; }
+.selecao-agente header span { color: #96312c; font-size: 0.61rem; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; }
+.selecao-agente header h2 { margin: 5px 0; font: 900 1.55rem "Special Elite", "Courier New", monospace; text-transform: uppercase; }
+.selecao-agente header p { margin: 0; color: #705738; font-size: 0.7rem; }
+.selecao-agente__lista { display: grid; gap: 8px; max-height: 280px; overflow-y: auto; }
+.selecao-agente__lista > button { display: grid; grid-template-columns: 45px 1fr auto; align-items: center; gap: 11px; width: 100%; padding: 10px; border: 1px solid #946f43; background: rgba(255, 247, 221, 0.54); color: #2c1b12; text-align: left; cursor: pointer; }
+.selecao-agente__lista > button > span { display: grid; place-items: center; width: 43px; height: 43px; border-radius: 50%; background: #28170f; color: #e9c66f; font-weight: 900; }
+.selecao-agente__lista div { display: grid; gap: 3px; }
+.selecao-agente__lista strong { font: 900 0.83rem Georgia, serif; text-transform: uppercase; }
+.selecao-agente__lista small { color: #71583b; font-size: 0.59rem; }
+.selecao-agente__lista i { color: #8b302a; font-size: 0.6rem; font-style: normal; font-weight: 900; text-transform: uppercase; }
+.selecao-agente form { display: grid; grid-template-columns: 1fr 1fr auto; gap: 9px; align-items: end; margin-top: 16px; padding: 14px; border: 1px dashed #946e43; background: rgba(255, 245, 214, 0.36); }
+.selecao-agente form h3 { grid-column: 1 / -1; margin: 0 0 3px; font: 900 0.78rem "Special Elite", monospace; text-transform: uppercase; }
+.selecao-agente form label { display: grid; gap: 5px; color: #704725; font-size: 0.57rem; font-weight: 900; text-transform: uppercase; }
+.selecao-agente form input { min-width: 0; min-height: 39px; padding: 8px; border: 1px solid #9a7648; border-radius: 0; background: #fff5dc; font-family: inherit; }
+.selecao-agente form button, .selecao-agente__fechar { min-height: 39px; padding: 9px 12px; border: 1px solid #a07340; background: linear-gradient(#7d322b, #3d1714); color: #ffe3bd; font: 900 0.59rem "Courier Prime", monospace; text-transform: uppercase; cursor: pointer; }
+.selecao-agente__sem-ficha { padding: 12px; border: 1px dashed #916b40; color: #745a3c; font-size: 0.68rem; }
+.selecao-agente__fechar { width: 100%; margin-top: 10px; background: linear-gradient(#4b3826, #271a12); }
+.selecao-agente > section > a { display: block; margin-top: 12px; color: #6d3a2c; font-size: 0.62rem; font-weight: 900; text-align: center; }
+
+@media (max-width: 1180px) { .pagina-jogador__corpo { grid-template-columns: minmax(0, 1fr) 300px; } }
+@media (max-width: 1030px) {
+  .pagina-jogador__corpo { grid-template-columns: 1fr; }
+  .pagina-jogador__lateral { position: static; grid-template-columns: repeat(2, minmax(0, 1fr)); max-height: none; overflow: visible; padding-right: 0; }
+}
+@media (max-width: 860px) {
+  .pagina-jogador { display: block; }
+  .pagina-jogador__conteudo { padding: 12px; }
+  .pagina-jogador__topo { align-items: stretch; flex-direction: column; }
+  .pagina-jogador__estado { min-width: 0; max-width: none; text-align: left; }
+}
+@media (max-width: 650px) {
+  .pagina-jogador__lateral { grid-template-columns: 1fr; }
+  .selecao-agente form { grid-template-columns: 1fr; }
+  .selecao-agente form h3 { grid-column: auto; }
+}
+.pagina-jogador__permissao { margin-bottom: 12px; padding: 12px 15px; border-left: 4px solid #39784b; background: rgba(57,120,75,.12); color: #285d37; font-weight: 700; }
+.pagina-jogador__permissao--bloqueada { border-color: #9a2f2f; background: rgba(154,47,47,.1); color: #7a2020; }

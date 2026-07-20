@@ -1,0 +1,170 @@
+.escudo-mestre {
+  --escudo-ouro: #d4a94f;
+  --escudo-ouro-claro: #f3d994;
+  --escudo-vinho: #74231f;
+  --escudo-vinho-escuro: #35120f;
+  --escudo-tinta: #21150e;
+  --escudo-papel: #ddc89d;
+  --escudo-papel-claro: #f3e5c3;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid #77502b;
+  background:
+    radial-gradient(circle at 92% 7%, rgba(116, 35, 31, 0.17), transparent 25%),
+    repeating-linear-gradient(0deg, rgba(72, 45, 23, 0.035) 0 1px, transparent 1px 7px),
+    linear-gradient(135deg, #eadbb9, #c5a46c);
+  color: var(--escudo-tinta);
+  box-shadow: 0 20px 46px rgba(0, 0, 0, 0.44), inset 0 0 0 4px rgba(255, 246, 216, 0.18);
+}
+
+.escudo-mestre::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+  background: linear-gradient(115deg, rgba(255, 255, 255, 0.13), transparent 23%, rgba(73, 38, 18, 0.08));
+}
+
+.escudo-mestre__cabecalho {
+  display: grid;
+  grid-template-columns: auto minmax(190px, 1fr) auto auto auto;
+  gap: 14px;
+  align-items: center;
+  min-height: 92px;
+  padding: 15px 18px;
+  border-bottom: 1px solid rgba(67, 43, 23, 0.52);
+  background: linear-gradient(100deg, rgba(255, 248, 221, 0.54), rgba(111, 36, 29, 0.11));
+}
+
+.escudo-mestre__selo {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border: 2px solid var(--escudo-vinho);
+  background: rgba(255, 244, 214, 0.42);
+  color: var(--escudo-vinho);
+  box-shadow: inset 0 0 0 3px rgba(125, 36, 34, 0.08), 0 5px 12px rgba(62, 31, 15, 0.16);
+  font: 900 0.88rem "Special Elite", serif;
+  transform: rotate(-3deg);
+}
+
+.escudo-mestre__titulo > span,
+.escudo-mestre__arquivo > header span,
+.escudo-mestre__comandos header > span {
+  color: var(--escudo-vinho);
+  font: 900 0.59rem "Courier Prime", monospace;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.escudo-mestre__titulo h2 { margin: 3px 0 0; font: 800 clamp(1.15rem, 2vw, 1.55rem) Cinzel, Georgia, serif; text-transform: uppercase; }
+.escudo-mestre__titulo p { margin: 3px 0 0; color: #654a30; font: 700 0.65rem "Courier Prime", monospace; }
+.escudo-mestre__estado { display: flex; gap: 7px; align-items: center; padding: 9px 12px; border: 1px solid rgba(61, 43, 26, 0.36); background: rgba(255, 247, 218, 0.38); font: 900 0.62rem "Courier Prime", monospace; text-transform: uppercase; }
+.escudo-mestre__estado-luz { width: 9px; height: 9px; border-radius: 50%; background: #4f9a59; box-shadow: 0 0 10px rgba(79, 154, 89, 0.65); }
+.escudo-mestre__estado-luz--oculta { background: #a43b33; box-shadow: 0 0 10px rgba(164, 59, 51, 0.5); }
+
+.escudo-mestre button { min-height: 36px; border: 1px solid #684625; border-radius: 0; background: linear-gradient(#e1c58d, #ae8248); color: #281a10; font: 900 0.62rem "Courier Prime", monospace; text-transform: uppercase; cursor: pointer; transition: transform 150ms ease, filter 150ms ease, border-color 150ms ease; }
+.escudo-mestre button:hover { border-color: #8c2b27; filter: brightness(1.07); transform: translateY(-1px); }
+.escudo-mestre button:focus-visible { outline: 2px solid var(--escudo-vinho); outline-offset: 2px; }
+.escudo-mestre__alternar { display: inline-flex; gap: 7px; align-items: center; padding: 0 13px; }
+.escudo-mestre__alternar span { color: var(--escudo-vinho); font-size: 1rem; }
+.escudo-mestre__criar-ficha { padding-inline: 14px; background: linear-gradient(#793027, #421713) !important; color: #ffe8c1 !important; }
+
+
+.escudo-mestre__conteudo { display: grid; gap: 15px; padding: 16px; }
+.escudo-mestre__resumo { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.escudo-mestre__resumo article { position: relative; min-width: 0; padding: 10px 12px 10px 15px; border: 1px solid rgba(77, 51, 27, 0.42); background: rgba(255, 247, 218, 0.34); }
+.escudo-mestre__resumo article::before { position: absolute; inset: 0 auto 0 0; width: 3px; content: ""; background: var(--escudo-vinho); }
+.escudo-mestre__resumo span, .escudo-mestre__resumo small { display: block; color: #654b31; font: 700 0.56rem "Courier Prime", monospace; text-transform: uppercase; }
+.escudo-mestre__resumo strong { display: block; margin: 2px 0; color: #291a10; font: 900 1.08rem "Special Elite", serif; }
+
+.escudo-mestre__arquivo { border: 1px solid rgba(76, 49, 25, 0.52); background: rgba(255, 248, 225, 0.25); box-shadow: inset 0 0 0 2px rgba(255, 250, 232, 0.14); }
+.escudo-mestre__arquivo > header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 13px; border-bottom: 1px solid rgba(76, 49, 25, 0.42); background: linear-gradient(90deg, rgba(112, 34, 29, 0.13), rgba(255, 246, 216, 0.22)); }
+.escudo-mestre__arquivo > header h3 { margin: 3px 0 0; font: 900 0.96rem Cinzel, Georgia, serif; text-transform: uppercase; }
+.escudo-mestre__arquivo > header small { color: #684c32; font: 700 0.59rem "Courier Prime", monospace; }
+.escudo-mestre__arquivo > header button { padding-inline: 12px; background: linear-gradient(#793027, #421713); color: #ffe8c1; }
+.escudo-mestre__grade-fichas { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr)); gap: 10px; padding: 11px; }
+.escudo-mestre__vazio { grid-column: 1 / -1; margin: 0; padding: 18px; border: 1px dashed rgba(91, 57, 29, 0.42); color: #654b31; font: 0.68rem/1.5 "Courier Prime", monospace; text-align: center; }
+
+.escudo-mestre__ficha { min-width: 0; border: 1px solid #76502b; background: linear-gradient(145deg, rgba(247, 231, 195, 0.92), rgba(205, 176, 121, 0.78)); box-shadow: 0 7px 15px rgba(55, 29, 14, 0.15), inset 0 0 0 2px rgba(255, 249, 226, 0.22); }
+.escudo-mestre__ficha--npc { border-color: #6b4127; background: linear-gradient(145deg, rgba(230, 210, 174, 0.94), rgba(183, 143, 94, 0.82)); }
+.escudo-mestre__ficha-cabecalho { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 11px; border-bottom: 1px dashed rgba(75, 46, 24, 0.45); }
+.escudo-mestre__retrato { display: grid; place-items: center; width: 48px; height: 48px; overflow: hidden; border: 2px solid #8b5b2d; border-radius: 50%; background: #25150e; color: #f0c76c; font: 900 0.72rem "Special Elite", serif; }
+.escudo-mestre__retrato img { width: 100%; height: 100%; object-fit: cover; }
+.escudo-mestre__ficha-cabecalho small { display: block; overflow: hidden; color: var(--escudo-vinho); font: 900 0.54rem "Courier Prime", monospace; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; }
+.escudo-mestre__ficha-cabecalho h4 { margin: 2px 0; overflow: hidden; font: 900 0.91rem Cinzel, Georgia, serif; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; }
+.escudo-mestre__ficha-cabecalho p { margin: 0; overflow: hidden; color: #5f442d; font: 0.58rem "Courier Prime", monospace; text-overflow: ellipsis; white-space: nowrap; }
+.escudo-mestre__token-status { align-self: start; padding: 4px 6px; border: 1px solid rgba(112, 44, 35, 0.38); color: #78362e; background: rgba(124, 45, 36, 0.07); font: 900 0.48rem "Courier Prime", monospace; text-transform: uppercase; }
+.escudo-mestre__token-status--ativo { border-color: rgba(55, 111, 61, 0.48); color: #356d3b; background: rgba(55, 111, 61, 0.09); }
+
+.escudo-mestre__barras { display: grid; gap: 7px; padding: 10px 11px; }
+.escudo-mestre__barra { --barra-cor: #9b3d37; }
+.escudo-mestre__barra--pe { --barra-cor: #3f6598; }
+.escudo-mestre__barra--san { --barra-cor: #705082; }
+.escudo-mestre__barra > span { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 3px; color: #523722; font: 800 0.53rem "Courier Prime", monospace; }
+.escudo-mestre__barra > span strong { color: var(--barra-cor); }
+.escudo-mestre__barra > i { display: block; height: 7px; overflow: hidden; border: 1px solid rgba(58, 35, 18, 0.38); background: rgba(56, 34, 18, 0.16); }
+.escudo-mestre__barra > i > b { display: block; height: 100%; background: linear-gradient(90deg, color-mix(in srgb, var(--barra-cor), #1c120c 22%), var(--barra-cor)); transition: width 220ms ease; }
+
+.escudo-mestre__ajustes { margin: 0 10px 10px; border: 1px solid rgba(78, 49, 26, 0.42); background: rgba(255, 246, 218, 0.28); }
+.escudo-mestre__ajustes summary { padding: 8px 10px; color: #573821; font: 900 0.58rem "Courier Prime", monospace; text-transform: uppercase; cursor: pointer; }
+.escudo-mestre__ajustes > div { display: grid; gap: 7px; padding: 0 8px 8px; }
+.escudo-mestre__ajuste { --ajuste-cor: #8f3732; display: grid; grid-template-columns: minmax(72px, 0.72fr) 1fr 1fr; gap: 5px; padding-left: 5px; border-left: 3px solid var(--ajuste-cor); }
+.escudo-mestre__ajuste--pe { --ajuste-cor: #3f6598; }
+.escudo-mestre__ajuste--san { --ajuste-cor: #705082; }
+.escudo-mestre__ajuste label { display: grid; grid-template-columns: auto 1fr; gap: 5px; align-items: center; color: var(--ajuste-cor); font: 900 0.55rem "Courier Prime", monospace; }
+.escudo-mestre__ajuste input { width: 100%; min-width: 0; height: 31px; padding: 5px 6px; border: 1px solid var(--ajuste-cor); background: rgba(255, 251, 235, 0.72); color: #281a10; font: 800 0.62rem "Courier Prime", monospace; }
+.escudo-mestre__ajuste button { min-height: 31px; padding: 4px 5px; border-color: var(--ajuste-cor); font-size: 0.47rem; }
+.escudo-mestre__ajuste button:first-of-type { background: linear-gradient(color-mix(in srgb, var(--ajuste-cor), #fff 10%), color-mix(in srgb, var(--ajuste-cor), #160e09 45%)); color: #fff5e5; }
+.escudo-mestre__atalhos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; padding: 0 10px 10px; }
+.escudo-mestre__ficha--npc .escudo-mestre__atalhos { grid-template-columns: 1fr; }
+.escudo-mestre__atalhos button { background: linear-gradient(#3a2417, #1d120d); color: #f3dcae; }
+.escudo-mestre__ficha--sem-ficha { border-style: dashed; background: rgba(246, 230, 193, 0.48); }
+.escudo-mestre__ficha-pendente { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 12px; }
+.escudo-mestre__ficha-pendente p { margin: 0; color: #654b31; font: 0.62rem/1.45 "Courier Prime", monospace; }
+.escudo-mestre__ficha-pendente button { padding-inline: 12px; background: linear-gradient(#793027, #421713); color: #ffe8c1; }
+
+.escudo-mestre__corpo { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(270px, 0.65fr); gap: 12px; }
+.escudo-mestre__anotacoes, .escudo-mestre__comandos { padding: 13px; border: 1px solid rgba(73, 48, 26, 0.46); background: rgba(255, 248, 226, 0.28); }
+.escudo-mestre__anotacoes { display: grid; gap: 7px; }
+.escudo-mestre__anotacoes > span { display: flex; justify-content: space-between; gap: 10px; font: 900 0.68rem "Courier Prime", monospace; text-transform: uppercase; }
+.escudo-mestre__anotacoes > span small { color: #735338; }
+.escudo-mestre__anotacoes textarea { width: 100%; min-height: 120px; resize: vertical; padding: 11px; border: 1px solid #765632; background: rgba(248, 235, 199, 0.76); color: #2a1a10; box-shadow: inset 0 1px 8px rgba(76, 47, 24, 0.1); font: 0.74rem/1.55 "Courier Prime", monospace; }
+.escudo-mestre__anotacoes em { color: #6a4b31; font: 0.58rem "Courier Prime", monospace; }
+.escudo-mestre__comandos { display: grid; align-content: start; gap: 10px; }
+.escudo-mestre__comandos header strong { display: block; margin-top: 3px; font: 800 0.92rem Cinzel, Georgia, serif; text-transform: uppercase; }
+.escudo-mestre__visibilidade { display: grid; grid-template-columns: auto 1fr; gap: 9px; align-items: center; padding: 10px; border: 1px solid rgba(50, 111, 66, 0.45); background: rgba(72, 137, 82, 0.1); }
+.escudo-mestre__visibilidade > span { color: #397747; font-size: 1.4rem; }
+.escudo-mestre__visibilidade strong, .escudo-mestre__visibilidade small { display: block; }
+.escudo-mestre__visibilidade strong { font: 900 0.68rem "Courier Prime", monospace; text-transform: uppercase; }
+.escudo-mestre__visibilidade small { margin-top: 2px; color: #614a34; font: 0.58rem/1.35 "Courier Prime", monospace; }
+.escudo-mestre__visibilidade--oculta { border-color: rgba(132, 42, 37, 0.5); background: rgba(132, 42, 37, 0.1); }
+.escudo-mestre__visibilidade--oculta > span { color: #8d2d29; }
+.escudo-mestre__botao-perigo { background: linear-gradient(#913b34, #4a1b18) !important; color: #ffe6d2 !important; }
+.escudo-mestre__botao-seguro { background: linear-gradient(#537b4d, #29472b) !important; color: #ecf6d7 !important; }
+.escudo-mestre__comandos > p { margin: 0; color: #614a34; font: 0.59rem/1.45 "Courier Prime", monospace; }
+.escudo-mestre__comandos > p span { color: var(--escudo-vinho); }
+.escudo-mestre__fechado { display: flex; gap: 8px; align-items: center; margin: 0; padding: 10px 16px; color: #664b31; font: 0.63rem "Courier Prime", monospace; }
+.escudo-mestre__fechado span { color: var(--escudo-vinho); }
+.escudo-mestre--fechado .escudo-mestre__cabecalho { min-height: 70px; border-bottom: 0; }
+
+@media (max-width: 980px) {
+  .escudo-mestre__cabecalho { grid-template-columns: auto 1fr auto; }
+  .escudo-mestre__estado { grid-column: 2 / -1; justify-self: start; }
+  .escudo-mestre__resumo { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .escudo-mestre__corpo { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 620px) {
+  .escudo-mestre__cabecalho { grid-template-columns: auto 1fr; }
+  .escudo-mestre__alternar, .escudo-mestre__criar-ficha, .escudo-mestre__estado { grid-column: 1 / -1; width: 100%; justify-content: center; }
+  .escudo-mestre__grade-fichas { grid-template-columns: 1fr; }
+  .escudo-mestre__ficha-cabecalho { grid-template-columns: auto minmax(0, 1fr); }
+  .escudo-mestre__token-status { grid-column: 1 / -1; justify-self: start; }
+  .escudo-mestre__ajuste { grid-template-columns: 1fr 1fr; }
+  .escudo-mestre__ajuste label { grid-column: 1 / -1; }
+  .escudo-mestre__ficha-pendente { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,21 @@
+.comunicacao-mesa__chat { background: repeating-linear-gradient(0deg, transparent 0 25px, rgba(91, 55, 30, 0.06) 25px 26px), linear-gradient(#ead4a8, #ddc18c); }
+.comunicacao-mesa__aviso { margin: 0; padding: 8px 11px; border-bottom: 1px dashed rgba(85, 54, 28, 0.38); background: rgba(140, 45, 40, 0.1); color: #742b27; font-size: 0.61rem; line-height: 1.4; }
+.comunicacao-mesa__lista { max-height: 235px; min-height: 116px; overflow-y: auto; padding: 12px; scrollbar-color: #8d693c rgba(0, 0, 0, 0.08); scrollbar-width: thin; }
+.comunicacao-mesa__vazio { display: grid; place-items: center; min-height: 105px; color: #765f3f; text-align: center; }
+.comunicacao-mesa__vazio > span { color: #9b302a; font-size: 1.15rem; }
+.comunicacao-mesa__vazio p { max-width: 220px; margin: 5px 0 0; font-size: 0.68rem; line-height: 1.4; }
+.comunicacao-mesa__mensagem { display: grid; grid-template-columns: 31px 1fr; gap: 8px; margin-bottom: 9px; }
+.comunicacao-mesa__avatar, .comunicacao-mesa__participantes div > span { display: grid; place-items: center; width: 31px; height: 31px; border: 1px solid #a8763c; border-radius: 50%; background: #28170f; color: #efc872; font-size: 0.62rem; font-weight: 900; }
+.comunicacao-mesa__mensagem > div { min-width: 0; padding: 8px 9px; border: 1px solid rgba(105, 72, 38, 0.27); border-radius: 0 8px 8px 8px; background: rgba(255, 246, 222, 0.62); }
+.comunicacao-mesa__mensagem header { display: flex; justify-content: space-between; gap: 8px; color: #8c2d28; font-size: 0.65rem; }
+.comunicacao-mesa__mensagem time { color: #8a7558; font-size: 0.57rem; }
+.comunicacao-mesa__mensagem p { margin: 4px 0 0; overflow-wrap: anywhere; font-size: 0.72rem; line-height: 1.42; white-space: pre-wrap; }
+.comunicacao-mesa__formulario { padding: 10px 11px 11px; border-top: 1px dashed rgba(85, 54, 28, 0.38); background: rgba(255, 244, 216, 0.46); }
+.comunicacao-mesa__formulario label { display: block; margin-bottom: 5px; color: #72512e; font-size: 0.58rem; font-weight: 900; text-transform: uppercase; }
+.comunicacao-mesa__formulario > div { display: grid; grid-template-columns: 1fr 42px; gap: 7px; }
+.comunicacao-mesa__formulario textarea { min-width: 0; resize: none; border: 1px solid #9e7b4c; border-radius: 0; background: #fff5dc; color: #291b13; padding: 9px; outline: none; font: 0.72rem "Courier Prime", "Courier New", monospace; }
+.comunicacao-mesa__formulario textarea:focus { border-color: #8c2d28; box-shadow: 0 0 0 2px rgba(140, 45, 40, 0.13); }
+.comunicacao-mesa__formulario button, .comunicacao-mesa__entrar, .comunicacao-mesa__controles button, .comunicacao-mesa__teste button { border: 1px solid #c08c51; background: linear-gradient(#783029, #401713); color: #ffe7c3; font: 900 0.68rem "Courier Prime", "Courier New", monospace; text-transform: uppercase; cursor: pointer; }
+.comunicacao-mesa__formulario button:disabled, .comunicacao-mesa__controles button:disabled, .comunicacao-mesa__teste button:disabled { cursor: not-allowed; filter: grayscale(1); opacity: 0.42; }
+.comunicacao-mesa__erro { display: block; margin-top: 6px; color: #8c2d28; font-size: 0.58rem; }
+.comunicacao-mesa__limpar { width: 100%; padding: 7px; border: 0; border-top: 1px solid rgba(92, 57, 31, 0.18); background: rgba(255, 255, 255, 0.13); color: #7d6240; font: 900 0.57rem "Courier Prime", "Courier New", monospace; text-transform: uppercase; cursor: pointer; }

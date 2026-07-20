@@ -1,0 +1,156 @@
+.menu-jogador {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  max-height: 100vh;
+  overflow-y: auto;
+  padding: 18px 15px;
+  border-right: 1px solid #795832;
+  background:
+    repeating-linear-gradient(0deg, rgba(91, 57, 28, 0.055) 0 1px, transparent 1px 7px),
+    linear-gradient(90deg, #ead7ad, #d8bc86);
+  color: #2b1a11;
+  font-family: "Courier Prime", "Courier New", monospace;
+  box-shadow: 9px 0 24px rgba(0, 0, 0, 0.34);
+}
+
+.menu-jogador__marca {
+  display: grid;
+  grid-template-columns: 58px 1fr;
+  gap: 12px;
+  align-items: start;
+  padding-bottom: 14px;
+  border-bottom: 1px dashed rgba(81, 47, 23, 0.42);
+}
+
+.menu-jogador__marca > span {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 48px;
+  border: 2px solid #9c302d;
+  color: #9c302d;
+  font-family: Georgia, serif;
+  font-weight: 900;
+  transform: rotate(-3deg);
+}
+
+.menu-jogador__marca h1 {
+  margin: 0 0 7px;
+  font: 400 1.45rem "Special Elite", "Courier New", monospace;
+}
+
+.menu-jogador__marca p {
+  margin: 2px 0;
+  font-size: 0.62rem;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.menu-jogador__acesso {
+  align-self: flex-start;
+  margin: 14px 0;
+  padding: 7px 9px;
+  border: 1px solid #438054;
+  color: #356b45;
+  font-size: 0.62rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.menu-jogador__agente {
+  display: grid;
+  grid-template-columns: 43px 1fr;
+  gap: 9px;
+  align-items: center;
+  margin-bottom: 13px;
+  padding: 10px;
+  border: 1px solid rgba(91, 56, 27, 0.34);
+  background: rgba(255, 245, 218, 0.52);
+}
+
+.menu-jogador__agente > img,
+.menu-jogador__agente > span {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 2px solid #7e5731;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #2b1a11;
+  color: #e8c36c;
+  font-weight: 900;
+}
+
+.menu-jogador__agente div { min-width: 0; }
+.menu-jogador__agente small { color: #8c2f2a; font-size: 0.53rem; text-transform: uppercase; }
+.menu-jogador__agente strong { display: block; overflow: hidden; margin: 2px 0; font: 900 0.74rem Georgia, serif; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; }
+.menu-jogador__agente p { margin: 0; color: #6f5538; font-size: 0.56rem; }
+
+.menu-jogador nav {
+  display: grid;
+  gap: 8px;
+}
+
+.menu-jogador nav button,
+.menu-jogador nav a,
+.menu-jogador footer button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 45px;
+  padding: 10px 13px;
+  border: 1px solid #84613b;
+  border-radius: 0;
+  background: linear-gradient(#dfc28d, #bd955e);
+  color: #2b1b12;
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.45), 0 2px 4px rgba(45, 28, 15, 0.18);
+  font: 900 0.68rem "Courier Prime", "Courier New", monospace;
+  text-align: left;
+  text-decoration: none;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.menu-jogador nav button > span,
+.menu-jogador nav a > span,
+.menu-jogador footer button > span {
+  width: 18px;
+  color: #6f4122;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.menu-jogador nav button.ativo {
+  border-color: #762823;
+  background: linear-gradient(135deg, #7e342c, #351814);
+  color: #ffe8bc;
+  box-shadow: inset 4px 0 #c79a4d, 0 5px 12px rgba(65, 26, 19, 0.28);
+}
+
+.menu-jogador nav button.ativo > span { color: #efc46e; }
+
+.menu-jogador footer {
+  display: grid;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px dashed rgba(81, 47, 23, 0.42);
+}
+
+.menu-jogador footer button { min-height: 40px; background: rgba(203, 172, 116, 0.65); font-size: 0.59rem; }
+
+@media (max-width: 860px) {
+  .menu-jogador { position: static; min-height: auto; max-height: none; }
+  .menu-jogador nav { grid-template-columns: repeat(3, 1fr); }
+  .menu-jogador nav button, .menu-jogador nav a { justify-content: center; min-height: 40px; padding: 8px; font-size: 0.58rem; }
+  .menu-jogador footer { grid-template-columns: 1fr 1fr; margin-top: 12px; }
+}
+
+@media (max-width: 560px) {
+  .menu-jogador nav { grid-template-columns: repeat(2, 1fr); }
+}

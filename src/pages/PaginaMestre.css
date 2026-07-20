@@ -1,0 +1,384 @@
+.pagina-mestre {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns:
+    280px minmax(0, 1fr);
+  background:
+    radial-gradient(
+      circle at 52% 10%,
+      rgba(115, 70, 34, 0.18),
+      transparent 28rem
+    ),
+    linear-gradient(
+      145deg,
+      #17110d,
+      #080706 72%
+    );
+}
+
+.pagina-mestre > .menu-mestre {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  max-height: 100vh;
+}
+
+.pagina-mestre__conteudo {
+  min-width: 0;
+  padding: 18px;
+}
+
+.pagina-mestre__cabecalho {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 22px;
+  min-height: 106px;
+  margin-bottom: 18px;
+  padding: 18px 22px;
+  border: 1px solid
+    rgba(202, 158, 80, 0.38);
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.02)
+        0 1px,
+      transparent 1px 7px
+    ),
+    linear-gradient(
+      135deg,
+      rgba(46, 33, 23, 0.98),
+      rgba(16, 13, 11, 0.98)
+    );
+  color: #f3dfb3;
+  box-shadow:
+    0 18px 40px
+      rgba(0, 0, 0, 0.42),
+    inset 0 0 0 1px
+      rgba(255, 255, 255, 0.04);
+}
+
+.pagina-mestre__cabecalho span {
+  color: #cfa65d;
+  font-family:
+    "Courier Prime",
+    "Courier New",
+    monospace;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.pagina-mestre__cabecalho h1 {
+  margin: 5px 0;
+  color: #fff0cb;
+  font-family:
+    "Cinzel",
+    Georgia,
+    serif;
+  font-size:
+    clamp(1.5rem, 3vw, 2.4rem);
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.pagina-mestre__cabecalho p {
+  margin: 0;
+  color: #c3b393;
+  font-family:
+    "Courier Prime",
+    "Courier New",
+    monospace;
+  font-size: 0.78rem;
+}
+
+.pagina-mestre__estado {
+  display: grid;
+  gap: 5px;
+  min-width: 220px;
+  max-width: 320px;
+  padding: 12px 15px;
+  border: 1px solid
+    rgba(202, 158, 80, 0.38);
+  background:
+    rgba(0, 0, 0, 0.22);
+  text-align: right;
+}
+
+.pagina-mestre__estado strong {
+  color: #d9c39a;
+  font-family:
+    "Courier Prime",
+    "Courier New",
+    monospace;
+  font-size: 0.7rem;
+  line-height: 1.4;
+}
+
+.pagina-mestre__corpo {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr) 330px;
+  gap: 18px;
+  align-items: start;
+  min-width: 0;
+}
+
+.pagina-mestre__painel {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+}
+
+.pagina-mestre__lateral {
+  position: sticky;
+  top: 18px;
+  display: grid;
+  gap: 16px;
+  max-height:
+    calc(100vh - 36px);
+  min-width: 0;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.pagina-mestre__lateral::-webkit-scrollbar {
+  width: 8px;
+}
+
+.pagina-mestre__lateral::-webkit-scrollbar-track {
+  background:
+    rgba(255, 255, 255, 0.05);
+}
+
+.pagina-mestre__lateral::-webkit-scrollbar-thumb {
+  background:
+    rgba(174, 128, 67, 0.62);
+}
+
+.pagina-mestre__lateral
+  .barra-lateral-mesa {
+  min-height: auto;
+  border-left: 0;
+}
+
+.rolador-mestre {
+  display: grid;
+  gap: 14px;
+  padding: 17px;
+  border: 4px solid #120b07;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.025)
+        0 2px,
+      transparent 2px 46px
+    ),
+    linear-gradient(
+      145deg,
+      #563823,
+      #27170f
+    );
+  color: #f2dfb4;
+  box-shadow:
+    0 18px 38px
+      rgba(0, 0, 0, 0.46),
+    inset 0 0 30px
+      rgba(0, 0, 0, 0.48);
+}
+
+.rolador-mestre header {
+  padding-bottom: 10px;
+  border-bottom: 1px dashed
+    rgba(232, 207, 157, 0.38);
+}
+
+.rolador-mestre header span {
+  color: #d1aa68;
+  font-family:
+    "Courier Prime",
+    "Courier New",
+    monospace;
+  font-size: 0.64rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.rolador-mestre header h2 {
+  margin: 4px 0 0;
+  color: #fff0ca;
+  font-family:
+    "Cinzel",
+    Georgia,
+    serif;
+  font-size: 1rem;
+  text-transform: uppercase;
+}
+
+.rolador-mestre__campos {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.rolador-mestre label {
+  display: grid;
+  gap: 6px;
+  color: #cdb98e;
+  font-family:
+    "Courier Prime",
+    "Courier New",
+    monospace;
+  font-size: 0.62rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.rolador-mestre select,
+.rolador-mestre input {
+  width: 100%;
+  min-height: 40px;
+  padding: 8px;
+  border: 1px solid
+    rgba(209, 170, 104, 0.62);
+  border-radius: 0;
+  background: #17100b;
+  color: #fff0ca;
+  outline: none;
+  font-family:
+    "Courier Prime",
+    "Courier New",
+    monospace;
+  font-weight: 900;
+}
+
+.rolador-mestre select:focus,
+.rolador-mestre input:focus {
+  border-color: #f0cb82;
+}
+
+.rolador-mestre > button {
+  min-height: 44px;
+  border: 1px solid
+    rgba(209, 170, 104, 0.72);
+  border-radius: 0;
+  background:
+    linear-gradient(
+      #7b3028,
+      #3a1511
+    );
+  color: #ffe4d2;
+  box-shadow:
+    0 2px 0
+      rgba(0, 0, 0, 0.42),
+    inset 0 1px 0
+      rgba(255, 255, 255, 0.12);
+  font-family:
+    "Courier Prime",
+    "Courier New",
+    monospace;
+  font-size: 0.76rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.rolador-mestre > button:hover {
+  border-color: #f0cb82;
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.rolador-mestre__resultado {
+  display: block;
+  min-height: 44px;
+  padding: 12px;
+  border: 1px dashed
+    rgba(232, 207, 157, 0.38);
+  background:
+    rgba(0, 0, 0, 0.22);
+  color: #ffe4a4;
+  font-family:
+    "Special Elite",
+    "Courier New",
+    monospace;
+  font-size: 0.86rem;
+  line-height: 1.4;
+  text-align: center;
+}
+
+@media (max-width: 1250px) {
+  .pagina-mestre__corpo {
+    grid-template-columns:
+      minmax(0, 1fr) 300px;
+  }
+}
+
+@media (max-width: 1050px) {
+  .pagina-mestre {
+    grid-template-columns:
+      240px minmax(0, 1fr);
+  }
+
+  .pagina-mestre__corpo {
+    grid-template-columns: 1fr;
+  }
+
+  .pagina-mestre__lateral {
+    position: static;
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+    max-height: none;
+    overflow: visible;
+    padding-right: 0;
+  }
+
+  .pagina-mestre__lateral
+    .barra-lateral-mesa {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 820px) {
+  .pagina-mestre {
+    display: block;
+  }
+
+  .pagina-mestre > .menu-mestre {
+    position: static;
+    max-height: none;
+  }
+
+  .pagina-mestre__conteudo {
+    padding: 12px;
+  }
+
+  .pagina-mestre__cabecalho {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .pagina-mestre__estado {
+    min-width: 0;
+    max-width: none;
+    text-align: left;
+  }
+}
+
+@media (max-width: 650px) {
+  .pagina-mestre__lateral {
+    grid-template-columns: 1fr;
+  }
+
+  .pagina-mestre__lateral
+    .barra-lateral-mesa {
+    grid-column: auto;
+  }
+
+  .rolador-mestre__campos {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,79 @@
+.painel-jogador {
+  min-height: 620px;
+  padding: 20px;
+  border: 1px solid #81613e;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 25px, rgba(91, 55, 30, 0.055) 25px 26px),
+    linear-gradient(135deg, #ead6aa, #d9bc84);
+  color: #2c1b12;
+  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.36), inset 0 0 0 9px rgba(255, 247, 220, 0.17);
+  font-family: "Courier Prime", "Courier New", monospace;
+}
+
+.painel-jogador__cabecalho {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 18px;
+  padding: 4px 3px 16px;
+  border-bottom: 1px dashed rgba(77, 46, 24, 0.48);
+}
+
+.painel-jogador__cabecalho span { color: #96322c; font-size: 0.64rem; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; }
+.painel-jogador__cabecalho h2 { margin: 4px 0; font: 900 1.55rem "Special Elite", "Courier New", monospace; text-transform: uppercase; }
+.painel-jogador__cabecalho p { margin: 0; color: #705737; font-size: 0.7rem; }
+.painel-jogador__selo { padding: 11px 15px; border: 2px solid #477a51; color: #477a51; font-size: 0.68rem; font-weight: 900; text-transform: uppercase; transform: rotate(2deg); }
+.painel-jogador__contador { display: grid; min-width: 84px; padding: 8px; border: 1px solid #8d693d; text-align: center; }
+.painel-jogador__contador strong { font: 900 1.35rem Georgia, serif; }
+.painel-jogador__contador span { color: #735130; font-size: 0.54rem; }
+
+.painel-jogador__papel { padding: 16px; border: 1px solid rgba(86, 54, 29, 0.35); background: rgba(255, 247, 220, 0.56); }
+.painel-jogador__papel label { display: block; margin-bottom: 8px; color: #81312a; font-size: 0.64rem; font-weight: 900; text-transform: uppercase; }
+.painel-jogador__papel textarea { width: 100%; resize: vertical; border: 1px solid #98764b; border-radius: 0; background: repeating-linear-gradient(0deg, #fff8e5 0 29px, rgba(86, 111, 140, 0.22) 29px 30px); color: #2e2016; padding: 12px; font: 0.82rem/30px "Courier Prime", "Courier New", monospace; outline: none; }
+.painel-jogador__papel textarea:focus { border-color: #91342d; box-shadow: 0 0 0 3px rgba(145, 52, 45, 0.11); }
+.painel-jogador__papel small { display: block; margin-top: 8px; color: #705b40; font-size: 0.58rem; }
+
+.painel-jogador__vazio { display: grid; place-items: center; min-height: 360px; border: 1px dashed rgba(78, 48, 25, 0.42); background: rgba(255, 248, 226, 0.3); color: #765d3e; text-align: center; }
+.painel-jogador__vazio > span { color: #98332d; font-size: 1.6rem; }
+.painel-jogador__vazio strong { font: 900 1.05rem "Special Elite", "Courier New", monospace; text-transform: uppercase; }
+.painel-jogador__vazio p { max-width: 420px; margin: 0; font-size: 0.72rem; }
+
+.painel-jogador__grade { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+.missao-jogador { position: relative; padding: 16px; border: 1px solid #987146; border-left: 5px solid #9b743e; background: rgba(255, 245, 216, 0.62); box-shadow: 0 7px 14px rgba(70, 42, 20, 0.14); }
+.missao-jogador--ativa { border-left-color: #8f302a; }
+.missao-jogador--concluida { border-left-color: #41744c; }
+.missao-jogador--falhou { opacity: 0.68; }
+.missao-jogador header { display: flex; justify-content: space-between; color: #8e302a; font-size: 0.58rem; font-weight: 900; text-transform: uppercase; }
+.missao-jogador header i { color: #5d492f; font-style: normal; }
+.missao-jogador h3 { margin: 12px 0 7px; font: 900 1.05rem "Special Elite", "Courier New", monospace; text-transform: uppercase; }
+.missao-jogador p, .missao-jogador dd, .missao-jogador li { font-size: 0.7rem; line-height: 1.5; }
+.missao-jogador dl { display: grid; grid-template-columns: 70px 1fr; margin: 12px 0 0; padding-top: 10px; border-top: 1px dashed rgba(75, 45, 24, 0.3); }
+.missao-jogador dt { color: #8d302a; font-size: 0.58rem; font-weight: 900; text-transform: uppercase; }
+.missao-jogador dd { margin: 0; }
+.missao-jogador__pistas { margin-top: 12px; padding: 10px; border: 1px dashed #9a774d; background: rgba(232, 207, 157, 0.3); }
+.missao-jogador__pistas strong { color: #76322b; font-size: 0.62rem; text-transform: uppercase; }
+.missao-jogador__pistas ul { margin: 7px 0 0; padding-left: 18px; }
+
+.painel-jogador__arquivos { display: grid; gap: 12px; }
+.painel-jogador__arquivos details { border: 1px solid #8c6740; background: rgba(255, 246, 220, 0.54); }
+.painel-jogador__arquivos summary { display: grid; grid-template-columns: 100px 1fr auto; align-items: center; gap: 13px; padding: 15px; cursor: pointer; list-style: none; }
+.painel-jogador__arquivos summary::-webkit-details-marker { display: none; }
+.painel-jogador__arquivos summary > span { color: #9a302b; font-size: 0.65rem; font-weight: 900; }
+.painel-jogador__arquivos summary div { display: grid; gap: 3px; }
+.painel-jogador__arquivos summary strong { font: 900 0.9rem Georgia, serif; text-transform: uppercase; }
+.painel-jogador__arquivos summary small { color: #755d40; font-size: 0.58rem; }
+.painel-jogador__arquivos summary i { padding: 5px 7px; border: 1px solid #57805d; color: #3e6947; font-size: 0.54rem; font-style: normal; text-transform: uppercase; }
+.painel-jogador__documento { display: grid; gap: 12px; padding: 16px; border-top: 1px dashed #98744b; background: rgba(255, 250, 233, 0.54); }
+.painel-jogador__documento section { display: grid; gap: 5px; }
+.painel-jogador__documento h4 { margin: 0; color: #8d302a; font-size: 0.62rem; text-transform: uppercase; }
+.painel-jogador__documento p { margin: 0; font-size: 0.73rem; line-height: 1.55; white-space: pre-wrap; }
+.painel-jogador__destaque { padding: 12px; border-left: 4px solid #a4332d; background: rgba(161, 52, 45, 0.08); font-weight: 900; }
+.painel-jogador__pre { white-space: pre-line !important; }
+
+@media (max-width: 620px) {
+  .painel-jogador { padding: 13px; }
+  .painel-jogador__cabecalho { align-items: flex-start; flex-direction: column; }
+  .painel-jogador__arquivos summary { grid-template-columns: 78px 1fr; }
+  .painel-jogador__arquivos summary > i { grid-column: 1 / -1; justify-self: start; }
+}

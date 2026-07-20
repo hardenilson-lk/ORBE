@@ -1,0 +1,146 @@
+.menu-contextual-token {
+  position: fixed;
+  z-index: 12020;
+  display: grid;
+  gap: 4px;
+  width: min(210px, calc(100vw - 24px));
+  max-height: calc(100vh - 24px);
+  padding: 7px;
+  overflow-y: auto;
+  border: 1px solid #a77c38;
+  background: linear-gradient(145deg, #302116, #160e09);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.62);
+}
+
+.menu-contextual-token button {
+  min-height: 34px;
+  padding: 7px 9px;
+  border: 1px solid rgba(211, 176, 105, 0.35);
+  background: rgba(224, 201, 158, 0.08);
+  color: #f4dfb5;
+  font: 800 0.68rem/1.2 "Courier Prime", "Courier New", monospace;
+  text-align: left;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.menu-contextual-token button:hover,
+.menu-contextual-token button:focus-visible {
+  border-color: #d5a54d;
+  background: rgba(139, 31, 31, 0.38);
+  outline: none;
+}
+
+.menu-contextual-token .menu-contextual-token__perigo { color: #ffb3a8; }
+
+.menu-contextual-token__rotacao {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding-bottom: 4px;
+  border-bottom: 1px dashed rgba(211, 176, 105, 0.28);
+}
+
+.menu-contextual-token__rotacao button {
+  color: #f2c86e;
+  font-size: 0.58rem;
+  text-align: center;
+}
+
+.mini-ficha-token__fundo,
+.editor-token-mapa__fundo,
+.painel-npcs-mapa__fundo {
+  position: fixed;
+  z-index: 12010;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(8, 5, 3, 0.64);
+  backdrop-filter: blur(2px);
+}
+
+.mini-ficha-token,
+.editor-token-mapa,
+.painel-npcs-mapa {
+  width: min(620px, 100%);
+  max-height: calc(100vh - 36px);
+  padding: 18px;
+  overflow-y: auto;
+  border: 2px solid #5d4027;
+  background:
+    repeating-linear-gradient(0deg, rgba(72, 47, 26, 0.04) 0 1px, transparent 1px 7px),
+    linear-gradient(145deg, #ead9b8, #c3a474);
+  color: #21150e;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.72);
+  font-family: "Courier Prime", "Courier New", monospace;
+}
+
+.mini-ficha-token > header,
+.editor-token-mapa > header,
+.painel-npcs-mapa > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed rgba(55, 34, 20, 0.5);
+}
+
+.mini-ficha-token header span,
+.editor-token-mapa header span,
+.painel-npcs-mapa header span { color: #8b1f1f; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; }
+.mini-ficha-token h2,
+.editor-token-mapa h2,
+.painel-npcs-mapa h2 { margin: 4px 0 0; font-family: Georgia, serif; text-transform: uppercase; }
+.mini-ficha-token header button,
+.editor-token-mapa header button,
+.painel-npcs-mapa header button { width: 36px; min-height: 36px; border: 1px solid #3b281c; background: transparent; font-size: 1.25rem; cursor: pointer; }
+
+.mini-ficha-token__identidade { display: grid; grid-template-columns: 82px 1fr; gap: 12px; align-items: center; margin: 16px 0; }
+.mini-ficha-token__identidade img,
+.mini-ficha-token__identidade > span { display: grid; place-items: center; width: 82px; height: 82px; border: 2px solid #513722; border-radius: 50%; object-fit: cover; background: #23170f; color: #eac97f; font-weight: 900; }
+.mini-ficha-token__grade,
+.painel-npcs-mapa__campos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.mini-ficha-token label,
+.painel-npcs-mapa label { display: grid; gap: 5px; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; }
+.mini-ficha-token input,
+.editor-token-mapa input,
+.editor-token-mapa select,
+.painel-npcs-mapa input { min-width: 0; min-height: 38px; padding: 7px; border: 1px solid #765c3e; background: rgba(255, 248, 228, 0.62); color: #21150e; font: inherit; }
+.mini-ficha-token > p { margin-bottom: 0; font-size: 0.7rem; line-height: 1.5; }
+
+.painel-npcs-mapa { width: min(820px, 100%); }
+.editor-token-mapa { width: min(560px, 100%); }
+.editor-token-mapa__resumo { display: grid; grid-template-columns: 58px minmax(0, 1fr); gap: 12px; align-items: center; margin: 16px 0; }
+.editor-token-mapa__resumo img,
+.editor-token-mapa__resumo > span { display: grid; place-items: center; width: 56px; height: 56px; border: 2px solid #513722; border-radius: 50%; object-fit: cover; background: #23170f; color: #eac97f; font-weight: 900; }
+.editor-token-mapa__resumo div { display: grid; gap: 4px; }
+.editor-token-mapa__resumo small { font-size: 0.65rem; }
+.editor-token-mapa__grade { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.editor-token-mapa label { display: grid; gap: 5px; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; }
+.editor-token-mapa__opcoes { display: grid; gap: 8px; margin-top: 14px; }
+.editor-token-mapa__opcoes label { display: flex; align-items: center; gap: 8px; }
+.editor-token-mapa__opcoes input { min-height: auto; }
+.editor-token-mapa > p { margin: 14px 0 0; font-size: 0.68rem; line-height: 1.5; }
+.painel-npcs-mapa form { display: grid; gap: 10px; margin: 16px 0; padding: 13px; border: 1px dashed rgba(55, 34, 20, 0.5); }
+.painel-npcs-mapa form h3 { margin: 0; }
+.painel-npcs-mapa form > button,
+.painel-npcs-mapa__lista button { min-height: 36px; padding: 7px 10px; border: 1px solid #6f4b20; background: linear-gradient(#8b6a2d, #4d3418); color: #fff0cd; font: 900 0.65rem "Courier Prime", monospace; text-transform: uppercase; cursor: pointer; }
+.painel-npcs-mapa form small { font-size: 0.64rem; }
+.painel-npcs-mapa__lista { display: grid; gap: 8px; }
+.painel-npcs-mapa__lista > p { padding: 14px; border: 1px dashed #806849; }
+.painel-npcs-mapa__lista article { display: grid; grid-template-columns: 48px minmax(0, 1fr) auto auto auto; gap: 9px; align-items: center; padding: 9px; border: 1px solid rgba(72, 48, 29, 0.48); background: rgba(255, 248, 228, 0.32); }
+.painel-npcs-mapa__lista .painel-npcs-mapa__remover { border-color: #7d2c25; background: #51201c; }
+.painel-npcs-mapa__lista img,
+.painel-npcs-mapa__lista article > span { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%; object-fit: cover; background: #24170e; color: #dfbd73; font-size: 0.62rem; font-weight: 900; }
+.painel-npcs-mapa__lista article > div { display: grid; gap: 3px; }
+.painel-npcs-mapa__lista article small { font-size: 0.62rem; }
+
+@media (max-width: 640px) {
+  .mini-ficha-token__grade,
+  .editor-token-mapa__grade,
+  .painel-npcs-mapa__campos { grid-template-columns: 1fr; }
+  .painel-npcs-mapa__lista article { grid-template-columns: 42px 1fr; }
+  .painel-npcs-mapa__lista article button { grid-column: span 1; }
+}

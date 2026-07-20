@@ -1,0 +1,30 @@
+.comunicacao-mesa__voz { display: grid; gap: 11px; padding: 12px; background: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.02) 0 2px, transparent 2px 42px), linear-gradient(145deg, #3d281c, #1b110c); color: #f3dfb6; }
+.comunicacao-mesa__estado-voz { display: grid; grid-template-columns: 10px 1fr; align-items: center; gap: 9px; padding: 9px; border: 1px solid rgba(208, 167, 91, 0.28); background: rgba(0, 0, 0, 0.2); }
+.comunicacao-mesa__estado-voz > span { width: 8px; height: 8px; border-radius: 50%; background: #846c56; }
+.comunicacao-mesa__estado-voz > span.ativo { background: #61b56f; box-shadow: 0 0 9px rgba(97, 181, 111, 0.8); }
+.comunicacao-mesa__estado-voz.estado-conectando > span, .comunicacao-mesa__estado-voz.estado-reconectando > span { background: #d4b04f; box-shadow: 0 0 9px rgba(212, 176, 79, 0.7); animation: comunicacao-pulso 1s ease-in-out infinite; }
+.comunicacao-mesa__estado-voz.estado-erro > span { background: #b34038; box-shadow: 0 0 9px rgba(179, 64, 56, 0.7); }
+.comunicacao-mesa__estado-voz div { display: grid; gap: 2px; }
+.comunicacao-mesa__estado-voz strong { color: #ffe6ab; font-size: 0.72rem; }
+.comunicacao-mesa__estado-voz small { color: #b9a47f; font-size: 0.59rem; line-height: 1.35; }
+.comunicacao-mesa__entrar { min-height: 42px; }
+.comunicacao-mesa__entrar.sair { background: linear-gradient(#3e3327, #211913); }
+.comunicacao-mesa__controles { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+.comunicacao-mesa__controles button { display: grid; place-items: center; gap: 3px; min-height: 53px; padding: 7px; border-color: rgba(199, 155, 81, 0.38); background: #2d2017; color: #d7c39d; font-size: 0.56rem; }
+.comunicacao-mesa__controles button span { color: #e3b860; font-size: 0.9rem; }
+.comunicacao-mesa__controles button.alerta { border-color: #a63d36; background: #4a1c18; color: #ffe1cf; }
+.comunicacao-mesa__teste { display: grid; grid-template-columns: 1fr 64px 56px; align-items: center; gap: 7px; padding: 9px; border: 1px dashed rgba(208, 167, 91, 0.35); }
+.comunicacao-mesa__teste > div:first-child { display: grid; gap: 2px; }
+.comunicacao-mesa__teste strong { font-size: 0.61rem; }
+.comunicacao-mesa__teste small { color: #a9926c; font-size: 0.52rem; }
+.comunicacao-mesa__medidor { height: 7px; overflow: hidden; background: #0e0a07; }
+.comunicacao-mesa__medidor span { display: block; height: 100%; background: linear-gradient(90deg, #4f9c61, #d4b04f, #ad3a32); transition: width 80ms linear; }
+.comunicacao-mesa__teste button { min-height: 31px; font-size: 0.52rem; }
+.comunicacao-mesa__participantes { border-top: 1px solid rgba(216, 180, 110, 0.26); padding-top: 9px; }
+.comunicacao-mesa__participantes > header { display: flex; justify-content: space-between; margin-bottom: 8px; color: #dfbf7d; font-size: 0.62rem; text-transform: uppercase; }
+.comunicacao-mesa__participantes > p { margin: 0; color: #a89170; font-size: 0.59rem; line-height: 1.45; }
+.comunicacao-mesa__participantes > div { display: grid; grid-template-columns: 31px 1fr auto; align-items: center; gap: 8px; margin-top: 6px; padding: 6px; border: 1px solid transparent; background: rgba(0, 0, 0, 0.18); transition: border-color 140ms ease, box-shadow 140ms ease; }
+.comunicacao-mesa__participantes > div.falando { border-color: #d4b04f; box-shadow: inset 0 0 14px rgba(212, 176, 79, 0.22), 0 0 8px rgba(212, 176, 79, 0.22); }
+.comunicacao-mesa__participantes div > strong { font-size: 0.65rem; }
+.comunicacao-mesa__participantes div > small { color: #78b57f; font-size: 0.54rem; }
+@keyframes comunicacao-pulso { 50% { opacity: 0.42; transform: scale(0.78); } }
