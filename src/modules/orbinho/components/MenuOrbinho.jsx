@@ -22,6 +22,9 @@ const opcoesPorRota = {
     { id: "menuMestre", texto: "Como usar o menu do mestre?" },
     { id: "reiniciar", texto: "Reiniciar tutorial" },
   ],
+  jogador: [
+    { id: "tourFicha", texto: "Aprender a montar minha ficha" },
+  ],
 };
 
 export default function MenuOrbinho({ tipoRota, aoEscolher, aoFechar }) {

@@ -2,7 +2,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { criarIdentidadeParticipante, criarNomeSala, LIVEKIT_URL, TOPICO_COMUNICACAO, validarConfiguracaoComunicacao } from "../config/comunicacaoConfig.js";
 import { criarClienteLiveKit, lerDadosRecebidos, publicarDados, RoomEvent, Track } from "../services/livekitClient.js";
+import { definirSalaComunicacao, limparSalaComunicacao } from "../services/comunicacaoRoomStore.js";
 import { solicitarTokenLiveKit } from "../services/tokenService.js";
+import { NOME_FAIXA_MESA_SONORA } from "../../components/mestre/mesaSonora/livekit/mesaSonoraLiveKitConstants.js";
 
 function metadados(participante) {
   try { return JSON.parse(participante?.metadata || "{}"); } catch { return {}; }
@@ -58,6 +60,7 @@ export default function useComunicacaoMesa({ mesaId, identidadeLocal, nomeLocal,
     roomRef.current = null;
     entrandoRef.current = false;
     if (room) {
+      limparSalaComunicacao(mesaId, room);
       try { await room.localParticipant.setMicrophoneEnabled(false); } catch (erro) { console.warn("[Comunicação] Microfone já estava encerrado.", erro); }
       room.removeAllListeners();
       await room.disconnect();
@@ -71,7 +74,7 @@ export default function useComunicacaoMesa({ mesaId, identidadeLocal, nomeLocal,
     setFalando(new Set());
     setEstadoConexao("desconectado");
     setEstado(mensagem);
-  }, [audiosRef]);
+  }, [audiosRef, mesaId]);
 
   const entrar = useCallback(async () => {
     if (entrandoRef.current || roomRef.current) {
@@ -89,6 +92,7 @@ export default function useComunicacaoMesa({ mesaId, identidadeLocal, nomeLocal,
     const identidade = criarIdentidadeParticipante(identidadeLocal);
     const room = criarClienteLiveKit();
     roomRef.current = room;
+    definirSalaComunicacao(mesaId, { room, conectado: false, papel: papelLocal, identidade });
 
     room.on(RoomEvent.ParticipantConnected, () => atualizarParticipantes(room));
     room.on(RoomEvent.ParticipantDisconnected, () => atualizarParticipantes(room));
@@ -96,7 +100,8 @@ export default function useComunicacaoMesa({ mesaId, identidadeLocal, nomeLocal,
     room.on(RoomEvent.TrackUnmuted, () => atualizarParticipantes(room));
     room.on(RoomEvent.LocalTrackPublished, () => atualizarParticipantes(room));
     room.on(RoomEvent.LocalTrackUnpublished, () => atualizarParticipantes(room));
-    room.on(RoomEvent.TrackSubscribed, (track) => {
+    room.on(RoomEvent.TrackSubscribed, (track, publicacao) => {
+      if (publicacao?.name === NOME_FAIXA_MESA_SONORA) return;
       if (track.kind !== Track.Kind.Audio || !audiosRef.current) return;
       const elemento = track.attach();
       elemento.autoplay = true;
@@ -112,7 +117,13 @@ export default function useComunicacaoMesa({ mesaId, identidadeLocal, nomeLocal,
       if (dados) setPacoteRecebido({ ...dados, recebidoDe: participante?.identity, recebidoEm: Date.now() });
     });
     room.on(RoomEvent.Reconnecting, () => { setEstadoConexao("reconectando"); setEstado("Conexão perdida. Tentando restabelecer a sala..."); });
-    room.on(RoomEvent.Reconnected, () => { setEstadoConexao("conectado"); setEstado("Conexão restabelecida."); atualizarParticipantes(room); });
+    room.on(RoomEvent.Reconnected, () => {
+      const meta = metadados(room.localParticipant);
+      definirSalaComunicacao(mesaId, { room, conectado: true, papel: meta.papel || papelLocal, identidade: room.localParticipant.identity });
+      setEstadoConexao("conectado");
+      setEstado("Conexão restabelecida.");
+      atualizarParticipantes(room);
+    });
     room.on(RoomEvent.Disconnected, () => {
       if (roomRef.current === room) void desconectar("A conexão com a sala foi encerrada.");
     });
@@ -138,6 +149,8 @@ export default function useComunicacaoMesa({ mesaId, identidadeLocal, nomeLocal,
       setConectado(true);
       setEstadoConexao("conectado");
       setEstado("Você está na voz da mesa.");
+      const meta = metadados(room.localParticipant);
+      definirSalaComunicacao(mesaId, { room, conectado: true, papel: meta.papel || papelLocal, identidade: room.localParticipant.identity });
       atualizarParticipantes(room);
     } catch (erro) {
       console.error("[Comunicação] Não foi possível entrar na sala.", erro);

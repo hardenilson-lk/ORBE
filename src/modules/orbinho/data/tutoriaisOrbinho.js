@@ -53,7 +53,8 @@ export const tutoriaisOrbinho = {
         seletor: '[data-assistente="menu-fichas"]',
         titulo: "Abra a ficha",
         mensagem:
-          "Clique em “Ficha do personagem” para abrir o formulário. Depois pressione Próximo e eu explicarei cada parte.",
+          "Clique em “Minha ficha” ou “Ficha do personagem”. Você escolheu fazer o tutorial; pode usar “Pular tutorial” a qualquer momento.",
+        passos: ["Abra a ficha pelo menu lateral.", "Não precisa salvar a cada etapa: primeiro monte o personagem e revise o saldo.", "Pressione Próximo para eu acompanhar cada parte."],
       },
       {
         seletor: '[data-assistente="ficha-inicio"]',
@@ -71,19 +72,23 @@ export const tutoriaisOrbinho = {
         seletor: '[data-assistente="ficha-identificacao"]',
         titulo: "Identificação e retrato",
         mensagem:
-          "Adicione o retrato e preencha nome do agente, jogador e origem. Esses são os dados básicos do personagem.",
+          "Comece pelo retrato, nome do agente e nome do jogador. Depois escolha a origem: ela representa a vida do personagem antes da investigação e indica duas perícias ligadas ao passado dele.",
+        passos: ["Escolha ou envie o retrato.", "Preencha o nome do agente e do jogador.", "Selecione uma origem que combine com a história.", "Use as perícias da origem como referência ao distribuir o treino."],
       },
       {
         seletor: '[data-assistente="ficha-classe-nex"]',
         titulo: "Classe, trilha e NEX",
         mensagem:
-          "Escolha a classe, a trilha e o NEX. Essas escolhas atualizam automaticamente vários valores calculados da ficha.",
+          "Escolha a classe primeiro: Combatente luta, Especialista domina perícias e Ocultista usa o paranormal. Depois selecione trilha e NEX; o NEX libera pontos e graus de treinamento automaticamente.",
+        passos: ["Escolha a classe conforme o papel do agente.", "Escolha uma trilha disponível para essa classe.", "Mantenha 5% para personagem inicial ou informe o NEX dado pelo mestre.", "A patente não substitui o NEX; ela controla acesso a equipamentos na narrativa."],
       },
       {
         seletor: '[data-assistente="ficha-atributos"]',
         titulo: "Atributos",
         mensagem:
-          "Preencha Agilidade, Força, Intelecto, Presença e Vigor. Eles influenciam perícias e outros cálculos do personagem.",
+          "Todos os cinco atributos começam em 1. Você recebe 4 pontos para distribuir. O contador mostra quanto resta e impede ultrapassar o total permitido pelo NEX.",
+        passos: ["AGI ajuda em reflexos, pontaria e defesa.", "FOR ajuda em luta e carga.", "INT amplia conhecimento e pontos de perícia.", "PRE sustenta interação, percepção e esforço.", "VIG aumenta resistência e PV.", "Se errar, reduza um atributo: o ponto volta imediatamente para o saldo."],
+        dica: "Antes do NEX 20%, nenhum atributo passa de 3. Os NEX 20%, 50%, 80% e 95% concedem um ponto adicional.",
       },
       {
         seletor: '[data-assistente="ficha-recursos"]',
@@ -101,7 +106,9 @@ export const tutoriaisOrbinho = {
         seletor: '[data-assistente="ficha-pericias"]',
         titulo: "Perícias",
         mensagem:
-          "Em cada perícia, informe treino e outros bônus. O total é recalculado automaticamente; use o botão da linha para realizar a rolagem.",
+          "Distribua os pontos no campo Treino. Cada ponto vale +5. O saldo depende da classe e do Intelecto; quando acabar, retire treino de uma perícia antes de escolher outra.",
+        passos: ["Procure as perícias indicadas pela origem e pela classe.", "Coloque +5 nas perícias treinadas.", "No NEX 35%, algumas podem chegar a +10.", "No NEX 70%, algumas podem chegar a +15.", "Use Outros somente para bônus de item, condição ou habilidade.", "O botão Rolar usa o total exibido na linha."],
+        dica: "O sistema bloqueia gasto acima do saldo, mas sempre permite reduzir treino para refazer a escolha.",
       },
       {
         seletor: '[data-assistente="ficha-dano-cura"]',
@@ -125,7 +132,8 @@ export const tutoriaisOrbinho = {
         seletor: '[data-assistente="ficha-equipamentos"]',
         titulo: "Equipamentos",
         mensagem:
-          "Clique em “Adicionar”, pesquise no catálogo, selecione o equipamento e confirme em “Adicionar selecionado”. O item entra no inventário da ficha.",
+          "Clique em “Adicionar”, pesquise no catálogo, selecione o equipamento e confirme. As cores ajudam a reconhecer rapidamente armas de fogo, lâminas, impacto, proteção, explosivos, consumíveis e ferramentas.",
+        passos: ["Abra o catálogo.", "Filtre ou pesquise o nome do item.", "Confira dano, alcance, volume e efeito.", "Adicione o item e marque se ele está em uso.", "Revise a carga: itens ativos entram nos cálculos da ficha."],
       },
       {
         seletor: '[data-assistente="ficha-progressao"]',
@@ -149,7 +157,8 @@ export const tutoriaisOrbinho = {
         seletor: '[data-assistente="ficha-salvar"]',
         titulo: "Salvar a ficha",
         mensagem:
-          "Por fim, clique em “Salvar ficha”. “Limpar ficha” prepara um formulário novo, então use essa opção com atenção.",
+          "Revise os contadores de Atributos e Perícias. Se não houver saldo negativo ou aviso de excesso, clique em “Salvar ficha”. “Limpar ficha” prepara um formulário novo.",
+        passos: ["Confira nome, origem, classe, trilha e NEX.", "Confira se os pontos foram distribuídos sem excesso.", "Revise recursos, ataques, equipamentos e anotações.", "Clique em Salvar ficha.", "Você pode abrir este tutorial novamente pelo botão do Orbinho."],
       },
     ],
   },
@@ -197,20 +206,40 @@ export const tutoriaisOrbinho = {
         seletor: '[data-assistente="mapa-painel-camadas"]',
         painelMapa: "camadas",
         menuMapaAberto: true,
-        titulo: "Organize pelas camadas",
+        titulo: "O que é uma camada?",
         categoria: "Cena · Camadas",
-        mensagem: "Cada tipo de conteúdo possui sua própria camada: mapa, objetos, paredes, tokens, efeitos, neblina e interface.",
-        passos: ["Visível mostra ou esconde o conteúdo.", "Travada impede edições acidentais.", "Esconder ou travar não apaga nada."],
-        dica: "Se uma ferramenta não deixar editar, confira primeiro se a camada correspondente está travada.",
+        mensagem: "Pense na cena como folhas transparentes empilhadas. O fundo fica em uma folha; paredes, tokens, luz e neblina ficam em folhas próprias. Assim você controla uma categoria sem estragar as outras.",
+        passos: ["Mapa guarda as imagens do cenário.", "Paredes guarda os limites de visão e passagem.", "Tokens guarda personagens e NPCs.", "Efeitos e Neblina controlam o que a mesa consegue enxergar."],
+        dica: "Camadas organizam categorias; elas não são fichas nem partes separadas da campanha.",
+      },
+      {
+        seletor: '[data-assistente="mapa-painel-camadas"]',
+        painelMapa: "camadas",
+        menuMapaAberto: true,
+        titulo: "Visibilidade não é bloqueio",
+        categoria: "Cena · Camadas",
+        mensagem: "Os dois botões de cada linha fazem trabalhos diferentes. Visível/Oculta muda o que é desenhado. Travada/Editável decide se aquela categoria aceita alterações.",
+        passos: ["Ocultar não apaga nada: apenas retira a categoria da tela.", "Travar mantém o conteúdo visível, mas protege contra cliques e movimentos acidentais.", "Para editar uma imagem, deixe Mapa visível e editável.", "Para desenhar paredes ou luzes, destrave a camada correspondente."],
+        dica: "Se você enxerga algo, mas não consegue mexer, a camada provavelmente está travada.",
+      },
+      {
+        seletor: '[data-assistente="mapa-painel-camadas"]',
+        painelMapa: "camadas",
+        menuMapaAberto: true,
+        titulo: "Camada inteira ou item individual",
+        categoria: "Cena · Camadas",
+        mensagem: "A camada funciona como um interruptor geral. Configurações individuais continuam sendo feitas na ferramenta de cada item.",
+        passos: ["Tokens controla todos os tokens de uma vez; Oculto, Proximidade e Visível controlam cada token separadamente.", "Mapa controla todas as imagens; Fundo seleciona, posiciona e redimensiona uma imagem específica.", "Efeitos controla toda a iluminação; Luz ajusta cada fonte e cada cone de visão.", "Interface reúne apenas guias como coordenadas e régua."],
+        dica: "Use Camadas para organizar ou diagnosticar. Use Fundo, Luz, Tokens e outras ferramentas para editar detalhes.",
       },
       {
         seletor: '[data-assistente="mapa-painel-paredes"]',
         painelMapa: "estruturas",
         menuMapaAberto: true,
-        titulo: "Desenhe paredes e portas",
+        titulo: "Desenhe paredes, portas e janelas",
         categoria: "Ambiente · Paredes",
-        mensagem: "Ative Parede ou Porta e arraste no mapa para criar um segmento. Essas estruturas bloqueiam visão e luz.",
-        passos: ["Escolha a ferramenta.", "Arraste do ponto inicial ao final no mapa.", "Abra uma porta para liberar a passagem.", "Você também pode ocultar, ajustar os pontos ou remover a estrutura."],
+        mensagem: "Ative Parede, Porta ou Janela e arraste no mapa. Aberturas fechadas cortam a visão; abertas deixam luz e visão atravessarem.",
+        passos: ["Escolha a ferramenta e arraste do ponto inicial ao final.", "Dê dois cliques na porta ou janela para abrir e fechar.", "Tranque uma porta para impedir que jogadores a abram.", "Use os controles sobre a abertura ou edite seus pontos neste painel."],
       },
       {
         seletor: '[data-assistente="mapa-painel-neblina"]',
@@ -228,7 +257,7 @@ export const tutoriaisOrbinho = {
         titulo: "Controle luz e visão",
         categoria: "Ambiente · Luz",
         mensagem: "A luz ambiente clareia a cena inteira. Fontes locais e o cone de visão de cada token revelam apenas o que realmente pode ser visto.",
-        passos: ["Ajuste intensidade, alcance e cor de cada luz.", "Ative Adicionar luz e clique no mapa.", "Defina alcance, direção e abertura do cone de cada token.", "Paredes e portas fechadas interrompem luz, visão e movimento."],
+        passos: ["Ajuste intensidade, alcance e cor de cada luz.", "Ative Adicionar luz e clique no mapa.", "Defina alcance, direção e abertura do cone de cada token.", "Paredes e aberturas fechadas interrompem luz e visão; a proximidade também respeita esses obstáculos."],
         dica: "Itens ativos como lanterna ou lampião no inventário também ampliam a visão do token.",
       },
       {
@@ -266,7 +295,7 @@ export const tutoriaisOrbinho = {
         titulo: "Defina quem controla cada peça",
         categoria: "Acesso · Permissões",
         mensagem: "Escolha o responsável de cada token e decida se jogadores podem controlá-lo, movê-lo ou até enxergá-lo.",
-        passos: ["Responsável define o dono principal.", "Compartilhar controle libera jogadores específicos.", "Bloquear movimento congela a peça.", "Ocultar dos jogadores mantém o token visível somente para o mestre."],
+        passos: ["Responsável define o dono principal.", "Compartilhar controle libera jogadores específicos.", "Bloquear movimento congela a peça.", "A visibilidade pode ser Oculta, por Proximidade ou sempre Visível."],
         dica: "Use Ver mapa como para conferir a visão de um jogador antes da sessão.",
       },
       {

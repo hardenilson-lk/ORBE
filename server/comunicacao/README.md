@@ -4,6 +4,6 @@ Este pequeno servidor Node gera tokens temporários do LiveKit. Ele não usa ban
 
 Copie `server/.env.example` para `server/.env`, preencha os dados do projeto LiveKit Cloud e execute `npm run dev:comunicacao` na raiz do ORBE.
 
-O endpoint `POST /api/livekit-token` aceita `sala`, `identidade`, `nome` e `papel`. O token dura 15 minutos e permite somente entrar na sala, publicar microfone, receber áudio e trocar mensagens de dados. Não há permissão administrativa, câmera, tela ou gravação.
+O endpoint `POST /api/livekit-token` aceita `sala`, `identidade`, `nome` e `papel`. O token dura 15 minutos. Jogadores publicam microfone, recebem áudio e trocam mensagens de dados; o mestre também pode publicar a faixa `orbe-mesa-sonora`. Não há permissão administrativa, câmera, tela ou gravação.
 
-Em produção, mantenha a mesma validação ao migrar o endpoint para Vercel ou Supabase Edge Functions e valide a sessão real do usuário antes de emitir o token.
+Em produção, não confie no campo `papel` enviado pelo navegador: valide a sessão real e a propriedade da mesa antes de emitir o token de mestre.

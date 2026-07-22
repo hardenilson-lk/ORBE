@@ -3,6 +3,7 @@ import {
   Routes,
 } from "react-router";
 
+import RotaProtegida from "./components/RotaProtegida.jsx";
 import PaginaArquivos from "./pages/PaginaArquivos.jsx";
 import PaginaInicial from "./pages/PaginaInicial.jsx";
 import PaginaJogador from "./pages/PaginaJogador.jsx";
@@ -27,36 +28,38 @@ function App() {
           element={<PaginaLogin />}
         />
 
-        <Route path="/inicio" element={<PaginaInicial />} />
-        <Route path="/mesas" element={<PaginaPortalMesas />} />
-        <Route path="/fichas" element={<PaginaPortalFichas />} />
-        <Route path="/sistemas" element={<PaginaPortalSistemas />} />
-        <Route path="/biblioteca" element={<PaginaPortalBiblioteca />} />
+        <Route element={<RotaProtegida />}>
+          <Route path="/inicio" element={<PaginaInicial />} />
+          <Route path="/mesas" element={<PaginaPortalMesas />} />
+          <Route path="/fichas" element={<PaginaPortalFichas />} />
+          <Route path="/sistemas" element={<PaginaPortalSistemas />} />
+          <Route path="/biblioteca" element={<PaginaPortalBiblioteca />} />
 
-        <Route
-          path="/arquivos"
-          element={<PaginaArquivos />}
-        />
+          <Route
+            path="/arquivos"
+            element={<PaginaArquivos />}
+          />
 
-        <Route
-          path="/arquivos/nova-mesa"
-          element={<PaginaNovaMesa />}
-        />
+          <Route
+            path="/arquivos/nova-mesa"
+            element={<PaginaNovaMesa />}
+          />
 
-        <Route
-          path="/arquivos/minhas-mesas"
-          element={<PaginaMinhasMesas />}
-        />
+          <Route
+            path="/arquivos/minhas-mesas"
+            element={<PaginaMinhasMesas />}
+          />
 
-        <Route
-          path="/arquivos/mesa/:mesaId"
-          element={<PaginaMestre />}
-        />
+          <Route
+            path="/arquivos/mesa/:mesaId"
+            element={<PaginaMestre />}
+          />
 
-        <Route
-          path="/arquivos/jogador/:mesaId"
-          element={<PaginaJogador />}
-        />
+          <Route
+            path="/arquivos/jogador/:mesaId"
+            element={<PaginaJogador />}
+          />
+        </Route>
       </Routes>
 
       <Orbinho />

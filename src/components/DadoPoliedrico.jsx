@@ -1,8 +1,8 @@
 import { useId } from "react";
 
 const COR_CONTORNO = "#2a1a12";
-const COR_CENTRO = "#f6d88f";
-const COR_HACHURA = "#8c5727";
+const COR_CENTRO = "#B784FF";
+const COR_HACHURA = "#9B5CFF";
 
 function Definicoes({ id }) {
   return (
@@ -14,7 +14,7 @@ function Definicoes({ id }) {
         patternUnits="userSpaceOnUse"
         patternTransform="rotate(35)"
       >
-        <rect width="7" height="7" fill="#e6af55" />
+        <rect width="7" height="7" fill="#B784FF" />
         <line
           x1="0"
           y1="0"
@@ -56,7 +56,7 @@ function Numero({ resultado, tamanho = 28, x = 60, y = 60 }) {
       x={x}
       y={y}
       fill={COR_CONTORNO}
-      stroke="#fff1c5"
+      stroke="#B784FF"
       strokeWidth="1.1"
       paintOrder="stroke"
       fontFamily="Georgia, Times New Roman, serif"

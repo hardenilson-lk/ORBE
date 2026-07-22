@@ -17,6 +17,40 @@
   box-shadow: 9px 0 24px rgba(0, 0, 0, 0.34);
 }
 
+.menu-jogador__recolher {
+  align-self: flex-end;
+  margin: -7px 0 10px;
+  padding: 5px 8px;
+  border: 1px solid #84613b;
+  background: rgba(47, 28, 17, 0.82);
+  color: #f0d8a7;
+  font: 800 0.56rem "Courier Prime", monospace;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.menu-jogador--recolhido {
+  align-items: center;
+  width: 62px;
+  padding: 12px 8px;
+  overflow: hidden;
+}
+
+.menu-jogador__mostrar {
+  display: grid;
+  place-items: center;
+  gap: 4px;
+  width: 44px;
+  min-height: 62px;
+  border: 1px solid #8f6539;
+  background: linear-gradient(#7e342c, #351814);
+  color: #ffe8bc;
+  cursor: pointer;
+}
+
+.menu-jogador__mostrar span { font-size: 1.1rem; }
+.menu-jogador__mostrar small { font: 800 0.48rem "Courier Prime", monospace; text-transform: uppercase; writing-mode: vertical-rl; }
+
 .menu-jogador__marca {
   display: grid;
   grid-template-columns: 58px 1fr;

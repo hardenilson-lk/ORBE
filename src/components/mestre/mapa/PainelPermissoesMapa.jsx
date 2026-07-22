@@ -9,7 +9,7 @@ function PainelPermissoesMapa({ tokens, fichas, previsualizacao, aoPrevisualizar
           {fichas.map((ficha) => <option value={ficha.jogador || ficha.id} key={ficha.id}>{ficha.nome || "Jogador sem nome"}</option>)}
         </select>
       </label>
-      <p className="painel-mapa__token-ajuda">O mestre sempre controla tudo. Jogadores veem tokens não ocultos e movem apenas os próprios ou os que receberam permissão para controlar.</p>
+      <p className="painel-mapa__token-ajuda">O mestre sempre controla tudo. Cada token pode ficar oculto, sempre visível ou ser revelado quando um personagem chegar perto.</p>
       <div className="painel-permissoes-mapa__lista">
         {tokens.length === 0 ? <p>Adicione tokens para configurar o acesso.</p> : tokens.map((token) => (
           <article key={token.id}>
@@ -22,7 +22,19 @@ function PainelPermissoesMapa({ tokens, fichas, previsualizacao, aoPrevisualizar
             </label>
             <label><input type="checkbox" checked={token.permissoes?.jogadores === true} onChange={(e) => aoAlterarToken(token.id, { permissoes: { ...token.permissoes, jogadores: e.target.checked } })} /> Permitir controle de jogadores</label>
             <label><input type="checkbox" checked={token.bloqueado} onChange={(e) => aoAlterarToken(token.id, { bloqueado: e.target.checked })} /> Bloquear movimento</label>
-            <label><input type="checkbox" checked={token.oculto} onChange={(e) => aoAlterarToken(token.id, { oculto: e.target.checked })} /> Ocultar dos jogadores</label>
+            <label>Visibilidade
+              <select value={token.modoVisibilidade || "oculto"} onChange={(e) => aoAlterarToken(token.id, {
+                modoVisibilidade: e.target.value,
+                oculto: e.target.value !== "visivel",
+              })}>
+                <option value="oculto">Oculto</option>
+                <option value="proximidade">Por proximidade</option>
+                <option value="visivel">Sempre visível</option>
+              </select>
+            </label>
+            {token.modoVisibilidade === "proximidade" ? <label>Alcance em casas
+              <input type="number" min="1" max="20" value={token.alcanceProximidade || 3} onChange={(e) => aoAlterarToken(token.id, { alcanceProximidade: Math.min(20, Math.max(1, Number(e.target.value) || 3)) })} />
+            </label> : null}
             <details>
               <summary>Compartilhar controle</summary>
               {fichas.map((ficha) => {

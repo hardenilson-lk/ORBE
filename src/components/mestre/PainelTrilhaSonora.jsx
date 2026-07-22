@@ -13,6 +13,7 @@ const TRILHA_VAZIA = {
 function PainelTrilhaSonora({
   trilhas = [],
   volumeInicial = 70,
+  aoTestarMesaSonora,
   aoAdicionarTrilha,
   aoRemoverTrilha,
   aoSelecionarTrilha,
@@ -163,14 +164,24 @@ function PainelTrilhaSonora({
           </p>
         </div>
 
-        <div className="painel-dossie__resumo">
-          <span>
-            Trilhas salvas
-          </span>
+        <div className="trilha-sonora__cabecalho-acoes">
+          <div className="painel-dossie__resumo">
+            <span>
+              Trilhas salvas
+            </span>
 
-          <strong>
-            {trilhasLocais.length}
-          </strong>
+            <strong>
+              {trilhasLocais.length}
+            </strong>
+          </div>
+
+          <button
+            className="trilha-sonora__botao-teste"
+            type="button"
+            onClick={aoTestarMesaSonora}
+          >
+            Testar mesa sonora
+          </button>
         </div>
       </header>
 

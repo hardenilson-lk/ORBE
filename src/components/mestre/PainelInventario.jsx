@@ -125,6 +125,19 @@ function obterIconeItem(tipo) {
   return "▣";
 }
 
+function obterClasseVisualItem(item = {}) {
+  const texto = normalizarTexto([item.tipo, item.categoria, item.grupo, item.tipoDano, item.nome].join(" "));
+  if (texto.includes("arma de fogo") || texto.includes("disparo") || texto.includes("balistico")) return "item-cor--fogo";
+  if (texto.includes("corte") || /faca|katana|machete|lamina|espada/.test(texto)) return "item-cor--corte";
+  if (texto.includes("impacto") || /bastao|martelo|marreta/.test(texto)) return "item-cor--impacto";
+  if (texto.includes("perfuracao") || /punhal|lanca/.test(texto)) return "item-cor--perfuracao";
+  if (texto.includes("protecao") || texto.includes("escudo")) return "item-cor--protecao";
+  if (texto.includes("explosivo") || texto.includes("granada")) return "item-cor--explosivo";
+  if (texto.includes("medico") || texto.includes("consumivel")) return "item-cor--consumivel";
+  if (texto.includes("tecnologia") || texto.includes("ferramenta")) return "item-cor--ferramenta";
+  return "item-cor--geral";
+}
+
 function obterImagemItem(item) {
   const imagemPersonalizada =
     String(
@@ -947,6 +960,7 @@ function PainelInventario({
             gap: 12px;
             padding: 14px;
             border: 1px solid rgba(67, 45, 25, 0.42);
+            border-left: 7px solid var(--item-cor, #8b6b3e);
             background:
               linear-gradient(
                 180deg,
@@ -1082,6 +1096,7 @@ function PainelInventario({
           .painel-inventario-atualizado
           .inventario-arquivos__item {
             border: 1px solid rgba(66, 45, 26, 0.35);
+            border-left: 7px solid var(--item-cor, #8b6b3e);
             background:
               linear-gradient(
                 180deg,
@@ -1560,7 +1575,7 @@ function PainelInventario({
                   {itensCatalogoFiltrados.map(
                     (itemCatalogo) => (
                       <article
-                        className="inventario-catalogo__item"
+                        className={`inventario-catalogo__item ${obterClasseVisualItem(itemCatalogo)}`}
                         key={
                           itemCatalogo.id
                         }
@@ -1979,11 +1994,7 @@ function PainelInventario({
 
                 return (
                   <article
-                    className={
-                      estaAberto
-                        ? "inventario-arquivos__item inventario-arquivos__item--aberto"
-                        : "inventario-arquivos__item inventario-arquivos__item--fechado"
-                    }
+                    className={`inventario-arquivos__item ${estaAberto ? "inventario-arquivos__item--aberto" : "inventario-arquivos__item--fechado"} ${obterClasseVisualItem(item)}`}
                     key={item.id}
                   >
                     <button

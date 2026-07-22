@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 
 import "./interacoesTokensMapa.css";
 
@@ -13,7 +14,7 @@ function MenuContextualToken({
   aoEditarToken,
   aoDuplicar,
   aoRemover,
-  aoAlternarOculto,
+  aoAlterarVisibilidade,
   aoAlternarBloqueado,
   aoTrazerFrente,
   aoEnviarTras,
@@ -47,8 +48,8 @@ function MenuContextualToken({
     return null;
   }
 
-  return (
-    <section
+  const menu = (
+    <div
       ref={menuRef}
       className="menu-contextual-token"
       role="menu"
@@ -75,9 +76,12 @@ function MenuContextualToken({
           Duplicar NPC
         </button>
       ) : null}
-      {podeAdministrar ? <button type="button" role="menuitem" onClick={aoAlternarOculto}>
-        {token.oculto ? "Revelar" : "Ocultar"}
-      </button> : null}
+      {podeAdministrar ? <div className="menu-contextual-token__visibilidade" role="group" aria-label="Visibilidade para jogadores">
+        <small>Visibilidade</small>
+        <button type="button" onClick={() => aoAlterarVisibilidade("oculto")} aria-pressed={token.modoVisibilidade === "oculto"}>Oculto</button>
+        <button type="button" onClick={() => aoAlterarVisibilidade("proximidade")} aria-pressed={token.modoVisibilidade === "proximidade"}>Proximidade</button>
+        <button type="button" onClick={() => aoAlterarVisibilidade("visivel")} aria-pressed={token.modoVisibilidade === "visivel"}>Visível</button>
+      </div> : null}
       {podeAdministrar ? <button type="button" role="menuitem" onClick={aoAlternarBloqueado}>
         {token.bloqueado ? "Desbloquear" : "Bloquear"}
       </button> : null}
@@ -95,8 +99,13 @@ function MenuContextualToken({
       >
         Remover do grid
       </button> : null}
-    </section>
+    </div>
   );
+
+  // O menu precisa ficar fora da arvore visual do mapa. Dentro do painel ele
+  // pode herdar regras de layout das secoes e acabar abrindo uma faixa vazia
+  // que empurra o grid para baixo.
+  return typeof document !== "undefined" ? createPortal(menu, document.body) : null;
 }
 
 export default MenuContextualToken;

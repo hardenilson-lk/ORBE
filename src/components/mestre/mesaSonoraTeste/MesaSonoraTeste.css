@@ -1,0 +1,93 @@
+.mesa-sonora {
+  --ms-madeira: #1d100b;
+  --ms-madeira-clara: #3c2418;
+  --ms-papel: #dbc59d;
+  --ms-ouro: #c89b45;
+  --ms-vermelho: #7f2723;
+  --ms-tinta: #23160f;
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+  padding: 18px;
+  color: #f1dfb6;
+  background: repeating-linear-gradient(90deg, rgba(255,255,255,.025) 0 1px, transparent 1px 7px), linear-gradient(135deg, #130c09, #2b190f 55%, #100906);
+  border: 1px solid #7b5b32;
+  box-shadow: inset 0 0 38px #000, 0 18px 42px rgba(0,0,0,.45);
+  font-family: "Courier Prime", "Courier New", monospace;
+}
+.mesa-sonora button, .mesa-sonora input, .mesa-sonora select { font: inherit; }
+.mesa-sonora button { cursor: pointer; }
+.mesa-sonora h2, .mesa-sonora h3, .mesa-sonora h4, .mesa-sonora p { margin: 0; }
+.mesa-sonora h2, .mesa-sonora h3, .mesa-sonora h4 { font-family: Cinzel, Georgia, serif; text-transform: uppercase; }
+.mesa-sonora__cabecalho { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 18px; padding: 20px; border: 1px solid #9d7741; background: linear-gradient(110deg, #2c160f, #160e0b 70%, #4b2018); }
+.mesa-sonora__cabecalho > div:first-child > span, .mesa-sonora section > header > span, .mesa-sonora__formulario header span { color: #d4ab59; font-size: .66rem; font-weight: 900; letter-spacing: .13em; text-transform: uppercase; }
+.mesa-sonora__cabecalho h2 { margin: 5px 0; color: #fff0c4; font-size: clamp(1.65rem, 3vw, 2.5rem); }
+.mesa-sonora__cabecalho p { color: #cbb58a; font-size: .78rem; }
+.mesa-sonora__cabecalho-acoes { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 8px; min-width: 0; max-width: 100%; }
+.mesa-sonora__cabecalho dl { display: flex; gap: 6px; margin: 0; }
+.mesa-sonora__cabecalho dl div { min-width: 62px; padding: 7px; border: 1px solid #836334; text-align: center; }
+.mesa-sonora__cabecalho dt { color: #bda573; font-size: .55rem; text-transform: uppercase; }
+.mesa-sonora__cabecalho dd { margin: 2px 0 0; color: #fff0bd; font-size: 1.2rem; font-weight: 900; }
+.botao-console, .mesa-sonora__transportes button, .botao-som__acoes button, .mesa-sonora__form-cena button, .mesa-sonora__lista-cenas button, .mesa-sonora__formulario header button { min-height: 36px; padding: 7px 11px; border: 1px solid #b68a42; background: linear-gradient(#6e441d, #39220f); color: #ffe8ad; font-size: .62rem; font-weight: 900; text-transform: uppercase; }
+.botao-console--primario { min-height: 44px; background: linear-gradient(#9a3a30, #541d19); }
+.botao-console--claro { color: #2b190e; background: linear-gradient(#e4c992, #ad8147); }
+.botao-console--perigo { border-color: #a04c43; background: #4b1715; }
+.mesa-sonora__aviso { display: flex; justify-content: space-between; gap: 15px; padding: 10px 14px; border-left: 4px solid #a87c30; background: rgba(223,190,119,.09); font-size: .7rem; }
+.mesa-sonora__aviso span { color: #bfae8d; }
+.mesa-sonora__controles { display: grid; grid-template-columns: minmax(220px,.7fr) auto minmax(340px,1fr); gap: 12px; padding: 14px; border: 1px solid #78562e; background: #160e0b; }
+.mesa-sonora__controle-master { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 9px; }
+.mesa-sonora label { display: grid; gap: 5px; color: #d5bd8e; font-size: .62rem; font-weight: 900; text-transform: uppercase; }
+.mesa-sonora__controle-master strong { color: #ffc45f; font-size: 1.3rem; }
+.mesa-sonora__transportes { display: flex; flex-wrap: wrap; align-items: end; gap: 5px; }
+.mesa-sonora__filtros { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 7px; }
+.mesa-sonora input, .mesa-sonora select { width: 100%; min-height: 38px; padding: 7px 9px; border: 1px solid #7e6138; border-radius: 0; color: #2a1a10; background: #ead8b3; }
+.mesa-sonora input[type="range"] { min-height: 22px; padding: 0; accent-color: #a83b30; }
+.mesa-sonora input[type="checkbox"] { width: 16px; min-height: 16px; accent-color: #9c332a; }
+.mesa-sonora__corpo { display: grid; grid-template-columns: minmax(0,1.55fr) minmax(330px,.75fr); gap: 14px; align-items: start; }
+.mesa-sonora__corpo > main, .mesa-sonora__corpo > aside { display: grid; gap: 14px; min-width: 0; }
+.mesa-sonora__biblioteca, .mesa-sonora__players, .mesa-sonora__formulario, .mesa-sonora__cenas { display: grid; gap: 12px; padding: 14px; border: 1px solid #826039; background: linear-gradient(145deg, rgba(59,35,22,.92), rgba(19,12,9,.95)); }
+.mesa-sonora section > header h3, .mesa-sonora__formulario header h3 { margin-top: 4px; color: #f5deb0; font-size: 1rem; }
+.mesa-sonora__botoes { display: grid; grid-template-columns: repeat(auto-fill, minmax(235px, 1fr)); gap: 10px; }
+.botao-som { overflow: hidden; border: 1px solid color-mix(in srgb, var(--cor-som) 72%, #d7b061); background: #140d0a; box-shadow: inset 0 3px 0 var(--cor-som); }
+.botao-som--tocando { box-shadow: inset 0 4px 0 var(--cor-som), 0 0 18px color-mix(in srgb, var(--cor-som) 48%, transparent); }
+.botao-som--erro { border-color: #c45a50; }
+.botao-som__disparo { display: grid; grid-template-columns: 45px 1fr auto; align-items: center; gap: 9px; width: 100%; min-height: 85px; padding: 12px; border: 0; color: #f4dfb4; background: linear-gradient(110deg, color-mix(in srgb, var(--cor-som) 42%, #19100b), #17100c 72%); text-align: left; }
+.botao-som__icone { display: grid; place-items: center; width: 42px; height: 42px; border: 1px solid #d4ab55; border-radius: 50%; color: #ffe8a0; font-size: 1.35rem; }
+.botao-som__texto { display: grid; gap: 5px; min-width: 0; }
+.botao-som__texto strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: uppercase; }
+.botao-som__texto small { color: #bba77f; }
+.botao-som__estado { color: #d8b86d; font-size: .52rem; text-transform: uppercase; writing-mode: vertical-rl; }
+.botao-som__indicadores { display: flex; gap: 6px; padding: 6px 9px; color: #cbb485; font-size: .55rem; }
+.botao-som__indicadores kbd { padding: 2px 5px; border: 1px solid #846232; background: #302013; }
+.botao-som > p { padding: 7px 9px; color: #ffb3a6; font-size: .58rem; }
+.botao-som__acoes { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; background: #49321e; }
+.botao-som__acoes button { min-height: 30px; padding: 4px 2px; border: 0; font-size: .48rem; }
+.mesa-sonora__formulario header { display: flex; justify-content: space-between; gap: 8px; }
+.mesa-sonora__grade-formulario { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 9px; }
+.mesa-sonora__campo-amplo { grid-column: 1 / -1; }
+.mesa-sonora__campo-amplo small { color: #aa9879; text-transform: none; }
+.mesa-sonora__opcoes { display: flex; flex-wrap: wrap; gap: 10px; }
+.mesa-sonora__opcoes label, .mesa-sonora__form-cena fieldset label { display: flex; align-items: center; gap: 6px; }
+.mesa-sonora__limpar-atalho { min-height: 25px; border: 0; color: #e0c38b; background: transparent; font-size: .55rem; text-align: left; }
+.mesa-sonora__erro { padding: 8px; border-left: 3px solid #b84b42; color: #ffb8ad; background: #411b18; font-size: .65rem; }
+.mesa-sonora__form-cena { display: grid; gap: 9px; padding: 10px; border: 1px dashed #816039; }
+.mesa-sonora__form-cena fieldset { display: grid; max-height: 150px; gap: 5px; overflow: auto; border: 1px solid #63482a; }
+.mesa-sonora__form-cena legend { color: #c9ad77; font-size: .6rem; text-transform: uppercase; }
+.mesa-sonora__form-cena > div, .mesa-sonora__lista-cenas article > div:last-child { display: flex; flex-wrap: wrap; gap: 5px; }
+.mesa-sonora__lista-cenas { display: grid; gap: 7px; }
+.mesa-sonora__lista-cenas article { display: grid; gap: 8px; padding: 9px; border: 1px solid #62472b; background: rgba(0,0,0,.22); }
+.mesa-sonora__lista-cenas article > div:first-child { display: flex; justify-content: space-between; gap: 8px; }
+.mesa-sonora__lista-cenas small { color: #aa9876; }
+.mesa-sonora__lista-cenas ul { display: grid; gap: 3px; margin: 0; padding: 0; list-style: none; }
+.mesa-sonora__lista-cenas li { display: flex; justify-content: space-between; gap: 8px; padding: 4px 6px; color: #baa681; background: rgba(0,0,0,.2); font-size: .58rem; }
+.mesa-sonora__lista-cenas li span { text-transform: uppercase; }
+.mesa-sonora__lista-cenas .cena-som--tocando { color: #ffe09b; box-shadow: inset 3px 0 #c69a48; }
+.mesa-sonora__lista-cenas .cena-som--pausado { color: #cfb8e8; box-shadow: inset 3px 0 #77569a; }
+.mesa-sonora__players > p { color: #b6a17d; font-size: .66rem; line-height: 1.5; }
+.mesa-sonora__players-grade { display: grid; grid-template-columns: repeat(auto-fit,minmax(250px,1fr)); gap: 9px; }
+.mesa-sonora__players-grade article { display: grid; gap: 6px; padding: 8px; border: 1px solid #5e442a; background: #0e0907; }
+.mesa-sonora__youtube-player, .mesa-sonora__youtube-player iframe { width: 100%; min-height: 158px; }
+.mesa-sonora__player-spotify { grid-column: 1 / -1; }
+.mesa-sonora__vazio { padding: 18px; border: 1px dashed #6e5234; color: #ac9b7a; font-size: .7rem; text-align: center; }
+@media (max-width: 1450px) { .mesa-sonora__cabecalho { flex-direction: column; } .mesa-sonora__cabecalho-acoes { justify-content: flex-start; } .mesa-sonora__controles { grid-template-columns: 1fr; } .mesa-sonora__filtros { grid-column: auto; } .mesa-sonora__corpo { grid-template-columns: 1fr; } }
+@media (max-width: 700px) { .mesa-sonora { padding: 10px; } .mesa-sonora__cabecalho { flex-direction: column; } .mesa-sonora__cabecalho-acoes { justify-content: flex-start; } .mesa-sonora__controles, .mesa-sonora__filtros, .mesa-sonora__grade-formulario { grid-template-columns: 1fr; } .mesa-sonora__campo-amplo, .mesa-sonora__filtros { grid-column: auto; } .botao-som__acoes { grid-template-columns: repeat(3,1fr); } }

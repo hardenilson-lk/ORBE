@@ -1,6 +1,6 @@
 import { calcularPoligonoVisao } from "./visaoMapa.js";
 
-function CamadaIluminacaoMapa({ largura, altura, iluminacao, luzes, fontesToken, barreiras, ativaEdicao, aoAdicionarLuz }) {
+function CamadaIluminacaoMapa({ largura, altura, iluminacao, luzes, fontesToken, barreiras, papelAtual, ativaEdicao, aoAdicionarLuz }) {
   const fontesManuais = luzes.map((luz) => ({
     ...luz,
     raioPixels: luz.raio,
@@ -8,8 +8,16 @@ function CamadaIluminacaoMapa({ largura, altura, iluminacao, luzes, fontesToken,
   }));
   const fontesVisao = iluminacao.visaoDinamica
     ? fontesToken.flatMap((fonte) => [
-      { ...fonte, id: `${fonte.id}-proximidade`, raioPixels: fonte.raioCurtoPixels, amplitude: Math.PI * 2 },
       { ...fonte, id: `${fonte.id}-cone` },
+      {
+        ...fonte,
+        id: `${fonte.id}-traseira`,
+        x: fonte.traseiraX,
+        y: fonte.traseiraY,
+        raioPixels: fonte.raioTraseiroPixels,
+        angulo: fonte.anguloTraseiro,
+        amplitude: fonte.amplitudeTraseira,
+      },
     ])
     : [];
   const fontes = [...fontesManuais, ...fontesVisao].filter((fonte) => fonte.raioPixels > 0);
@@ -39,7 +47,7 @@ function CamadaIluminacaoMapa({ largura, altura, iluminacao, luzes, fontesToken,
             </radialGradient>
           );
         })}
-        {fontesToken.map((fonte) => {
+        {fontesVisao.map((fonte) => {
           const gradienteId = `gradiente-brilho-token-${String(fonte.id).replace(/[^a-zA-Z0-9_-]/g, "-")}`;
           return (
             <radialGradient key={gradienteId} id={gradienteId} gradientUnits="userSpaceOnUse" cx={fonte.x} cy={fonte.y} r={fonte.raioPixels}>
@@ -79,7 +87,7 @@ function CamadaIluminacaoMapa({ largura, altura, iluminacao, luzes, fontesToken,
         fill={iluminacao.corAmbiente}
         opacity={Math.min(0.16, iluminacao.luzAmbiente * 0.12)}
       />
-      {iluminacao.visaoDinamica ? fontesToken.map((fonte) => {
+      {iluminacao.visaoDinamica ? fontesVisao.map((fonte) => {
         const gradienteId = `gradiente-brilho-token-${String(fonte.id).replace(/[^a-zA-Z0-9_-]/g, "-")}`;
         const poligono = calcularPoligonoVisao(
           { x: fonte.x, y: fonte.y },
@@ -97,7 +105,7 @@ function CamadaIluminacaoMapa({ largura, altura, iluminacao, luzes, fontesToken,
           />
         );
       }) : null}
-      {luzes.map((luz) => (
+      {papelAtual === "mestre" ? luzes.map((luz) => (
         <circle
           className="camada-iluminacao-mapa__fonte"
           style={{ fill: luz.cor, color: luz.cor }}
@@ -106,7 +114,7 @@ function CamadaIluminacaoMapa({ largura, altura, iluminacao, luzes, fontesToken,
           cy={luz.y}
           r="10"
         />
-      ))}
+      )) : null}
     </svg>
   );
 }

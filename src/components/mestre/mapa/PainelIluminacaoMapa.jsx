@@ -26,7 +26,7 @@ function PainelIluminacaoMapa({ iluminacao, luzes, tokens, fichas, ferramenta, b
           const ficha = fichas.find((item) => item.id === token.fichaId);
           return <article key={token.id}>
             <strong>{ficha?.nome || token.nome || "Token"}</strong>
-            <label>Casas <input type="number" min="0" max="50" value={token.visaoAlcance ?? 6} onChange={(e) => aoAlterarToken(token.id, { visaoAlcance: Number(e.target.value) })} /></label>
+            <label>Casas <input type="number" min="0" max="3" value={Math.min(3, token.visaoAlcance ?? 3)} onChange={(e) => aoAlterarToken(token.id, { visaoAlcance: Math.min(3, Number(e.target.value)) })} /></label>
             <label>Direção <select value={token.rotacao ?? 0} onChange={(e) => aoAlterarToken(token.id, { rotacao: Number(e.target.value) })}>
               <option value="180">Norte</option><option value="270">Leste</option><option value="0">Sul</option><option value="90">Oeste</option>
             </select></label>

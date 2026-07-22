@@ -405,6 +405,28 @@
 
 /* Trilha sonora */
 
+.trilha-sonora__cabecalho-acoes {
+  display: grid;
+  justify-items: stretch;
+  gap: 8px;
+}
+
+.trilha-sonora__botao-teste {
+  min-height: 36px;
+  padding: 6px 10px;
+  border: 1px solid #8b632d;
+  background: linear-gradient(#3b2415, #21140d);
+  color: #f0d99e;
+  font: 900 0.6rem "Courier Prime", monospace;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.trilha-sonora__botao-teste:hover {
+  border-color: var(--dossie-dourado);
+  filter: brightness(1.12);
+}
+
 .trilha-sonora__controle {
   display: grid;
   grid-template-columns:
@@ -965,3 +987,12 @@
   .painel-dossie__resumos-duplos { width: 100%; }
   .painel-dossie__resumos-duplos .painel-dossie__resumo { flex: 1; min-width: 0; }
 }
+.item-cor--fogo { --item-cor: #a63c32; }
+.item-cor--corte { --item-cor: #a8aeb7; }
+.item-cor--impacto { --item-cor: #8a633e; }
+.item-cor--perfuracao { --item-cor: #6d7890; }
+.item-cor--protecao { --item-cor: #3d6f91; }
+.item-cor--explosivo { --item-cor: #d06b28; }
+.item-cor--consumivel { --item-cor: #4d8b62; }
+.item-cor--ferramenta { --item-cor: #8b5da8; }
+.item-cor--geral { --item-cor: #9b7b45; }

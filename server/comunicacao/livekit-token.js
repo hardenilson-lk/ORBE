@@ -2,6 +2,7 @@ import { createServer } from "node:http";
 import { AccessToken, TrackSource } from "livekit-server-sdk";
 
 const PORTA = Number.parseInt(process.env.PORT || "3001", 10);
+const HOST = process.env.HOST || "127.0.0.1";
 const ORIGEM_PERMITIDA = process.env.ALLOWED_ORIGIN || "http://localhost:5173";
 const CAMINHO_TOKEN = "/api/livekit-token";
 const LIMITE_CORPO = 16 * 1024;
@@ -72,11 +73,14 @@ const servidor = createServer(async (requisicao, resposta) => {
       metadata: JSON.stringify({ nome: entrada.nome, papel: entrada.papel }),
       ttl: "15m",
     });
+    const papelMestre = entrada.papel.toLocaleLowerCase("pt-BR") === "mestre";
     token.addGrant({
       roomJoin: true,
       room: entrada.sala,
       canPublish: true,
-      canPublishSources: [TrackSource.MICROPHONE],
+      canPublishSources: papelMestre
+        ? [TrackSource.MICROPHONE, TrackSource.SCREEN_SHARE_AUDIO]
+        : [TrackSource.MICROPHONE],
       canSubscribe: true,
       canPublishData: true,
     });
@@ -90,7 +94,6 @@ const servidor = createServer(async (requisicao, resposta) => {
   }
 });
 
-servidor.listen(PORTA, () => {
-  console.log(`[Comunicação] Servidor de token em http://localhost:${PORTA}${CAMINHO_TOKEN}`);
+servidor.listen(PORTA, HOST, () => {
+  console.log(`[Comunicação] Servidor de token em http://${HOST}:${PORTA}${CAMINHO_TOKEN}`);
 });
-

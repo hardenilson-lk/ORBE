@@ -21,6 +21,13 @@ import {
 } from "../../data/periciasArquivos.js";
 
 import {
+  obterRegraAtributos,
+  obterRegraPericias,
+  podeAlterarAtributo,
+  podeAlterarTreinoPericia,
+} from "../../data/regrasCriacaoFichaArquivos.js";
+
+import {
   criarFichaArquivosVazia,
   recalcularFichaArquivos,
 } from "../../utils/fichasArquivos.js";
@@ -153,6 +160,8 @@ function PainelFichas({
     setEquipamentoSelecionadoId,
   ] = useState("");
 
+  const [mensagemDistribuicao, setMensagemDistribuicao] = useState("");
+
   useEffect(() => {
     if (fichaSelecionada) {
       setFicha(
@@ -215,6 +224,9 @@ function PainelFichas({
         item.id ===
         equipamentoSelecionadoId,
     ) || null;
+
+  const regraAtributos = obterRegraAtributos(ficha);
+  const regraPericias = obterRegraPericias(ficha);
 
   function atualizarCampo(
     nomeCampo,
@@ -281,17 +293,36 @@ function PainelFichas({
     );
   }
 
+  function atualizarAtributo(nomeCampo, valor) {
+    const resultado = podeAlterarAtributo(ficha, nomeCampo, valor);
+    setMensagemDistribuicao(resultado.mensagem);
+    if (!resultado.permitido) return;
+
+    setFicha((fichaAnterior) =>
+      recalcularFichaArquivos({
+        ...fichaAnterior,
+        [nomeCampo]: resultado.valor,
+      }),
+    );
+  }
+
   function atualizarPericia(
     periciaId,
     campo,
     valor,
   ) {
+    const resultadoTreino = campo === "treino"
+      ? podeAlterarTreinoPericia(ficha, periciaId, valor)
+      : { permitido: true, valor: Number(valor) || 0, mensagem: "" };
+
+    setMensagemDistribuicao(resultadoTreino.mensagem);
+    if (!resultadoTreino.permitido) return;
+
     setFicha(
       (fichaAnterior) => {
-        const periciasAtuais =
-          criarValoresPericiasArquivos(
-            fichaAnterior.pericias,
-          );
+        const periciasAtuais = criarValoresPericiasArquivos(
+          fichaAnterior.pericias,
+        );
 
         const periciaAnterior =
           periciasAtuais[
@@ -306,7 +337,7 @@ function PainelFichas({
           ...periciaAnterior,
 
           [campo]:
-            Number(valor) || 0,
+            resultadoTreino.valor,
         };
 
         proximaPericia.total =
@@ -476,6 +507,13 @@ function PainelFichas({
   function salvarFicha(evento) {
     evento.preventDefault();
 
+    const atributosAntesDeSalvar = obterRegraAtributos(ficha);
+    const periciasAntesDeSalvar = obterRegraPericias(ficha);
+    if (atributosAntesDeSalvar.excedentes || periciasAntesDeSalvar.excedentes) {
+      setMensagemDistribuicao("Corrija os pontos acima do limite antes de salvar. Você pode reduzir atributos ou o Treino das perícias para devolver pontos.");
+      return;
+    }
+
     const fichaParaSalvar =
       recalcularFichaArquivos({
         ...ficha,
@@ -563,15 +601,25 @@ function PainelFichas({
           </h2>
         </div>
 
-        {permitirNovaFicha ? (
+        <div className="painel-fichas__acoes-cabecalho">
           <button
             type="button"
-            onClick={criarNovaFicha}
+            onClick={() => window.dispatchEvent(new CustomEvent("orbinho:iniciar-tutorial", { detail: { id: "fichaPersonagem", reiniciar: true } }))}
           >
-            Nova ficha
+            Orbinho: montar ficha
           </button>
-        ) : null}
+          {permitirNovaFicha ? (
+            <button
+              type="button"
+              onClick={criarNovaFicha}
+            >
+              Nova ficha
+            </button>
+          ) : null}
+        </div>
       </header>
+
+      {mensagemDistribuicao ? <p className="ficha-arquivos__aviso-distribuicao" role="status">{mensagemDistribuicao}</p> : null}
 
       <section className="painel-fichas__mesa" data-assistente="ficha-lista">
         <h3>
@@ -849,7 +897,17 @@ function PainelFichas({
             </section>
 
             <section className="ficha-arquivos__atributos" data-assistente="ficha-atributos">
-              <h3>Atributos</h3>
+              <div className="ficha-arquivos__titulo-com-saldo">
+                <div>
+                  <h3>Atributos</h3>
+                  <small>Todos começam em 1. Distribua 4 pontos; os marcos 20%, 50%, 80% e 95% concedem +1.</small>
+                </div>
+                <strong className={regraAtributos.excedentes ? "saldo-pontos saldo-pontos--erro" : regraAtributos.restantes ? "saldo-pontos" : "saldo-pontos saldo-pontos--completo"}>
+                  {regraAtributos.excedentes ? `${regraAtributos.excedentes} acima do limite` : `${regraAtributos.restantes} ponto(s) restante(s)`}
+                </strong>
+              </div>
+
+              <p className="ficha-arquivos__cola-regra">NEX {regraAtributos.nex}% · total permitido {regraAtributos.limiteTotal} · máximo {regraAtributos.limitePorAtributo} por atributo. Reduzir um valor devolve o ponto.</p>
 
               <div className="ficha-arquivos__atributos-lista">
                 <label>
@@ -862,7 +920,7 @@ function PainelFichas({
                       ficha.agilidade
                     }
                     onChange={(evento) =>
-                      atualizarNumero(
+                      atualizarAtributo(
                         "agilidade",
                         evento.target
                           .value,
@@ -883,7 +941,7 @@ function PainelFichas({
                     min="0"
                     value={ficha.forca}
                     onChange={(evento) =>
-                      atualizarNumero(
+                      atualizarAtributo(
                         "forca",
                         evento.target
                           .value,
@@ -906,7 +964,7 @@ function PainelFichas({
                       ficha.intelecto
                     }
                     onChange={(evento) =>
-                      atualizarNumero(
+                      atualizarAtributo(
                         "intelecto",
                         evento.target
                           .value,
@@ -929,7 +987,7 @@ function PainelFichas({
                       ficha.presenca
                     }
                     onChange={(evento) =>
-                      atualizarNumero(
+                      atualizarAtributo(
                         "presenca",
                         evento.target
                           .value,
@@ -950,7 +1008,7 @@ function PainelFichas({
                     min="0"
                     value={ficha.vigor}
                     onChange={(evento) =>
-                      atualizarNumero(
+                      atualizarAtributo(
                         "vigor",
                         evento.target
                           .value,
@@ -1142,6 +1200,7 @@ function PainelFichas({
 
           <TabelaPericias
             valores={ficha.pericias}
+            regra={regraPericias}
             aoAlterarPericia={
               atualizarPericia
             }

@@ -8,6 +8,8 @@ import PainelInventario from "../components/mestre/PainelInventario.jsx";
 import PainelMapa from "../components/mestre/PainelMapa.jsx";
 import MenuJogador from "../components/jogador/MenuJogador.jsx";
 import PaineisJogador from "../components/jogador/PaineisJogador.jsx";
+import MesaSonoraJogador from "../components/jogador/MesaSonoraJogador.jsx";
+import { MesaSonoraLiveKitProvider } from "../components/mestre/mesaSonora/livekit/MesaSonoraLiveKitContext.jsx";
 
 import {
   criarFichaArquivosVazia,
@@ -56,6 +58,7 @@ function PaginaJogador() {
   const [modificador, setModificador] = useState(0);
   const [resultado, setResultado] = useState("Pronto para rolar.");
   const [mensagemSistema, setMensagemSistema] = useState("Conectado ao arquivo da campanha.");
+  const [menuRecolhido, setMenuRecolhido] = useState(() => localStorage.getItem("orbe:jogador:menu-recolhido") === "true");
 
   const mesa = lerMesasSalvas().find((item) => String(item.id) === String(mesaId));
   const usuarioPortal = lerUsuarioAtual();
@@ -240,6 +243,14 @@ function PaginaJogador() {
     setMensagemSistema("Campanha atualizada.");
   }
 
+  function alternarMenuPrincipal() {
+    setMenuRecolhido((valorAtual) => {
+      const proximo = !valorAtual;
+      localStorage.setItem("orbe:jogador:menu-recolhido", String(proximo));
+      return proximo;
+    });
+  }
+
   function renderizarConteudo() {
     if (!fichaAtiva) return null;
 
@@ -273,7 +284,8 @@ function PaginaJogador() {
   const missaoAtiva = listaSegura(sessao.missoes).find((missao) => missao.status === "ativa" && missao.privada !== true);
 
   return (
-    <div className="pagina-jogador">
+    <MesaSonoraLiveKitProvider mesaId={mesaId}>
+    <div className={menuRecolhido ? "pagina-jogador pagina-jogador--menu-recolhido" : "pagina-jogador"}>
       <Dados3D ref={dadosRef} aoFinalizar={finalizarRolagem} />
 
       <MenuJogador
@@ -284,6 +296,8 @@ function PaginaJogador() {
         aoSelecionarMenu={setMenuAtivo}
         aoTrocarPersonagem={() => setSelecaoAberta(true)}
         aoAtualizar={recarregar}
+        recolhido={menuRecolhido}
+        aoAlternarRecolhido={alternarMenuPrincipal}
       />
 
       <main className="pagina-jogador__conteudo">
@@ -321,6 +335,8 @@ function PaginaJogador() {
               papelLocal="Jogador"
             />
 
+            <MesaSonoraJogador />
+
             <section className="transmissao-jogador">
               <span>Objetivo atual</span>
               <h2>{missaoAtiva?.titulo || "Aguardando missão"}</h2>
@@ -343,6 +359,7 @@ function PaginaJogador() {
         </div>
       ) : null}
     </div>
+    </MesaSonoraLiveKitProvider>
   );
 }
 

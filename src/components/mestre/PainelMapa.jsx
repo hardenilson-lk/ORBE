@@ -131,6 +131,10 @@ function segmentoCruzaBarreira(origem, destino, barreira) {
     const u = (qpx * ry - qpy * rx) / divisor;
     return t > 0.025 && t <= 1 && u >= 0 && u <= 1;
 }
+function diferencaAngular(anguloA, anguloB) {
+    const volta = Math.PI * 2;
+    return Math.abs((((anguloA - anguloB) % volta) + Math.PI * 3) % volta - Math.PI);
+}
 function normalizarGrid(gridRecebido) {
     const grid = gridRecebido &&
         typeof gridRecebido === "object"
@@ -169,6 +173,11 @@ function normalizarToken(tokenRecebido, indice, grid) {
     const coluna = Math.round(x / grid.tamanhoCelula);
     const linha = Math.round(y / grid.tamanhoCelula);
     const tipo = token.tipo === "npc" || token.npcId ? "npc" : "jogador";
+    const modoVisibilidade = ["oculto", "proximidade", "visivel"].includes(token.modoVisibilidade)
+        ? token.modoVisibilidade
+        : token.oculto === false
+            ? "visivel"
+            : "oculto";
     return {
         ...token,
         id: token.id ||
@@ -195,8 +204,15 @@ function normalizarToken(tokenRecebido, indice, grid) {
             false,
         bloqueado: token.bloqueado ===
             true,
-        oculto: token.oculto === true,
-        visaoAlcance: limitarNumero(token.visaoAlcance, 6, 0, 50),
+        // Um token so e liberado aos jogadores quando o mestre o marca
+        // explicitamente como visivel (oculto === false). Tokens antigos sem
+        // essa informacao permanecem seguros e privados por padrao.
+        modoVisibilidade,
+        oculto: modoVisibilidade !== "visivel",
+        alcanceProximidade: limitarNumero(token.alcanceProximidade, 3, 1, 20),
+        visaoAlcance: token.visaoAlcance == null || Number(token.visaoAlcance) === 6
+            ? 3
+            : limitarNumero(token.visaoAlcance, 3, 0, 50),
         visaoCone: limitarNumero(token.visaoCone, 240, 45, 360),
         proprietario: String(token.proprietario || (tipo === "npc" ? "mestre" : token.fichaId || "")),
         permissoes: token.permissoes && typeof token.permissoes === "object"
@@ -210,14 +226,24 @@ function normalizarEstrutura(itemRecebido, indice, tipo) {
         x: limitarNumero(valor?.x, 0, 0, 100000),
         y: limitarNumero(valor?.y, 0, 0, 100000),
     });
+    const tipoEstrutura = tipo === "janela" || item.tipoEstrutura === "janela"
+        ? "janela"
+        : tipo === "porta" || item.tipoEstrutura === "porta"
+            ? "porta"
+            : "parede";
+    const interativa = tipoEstrutura !== "parede";
+    const aberta = interativa && item.aberta === true;
     return {
         ...item,
-        id: String(item.id || `${tipo}-${indice}`),
+        id: String(item.id || `${tipoEstrutura}-${indice}`),
+        tipoEstrutura,
         inicio: ponto(item.inicio),
         fim: ponto(item.fim),
-        aberta: tipo === "porta" && item.aberta === true,
+        aberta,
+        trancada: tipoEstrutura === "porta" && item.trancada === true,
         oculta: item.oculta === true,
-        bloqueiaVisao: tipo === "parede" || item.aberta !== true,
+        bloqueiaVisao: tipoEstrutura === "parede" || !aberta,
+        bloqueiaMovimento: tipoEstrutura === "parede" || tipoEstrutura === "janela" || !aberta,
         camada: "paredes",
     };
 }
@@ -306,7 +332,7 @@ function normalizarMapa(mapaRecebido) {
             tipo: String(npc?.tipo || "NPC"),
         })),
         paredes: criarListaSegura(mapaSeguro.paredes).map((item, indice) => normalizarEstrutura(item, indice, "parede")),
-        portas: criarListaSegura(mapaSeguro.portas).map((item, indice) => normalizarEstrutura(item, indice, "porta")),
+        portas: criarListaSegura(mapaSeguro.portas).map((item, indice) => normalizarEstrutura(item, indice, item?.tipoEstrutura === "janela" ? "janela" : "porta")),
     };
 }
 function hexParaRgba(cor, opacidade) {
@@ -423,7 +449,7 @@ async function compactarImagemMapa(arquivo) {
         alturaOriginal: imagem.naturalHeight,
     };
 }
-function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [], papelAtual = "mestre", jogadorAtualId = "", aoAtualizarFicha, aoAlterarMapa, aoAlterarMensagem, }) {
+function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [], papelAtual = "mestre", jogadorAtualId = "", aoAtualizarFicha, aoAlterarMapa, aoAlterarMensagem, aoAbrirMiniFicha, }) {
     const viewportRef = useRef(null);
     const arquivoFundoRef = useRef(null);
     const arrasteMapaRef = useRef(null);
@@ -434,6 +460,9 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
     const ignorarCliqueMapaRef = useRef(false);
     const teclaEspacoRef = useRef(false);
     const scrollSalvarRef = useRef(null);
+    const janelaFerramentaRef = useRef(null);
+    const arrasteJanelaFerramentaRef = useRef(null);
+    const recolherJanelaTimeoutRef = useRef(null);
     const mapaRef = useRef(normalizarMapa(mapa));
     const [mapaLocal, setMapaLocal,] = useState(() => normalizarMapa(mapa));
     const [tamanhoViewport, setTamanhoViewport,] = useState({
@@ -441,6 +470,9 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
         altura: 0,
     });
     const [painelAtivo, setPainelAtivo,] = useState("");
+    const [painelRecolhido, setPainelRecolhido] = useState(false);
+    const [painelDestravado, setPainelDestravado] = useState(false);
+    const [posicaoPainel, setPosicaoPainel] = useState(null);
     const [menuFerramentasAberto, setMenuFerramentasAberto] = useState(false);
     const [guiaAberto, setGuiaAberto,] = useState(false);
     const [arrastandoMapa, setArrastandoMapa,] = useState(false);
@@ -550,6 +582,9 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
             if (scrollSalvarRef.current) {
                 clearTimeout(scrollSalvarRef.current);
             }
+            if (recolherJanelaTimeoutRef.current) {
+                clearTimeout(recolherJanelaTimeoutRef.current);
+            }
         };
     }, []);
     useEffect(() => {
@@ -613,9 +648,59 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
     const entidadeMiniFicha = miniFichaAberta?.tipo === "npc"
         ? npcs.find((npc) => npc.id === miniFichaAberta.id) || null
         : fichasSeguras.find((ficha) => ficha.id === miniFichaAberta?.id) || null;
+    const barreirasVisao = [
+        ...mapaLocal.paredes,
+        ...mapaLocal.portas.filter((estrutura) => estrutura.bloqueiaVisao),
+    ];
+    const barreirasMovimento = [
+        ...mapaLocal.paredes,
+        ...mapaLocal.portas.filter((estrutura) => estrutura.bloqueiaMovimento),
+    ];
+    const tokensDoJogador = papelEfetivo === "jogador"
+        ? tokens.filter((token) => podeControlarTokenMapa({
+            token: { ...token, bloqueado: false },
+            papelAtual: papelEfetivo,
+            jogadorAtualId: jogadorEfetivoId,
+        }))
+        : [];
+    const calcularOpacidadePorVisao = (tokenAlvo) => {
+        const centroAlvoX = tokenAlvo.x + (tokenAlvo.tamanho * grid.tamanhoCelula) / 2;
+        const centroAlvoY = tokenAlvo.y + (tokenAlvo.tamanho * grid.tamanhoCelula) / 2;
+        const alcanceProximidade = limitarNumero(tokenAlvo.alcanceProximidade, 3, 1, 20) * grid.tamanhoCelula;
+        return tokensDoJogador.reduce((maiorOpacidade, tokenJogador) => {
+            const centroJogadorX = tokenJogador.x + (tokenJogador.tamanho * grid.tamanhoCelula) / 2;
+            const centroJogadorY = tokenJogador.y + (tokenJogador.tamanho * grid.tamanhoCelula) / 2;
+            const dx = centroAlvoX - centroJogadorX;
+            const dy = centroAlvoY - centroJogadorY;
+            const distancia = Math.hypot(dx, dy);
+            const alcanceVisao = limitarNumero(tokenJogador.visaoAlcance, 3, 0, 50) * grid.tamanhoCelula;
+            const alcance = Math.min(alcanceProximidade, alcanceVisao);
+            if (alcance <= 0 || distancia > alcance) return maiorOpacidade;
+            const origem = { x: centroJogadorX, y: centroJogadorY };
+            const destino = { x: centroAlvoX, y: centroAlvoY };
+            if (barreirasVisao.some((barreira) => segmentoCruzaBarreira(origem, destino, barreira))) {
+                return maiorOpacidade;
+            }
+            const estaNoHaloProximo = distancia <= grid.tamanhoCelula;
+            const anguloFrente = ((90 + (Number(tokenJogador.rotacao) || 0)) * Math.PI) / 180;
+            const anguloAlvo = Math.atan2(dy, dx);
+            const metadeCone = ((Number(tokenJogador.visaoCone) || 240) * Math.PI) / 360;
+            if (!estaNoHaloProximo && diferencaAngular(anguloAlvo, anguloFrente) > metadeCone) {
+                return maiorOpacidade;
+            }
+            const progresso = Math.max(0, Math.min(1, 1 - distancia / alcance));
+            const opacidade = 0.18 + 0.82 * Math.pow(progresso, 0.72);
+            return Math.max(maiorOpacidade, opacidade);
+        }, 0);
+    };
+    const opacidadeProximidadePorToken = new Map(tokens.map((token) => [
+        token.id,
+        token.modoVisibilidade === "proximidade" ? calcularOpacidadePorVisao(token) : 1,
+    ]));
     const tokensVisiveis = papelEfetivo === "mestre"
         ? tokens
-        : tokens.filter((token) => !token.oculto);
+        : tokens.filter((token) => token.modoVisibilidade === "visivel"
+            || (token.modoVisibilidade === "proximidade" && (opacidadeProximidadePorToken.get(token.id) || 0) > 0));
     const larguraMundo = grid.colunas *
         grid.tamanhoCelula;
     const alturaMundo = grid.linhas *
@@ -626,20 +711,29 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
         camera.zoom;
     const larguraCanvas = Math.max(larguraComZoom, tamanhoViewport.largura);
     const alturaCanvas = Math.max(alturaComZoom, tamanhoViewport.altura);
-    const barreirasVisao = [...mapaLocal.paredes, ...mapaLocal.portas.filter((porta) => !porta.aberta)];
     const fontesToken = tokensVisiveis.filter((token) => papelEfetivo === "mestre" || podeControlarTokenMapa({ token, papelAtual: papelEfetivo, jogadorAtualId: jogadorEfetivoId })).map((token) => {
         const ficha = obterEntidadeDoToken(token);
         const inventario = criarListaSegura(ficha?.inventario);
         const possuiLuz = inventario.some((item) => item?.ativo !== false && /lanterna|lampi[aã]o|luz qu[ií]mica|farol/i.test(`${item?.nome || ""} ${item?.descricao || ""}`));
-        const alcance = limitarNumero(token.visaoAlcance, 6, 0, 50) + (possuiLuz ? 4 : 0);
+        const alcance = Math.min(3, limitarNumero(token.visaoAlcance, 3, 0, 50) + (possuiLuz ? 4 : 0));
+        const angulo = ((90 + (Number(token.rotacao) || 0)) * Math.PI) / 180;
+        const centroX = token.x + (token.tamanho * grid.tamanhoCelula) / 2;
+        const centroY = token.y + (token.tamanho * grid.tamanhoCelula) / 2;
+        const distanciaAteSeta = token.tamanho * grid.tamanhoCelula * 0.5;
         return {
             id: `visao-${token.id}`,
-            x: token.x + (token.tamanho * grid.tamanhoCelula) / 2,
-            y: token.y + (token.tamanho * grid.tamanhoCelula) / 2,
+            x: centroX + Math.cos(angulo) * distanciaAteSeta,
+            y: centroY + Math.sin(angulo) * distanciaAteSeta,
             raioPixels: alcance * grid.tamanhoCelula,
-            raioCurtoPixels: Math.min(alcance * grid.tamanhoCelula, grid.tamanhoCelula * 1.35),
-            angulo: ((90 + (Number(token.rotacao) || 0)) * Math.PI) / 180,
+            traseiraX: centroX,
+            traseiraY: centroY,
+            raioTraseiroPixels: grid.tamanhoCelula,
+            angulo,
+            anguloTraseiro: angulo + Math.PI,
             amplitude: ((Number(token.visaoCone) || 240) * Math.PI) / 180,
+            // Um halo completo de uma casa fecha as laterais junto ao token,
+            // enquanto o cone principal continua começando na seta frontal.
+            amplitudeTraseira: Math.PI * 2,
             intensidade: 1,
             cor: "#f3d58a",
         };
@@ -722,24 +816,40 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
     }
     function criarEstrutura(inicio, fim) {
         if (!ferramentaEstrutura || mapaRef.current.camadas.paredes.bloqueada) return;
-        const campo = ferramentaEstrutura === "porta" ? "portas" : "paredes";
+        const campo = ferramentaEstrutura === "parede" ? "paredes" : "portas";
         const novo = normalizarEstrutura({
             id: `${ferramentaEstrutura}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
             inicio,
             fim,
         }, mapaRef.current[campo].length, ferramentaEstrutura);
-        registrarMapa({ ...mapaRef.current, [campo]: [...mapaRef.current[campo], novo] }, `${ferramentaEstrutura === "porta" ? "Porta" : "Parede"} criada.`);
+        const nome = ferramentaEstrutura === "janela" ? "Janela" : ferramentaEstrutura === "porta" ? "Porta" : "Parede";
+        registrarMapa({ ...mapaRef.current, [campo]: [...mapaRef.current[campo], novo] }, `${nome} criada.`);
     }
     function alterarEstrutura(tipo, id, alteracoes) {
-        const campo = tipo === "porta" ? "portas" : "paredes";
+        const campo = tipo === "parede" ? "paredes" : "portas";
         registrarMapa({
             ...mapaRef.current,
             [campo]: mapaRef.current[campo].map((item) => item.id === id ? normalizarEstrutura({ ...item, ...alteracoes }, 0, tipo) : item),
         }, "Estrutura atualizada.");
     }
     function removerEstrutura(tipo, id) {
-        const campo = tipo === "porta" ? "portas" : "paredes";
+        const campo = tipo === "parede" ? "paredes" : "portas";
         registrarMapa({ ...mapaRef.current, [campo]: mapaRef.current[campo].filter((item) => item.id !== id) }, "Estrutura removida.");
+    }
+    function alternarAberturaEstrutura(estrutura) {
+        if (!estrutura || estrutura.tipoEstrutura === "parede") return;
+        if (papelEfetivo !== "mestre" && estrutura.trancada) {
+            mostrarAviso("A porta está trancada. Somente o mestre pode destrancá-la.");
+            return;
+        }
+        alterarEstrutura(estrutura.tipoEstrutura, estrutura.id, { aberta: !estrutura.aberta });
+    }
+    function alternarTrancaEstrutura(estrutura) {
+        if (!estrutura || estrutura.tipoEstrutura !== "porta" || papelEfetivo !== "mestre") return;
+        alterarEstrutura("porta", estrutura.id, {
+            trancada: !estrutura.trancada,
+            aberta: estrutura.trancada ? estrutura.aberta : false,
+        });
     }
     function atualizarNeblina(campo, valor) {
         registrarMapa({ ...mapaRef.current, neblina: { ...mapaRef.current.neblina, [campo]: valor } }, "Neblina atualizada.");
@@ -792,6 +902,10 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
             mapas: [...criarListaSegura(mapaRef.current.mapas), novoFundo],
             fundoAtivoId: id,
             fundo: novoFundo,
+            camadas: novoFundo.bloqueado ? mapaRef.current.camadas : {
+                ...mapaRef.current.camadas,
+                mapa: { ...mapaRef.current.camadas.mapa, bloqueada: false },
+            },
         }, mensagem);
     }
     function selecionarFundo(fundoId) {
@@ -799,17 +913,82 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
         if (!selecionado) return;
         registrarMapa({ ...mapaRef.current, fundoAtivoId: fundoId, fundo: selecionado }, `${selecionado.nome} selecionado.`);
         setPainelAtivo("fundo");
+        setPainelRecolhido(false);
     }
     function alterarOrdemFundo(direcao) {
         const ordens = mapas.map((item) => Number(item.ordem) || 0);
         atualizarFundo("ordem", direcao === "frente" ? Math.max(0, ...ordens) + 1 : Math.min(0, ...ordens) - 1, direcao === "frente" ? "Parte trazida para frente." : "Parte enviada para trás.");
     }
     function alternarPainel(nomePainel) {
+        setPainelRecolhido(false);
         setPainelAtivo((painelAnterior) => painelAnterior ===
             nomePainel
             ? ""
             : nomePainel);
         setMenuFerramentasAberto(false);
+    }
+    function fecharPainelAtivo() {
+        setPainelAtivo("");
+        setPainelRecolhido(false);
+        setPainelDestravado(false);
+        setPosicaoPainel(null);
+    }
+    function cancelarRecolhimentoAutomatico() {
+        if (!recolherJanelaTimeoutRef.current) return;
+        clearTimeout(recolherJanelaTimeoutRef.current);
+        recolherJanelaTimeoutRef.current = null;
+    }
+    function agendarRecolhimentoAutomatico() {
+        if (painelDestravado || painelRecolhido) return;
+        cancelarRecolhimentoAutomatico();
+        recolherJanelaTimeoutRef.current = setTimeout(() => {
+            setPainelRecolhido(true);
+            recolherJanelaTimeoutRef.current = null;
+        }, 260);
+    }
+    function alternarPainelDestravado() {
+        cancelarRecolhimentoAutomatico();
+        if (painelDestravado) {
+            setPainelDestravado(false);
+            setPosicaoPainel(null);
+            return;
+        }
+        const retangulo = janelaFerramentaRef.current?.getBoundingClientRect();
+        setPosicaoPainel(retangulo ? { x: retangulo.left, y: retangulo.top } : { x: 24, y: 150 });
+        setPainelDestravado(true);
+        setPainelRecolhido(false);
+    }
+    function iniciarArrasteJanelaFerramenta(evento) {
+        if (!painelDestravado || painelRecolhido || evento.button !== 0 || evento.target.closest("button")) return;
+        const retangulo = janelaFerramentaRef.current?.getBoundingClientRect();
+        if (!retangulo) return;
+        evento.preventDefault();
+        evento.currentTarget.setPointerCapture(evento.pointerId);
+        arrasteJanelaFerramentaRef.current = {
+            pointerId: evento.pointerId,
+            inicioX: evento.clientX,
+            inicioY: evento.clientY,
+            x: retangulo.left,
+            y: retangulo.top,
+            largura: retangulo.width,
+            altura: retangulo.height,
+        };
+    }
+    function moverJanelaFerramenta(evento) {
+        const arraste = arrasteJanelaFerramentaRef.current;
+        if (!arraste || arraste.pointerId !== evento.pointerId) return;
+        evento.preventDefault();
+        const limiteX = Math.max(8, window.innerWidth - Math.min(arraste.largura, window.innerWidth) - 8);
+        const limiteY = Math.max(8, window.innerHeight - 52);
+        setPosicaoPainel({
+            x: limitarNumero(arraste.x + evento.clientX - arraste.inicioX, 8, 8, limiteX),
+            y: limitarNumero(arraste.y + evento.clientY - arraste.inicioY, 8, 8, limiteY),
+        });
+    }
+    function finalizarArrasteJanelaFerramenta(evento) {
+        const arraste = arrasteJanelaFerramentaRef.current;
+        if (!arraste || arraste.pointerId !== evento.pointerId) return;
+        arrasteJanelaFerramentaRef.current = null;
     }
     function alternarBloqueioFundo() {
         if (!fundo.imagem) {
@@ -817,16 +996,26 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
             return;
         }
         const novoBloqueio = !fundo.bloqueado;
-        atualizarFundo("bloqueado", novoBloqueio, novoBloqueio
-            ? "Imagem travada."
-            : "Imagem destravada. Arraste o centro, as linhas ou os cantos.");
+        registrarMapa({
+            ...criarMapaComFundoAtualizado(mapaRef.current, { bloqueado: novoBloqueio }),
+            camadas: {
+                ...mapaRef.current.camadas,
+                mapa: { ...mapaRef.current.camadas.mapa, bloqueada: novoBloqueio },
+            },
+        }, novoBloqueio ? "Imagem travada." : "Edição livre ativada. Arraste a imagem ou use as oito alças para redimensionar.");
     }
     function travarFundo() {
         if (!fundo.imagem ||
             fundo.bloqueado) {
             return;
         }
-        atualizarFundo("bloqueado", true, "Imagem travada.");
+        registrarMapa({
+            ...criarMapaComFundoAtualizado(mapaRef.current, { bloqueado: true }),
+            camadas: {
+                ...mapaRef.current.camadas,
+                mapa: { ...mapaRef.current.camadas.mapa, bloqueada: true },
+            },
+        }, "Imagem travada.");
     }
     function obterFichaDoToken(token) {
         return obterEntidadeDoToken(token);
@@ -903,7 +1092,9 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
             mostrarNome: true,
             mostrarPv: true,
             bloqueado: false,
-            oculto: false,
+            oculto: true,
+            modoVisibilidade: "oculto",
+            alcanceProximidade: 3,
             camada: "tokens",
             ordem: mapaRef.current.tokens.length + 1,
             proprietario: ficha.jogador || ficha.id,
@@ -968,7 +1159,9 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
             mostrarNome: true,
             mostrarPv: true,
             bloqueado: false,
-            oculto: false,
+            oculto: true,
+            modoVisibilidade: "oculto",
+            alcanceProximidade: 3,
             camada: "tokens",
             ordem: mapaRef.current.tokens.length + 1,
             proprietario: "mestre",
@@ -989,6 +1182,9 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
             ...token,
             id: `token-npc-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
             ...criarAlteracaoPosicao(token.x + deslocamento, token.y + deslocamento, token.tamanho),
+            oculto: true,
+            modoVisibilidade: "oculto",
+            alcanceProximidade: 3,
             ordem: Math.max(0, ...mapaRef.current.tokens.map((item) => Number(item.ordem) || 0)) + 1,
         };
         registrarMapa({
@@ -1038,10 +1234,16 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
             mostrarAviso("Este token não possui uma ficha vinculada.");
             return;
         }
-        setMiniFichaAberta({
+        const referenciaMiniFicha = {
             tipo: token.tipo,
             id: token.tipo === "npc" ? token.npcId : token.fichaId,
-        });
+        };
+        if (typeof aoAbrirMiniFicha === "function") {
+            aoAbrirMiniFicha(referenciaMiniFicha);
+        }
+        else {
+            setMiniFichaAberta(referenciaMiniFicha);
+        }
         setMenuTokenPosicao(null);
     }
     function atualizarEntidadeMiniFicha(alteracoes) {
@@ -1085,7 +1287,7 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
         const metade = (token.tamanho * grid.tamanhoCelula) / 2;
         const origem = { x: token.x + metade, y: token.y + metade };
         const destino = { x: alteracao.x + metade, y: alteracao.y + metade };
-        return barreirasVisao.some((barreira) => segmentoCruzaBarreira(origem, destino, barreira));
+        return barreirasMovimento.some((barreira) => segmentoCruzaBarreira(origem, destino, barreira));
     }
     function moverTokenSelecionadoPorClique(evento) {
         if (ignorarCliqueMapaRef.current) {
@@ -2645,7 +2847,7 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
 
           .painel-mapa__token {
             position: absolute;
-            z-index: 8;
+            z-index: 30;
 
             display: block;
 
@@ -3252,8 +3454,11 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
         }}
         aoDuplicar={() => duplicarTokenNpc(tokenSelecionado)}
         aoRemover={() => removerToken(tokenSelecionado)}
-        aoAlternarOculto={() => {
-          atualizarToken(tokenSelecionado.id, { oculto: !tokenSelecionado.oculto }, tokenSelecionado.oculto ? "Token revelado." : "Token ocultado.");
+        aoAlterarVisibilidade={(modoVisibilidade) => {
+          atualizarToken(tokenSelecionado.id, {
+            modoVisibilidade,
+            oculto: modoVisibilidade !== "visivel",
+          }, modoVisibilidade === "visivel" ? "Token visível aos jogadores." : modoVisibilidade === "proximidade" ? "Token visível por proximidade." : "Token ocultado.");
           setMenuTokenPosicao(null);
         }}
         aoAlternarBloqueado={() => {
@@ -3339,7 +3544,7 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
 
         <div className="painel-mapa__ferramentas-grupo">
           <span className="painel-mapa__ferramentas-legenda">Ambiente</span>
-          <button type="button" title="Paredes e portas" disabled={papelEfetivo !== "mestre"} aria-pressed={painelEstruturas} onClick={() => alternarPainel("estruturas")}><i aria-hidden="true">⌑</i><span>Paredes</span></button>
+          <button type="button" title="Paredes, portas e janelas" disabled={papelEfetivo !== "mestre"} aria-pressed={painelEstruturas} onClick={() => alternarPainel("estruturas")}><i aria-hidden="true">⌑</i><span>Estruturas</span></button>
           <button type="button" title="Neblina de guerra" disabled={papelEfetivo !== "mestre"} aria-pressed={painelNeblina} onClick={() => alternarPainel("neblina")}><i aria-hidden="true">◌</i><span>Neblina</span></button>
           <button type="button" title="Visão e iluminação" disabled={papelEfetivo !== "mestre"} aria-pressed={painelLuz} onClick={() => alternarPainel("luz")}><i aria-hidden="true">✦</i><span>Luz</span></button>
         </div>
@@ -3358,7 +3563,38 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
         </div>
       </div>
 
-      {painelGrid ? (<section className="painel-mapa__config-grid" data-assistente="mapa-painel-grid">
+      {painelAtivo && !painelNpc ? (
+        <div
+          ref={janelaFerramentaRef}
+          className={[
+            "painel-mapa__janela-ferramenta",
+            painelRecolhido ? "painel-mapa__janela-ferramenta--recolhida" : "",
+            painelDestravado ? "painel-mapa__janela-ferramenta--destravada" : "",
+          ].filter(Boolean).join(" ")}
+          style={painelDestravado && posicaoPainel ? { left: `${posicaoPainel.x}px`, top: `${posicaoPainel.y}px` } : undefined}
+          onMouseEnter={cancelarRecolhimentoAutomatico}
+          onMouseLeave={agendarRecolhimentoAutomatico}
+        >
+          <div
+            className="painel-mapa__painel-controle"
+            onPointerDown={iniciarArrasteJanelaFerramenta}
+            onPointerMove={moverJanelaFerramenta}
+            onPointerUp={finalizarArrasteJanelaFerramenta}
+            onPointerCancel={finalizarArrasteJanelaFerramenta}
+          >
+            <strong title={painelDestravado ? "Arraste por esta barra para mover a janela" : undefined}>
+              {painelDestravado ? "↕ " : ""}{ROTULOS_PAINEIS_MAPA[painelAtivo] || "Ferramenta do mapa"}
+            </strong>
+            <button type="button" aria-expanded={!painelRecolhido} onClick={() => setPainelRecolhido((recolhido) => !recolhido)}>
+              {painelRecolhido ? "▣ Abrir" : "— Recolher"}
+            </button>
+            <button type="button" aria-pressed={painelDestravado} onClick={alternarPainelDestravado}>
+              {painelDestravado ? "⌖ Fixar" : "↗ Destravar"}
+            </button>
+            <button type="button" aria-label="Fechar ferramenta" onClick={fecharPainelAtivo}>× Fechar</button>
+          </div>
+
+      {!painelRecolhido && painelGrid ? (<section className="painel-mapa__config-grid" data-assistente="mapa-painel-grid">
           <header>
             <h3>
               Configuração do grid
@@ -3437,7 +3673,7 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
           </div>
         </section>) : null}
 
-      {painelMedicao ? (<section className="painel-mapa__config-grid painel-mapa__config-medicao" data-assistente="mapa-painel-regua">
+      {!painelRecolhido && painelMedicao ? (<section className="painel-mapa__config-grid painel-mapa__config-medicao" data-assistente="mapa-painel-regua">
           <header>
             <h3>Régua e medição</h3>
             <button type="button" onClick={() => setPainelAtivo("")}>Fechar</button>
@@ -3467,11 +3703,11 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
           <p className="painel-mapa__token-ajuda">Arraste sobre o mapa para traçar uma linha. A régua respeita o tamanho das casas e a regra de diagonal escolhida.</p>
         </section>) : null}
 
-      {painelCamadas ? (
+      {!painelRecolhido && painelCamadas ? (
         <PainelCamadasMapa camadas={mapaLocal.camadas} aoAlterar={atualizarCamada} aoFechar={() => setPainelAtivo("")} />
       ) : null}
 
-      {painelEstruturas ? (
+      {!painelRecolhido && painelEstruturas ? (
         <PainelEstruturasMapa
           ferramenta={ferramentaEstrutura}
           paredes={mapaLocal.paredes}
@@ -3484,7 +3720,7 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
         />
       ) : null}
 
-      {painelNeblina ? (
+      {!painelRecolhido && painelNeblina ? (
         <PainelNeblinaMapa
           neblina={mapaLocal.neblina}
           ferramenta={ferramentaNeblina}
@@ -3496,7 +3732,7 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
         />
       ) : null}
 
-      {painelLuz ? (
+      {!painelRecolhido && painelLuz ? (
         <PainelIluminacaoMapa
           iluminacao={mapaLocal.iluminacao}
           luzes={mapaLocal.luzes}
@@ -3513,7 +3749,7 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
         />
       ) : null}
 
-      {painelPermissoes && papelAtual === "mestre" ? (
+      {!painelRecolhido && painelPermissoes && papelAtual === "mestre" ? (
         <PainelPermissoesMapa
           tokens={tokens}
           fichas={fichasSeguras}
@@ -3524,7 +3760,7 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
         />
       ) : null}
 
-      {painelFundo ? (<section className="painel-mapa__config-fundo" data-assistente="mapa-painel-fundo">
+      {!painelRecolhido && painelFundo ? (<section className="painel-mapa__config-fundo" data-assistente="mapa-painel-fundo">
           <header>
             <h3>
               Mapas da cena
@@ -3562,8 +3798,8 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
 
             <button type="button" disabled={!fundo.imagem} onClick={alternarBloqueioFundo}>
               {fundo.bloqueado
-                ? "Destravar imagem"
-                : "Travar imagem"}
+                ? "Editar e redimensionar"
+                : "Finalizar edição"}
             </button>
 
             <button type="button" disabled={!fundo.imagem} onClick={ajustarFundoAoGrid}>
@@ -3604,12 +3840,7 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
           </p>
 
           {fundoEditavel ? (<p className="painel-mapa__fundo-ajuda">
-              Arraste o centro
-              para mover, as
-              linhas para aumentar
-              ou diminuir e os
-              cantos para alterar
-              largura e altura.
+              Edição livre ativa: arraste o centro para mover. Use as quatro linhas para alterar apenas largura ou altura e os quatro cantos para redimensionar livremente nos dois eixos. Clique em “Finalizar edição” quando terminar.
             </p>) : null}
 
           <div className="painel-mapa__fundo-campos">
@@ -3662,7 +3893,7 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
           </div>
         </section>) : null}
 
-      {painelToken ? (<section className="painel-mapa__config-token" data-assistente="mapa-painel-tokens">
+      {!painelRecolhido && painelToken ? (<section className="painel-mapa__config-token" data-assistente="mapa-painel-tokens">
           <header>
             <h3>
               Tokens das fichas
@@ -3738,7 +3969,49 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
               campanha.
             </p>)}
 
+          <div className="painel-mapa__visibilidade-tokens">
+            <div className="painel-mapa__visibilidade-cabecalho">
+              <strong>Visibilidade para jogadores</strong>
+              <small>Todo token novo começa oculto. Libere apenas quando estiver pronto.</small>
+            </div>
+
+            {tokens.length > 0 ? tokens.map((token) => {
+                const fichaDoToken = obterFichaDoToken(token);
+                const nomeToken = fichaDoToken?.nome || token.nome || (token.tipo === "npc" ? "NPC" : "Agente");
+                return (
+                  <article className="painel-mapa__controle-visibilidade" key={`visibilidade-${token.id}`}>
+                    <span aria-hidden="true">{token.modoVisibilidade === "visivel" ? "●" : token.modoVisibilidade === "proximidade" ? "◎" : "◌"}</span>
+                    <div>
+                      <strong>{nomeToken}</strong>
+                      <small>{token.tipo === "npc" ? "NPC" : "Jogador"} · {token.modoVisibilidade === "visivel" ? "visível aos jogadores" : token.modoVisibilidade === "proximidade" ? `aparece a ${token.alcanceProximidade} casas` : "oculto dos jogadores"}</small>
+                    </div>
+                    <div className="painel-mapa__modos-visibilidade" role="group" aria-label={`Visibilidade de ${nomeToken}`}>
+                      {[{ modo: "oculto", rotulo: "Oculto" }, { modo: "proximidade", rotulo: "Proximidade" }, { modo: "visivel", rotulo: "Visível" }].map(({ modo, rotulo }) => (
+                        <button
+                          type="button"
+                          className={token.modoVisibilidade === modo ? "painel-mapa__modo-visibilidade--ativo" : ""}
+                          aria-pressed={token.modoVisibilidade === modo}
+                          onClick={() => atualizarToken(token.id, {
+                            modoVisibilidade: modo,
+                            oculto: modo !== "visivel",
+                          }, `${nomeToken}: visibilidade alterada para ${rotulo.toLowerCase()}.`)}
+                          key={modo}
+                        >
+                          {rotulo}
+                        </button>
+                      ))}
+                    </div>
+                  </article>
+                );
+              }) : (
+                <p className="painel-mapa__token-ajuda">Nenhum token foi colocado no mapa.</p>
+              )}
+          </div>
+
         </section>) : null}
+
+        </div>
+      ) : null}
 
       {guiaAberto ? (<section className="painel-mapa__guia">
           <h3>
@@ -3746,7 +4019,7 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
           </h3>
 
           <p>
-            Selecione um token e clique em uma casa para movê-lo, ou arraste a peça. Paredes e portas fechadas bloqueiam a passagem. A câmera só se move com Espaço + arraste, botão do meio ou toque; use Ctrl + roda para aplicar zoom.
+            Selecione um token e clique em uma casa para movê-lo, ou arraste a peça. Paredes, portas fechadas e janelas bloqueiam a passagem. Dê dois cliques em uma abertura para usá-la. A câmera só se move com Espaço + arraste, botão do meio ou toque; use Ctrl + roda para aplicar zoom.
           </p>
         </section>) : null}
 
@@ -3843,6 +4116,8 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
                   portas={mapaLocal.portas}
                   papelAtual={papelEfetivo}
                   aoCriar={criarEstrutura}
+                  aoAlternarAbertura={alternarAberturaEstrutura}
+                  aoAlternarTranca={alternarTrancaEstrutura}
                 />
               ) : null}
 
@@ -3866,6 +4141,7 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
                   luzes={mapaLocal.luzes}
                   fontesToken={fontesToken}
                   barreiras={barreirasVisao}
+                  papelAtual={papelEfetivo}
                   ativaEdicao={painelLuz && ferramentaLuz === "luz" && !mapaLocal.camadas.efeitos.bloqueada && papelEfetivo === "mestre"}
                   aoAdicionarLuz={adicionarLuz}
                 />
@@ -3946,8 +4222,11 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
                     token.bloqueado
                         ? "painel-mapa__token--bloqueado"
                         : "",
-                    token.oculto
+                    papelEfetivo === "mestre" && token.modoVisibilidade === "oculto"
                         ? "painel-mapa__token--oculto"
+                        : "",
+                    papelEfetivo === "mestre" && token.modoVisibilidade === "proximidade"
+                        ? "painel-mapa__token--proximidade"
                         : "",
                     token.tipo === "npc"
                         ? "painel-mapa__token--npc"
@@ -3968,7 +4247,10 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
                     pointerEvents: fundoEditavel || mapaLocal.camadas.tokens.bloqueada
                         ? "none"
                         : "auto",
-                    zIndex: Number(token.ordem) || 1,
+                    zIndex: 30 + (Number(token.ordem) || 1),
+                    opacity: papelEfetivo === "jogador" && token.modoVisibilidade === "proximidade"
+                        ? opacidadeProximidadePorToken.get(token.id)
+                        : undefined,
                     "--token-rotacao": `${token.rotacao || 0}deg`,
                     "--token-cor": obterCorToken(token.fichaId ||
                         token.id),
@@ -4021,7 +4303,7 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
                         style={{
                           left: `${token.x - 13}px`,
                           top: `${token.y - 13}px`,
-                          zIndex: (Number(token.ordem) || 1) + 2,
+                          zIndex: 33 + (Number(token.ordem) || 1),
                         }}
                       >
                         ↷
@@ -4038,7 +4320,7 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
                         style={{
                           left: `${token.x + tamanhoPixels - 13}px`,
                           top: `${token.y - 13}px`,
-                          zIndex: (Number(token.ordem) || 1) + 2,
+                          zIndex: 33 + (Number(token.ordem) || 1),
                         }}
                       >
                         •••

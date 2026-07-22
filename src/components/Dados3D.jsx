@@ -47,7 +47,7 @@ const Dados3D = forwardRef(
             assetPath: "/assets/dice-box/",
 
             theme: "default",
-            themeColor: "#c79a4d",
+            themeColor: "#9B5CFF",
 
             scale: 4.5,
             gravity: 1,

@@ -108,7 +108,7 @@ export default function Orbinho() {
   const balaoRef = useRef(null);
   const [alvo, setAlvo] = useState(null);
   const medirAlvo = useCallback((retangulo) => setAlvo(retangulo), []);
-  const { aberto, ajudaAtiva, etapaAtual, fechar: fecharOrbinho } = orbinho;
+  const { aberto, ajudaAtiva, etapaAtual, fechar: fecharOrbinho, iniciarTutorial } = orbinho;
 
   useEffect(() => {
     if (aberto) balaoRef.current?.focus();
@@ -124,6 +124,16 @@ export default function Orbinho() {
       },
     }));
   }, [orbinho.etapa, orbinho.tutorial]);
+
+  useEffect(() => {
+    function iniciarTutorialSolicitado(evento) {
+      const tutorialId = evento.detail?.id;
+      if (!tutorialId) return;
+      iniciarTutorial(tutorialId, evento.detail?.reiniciar === true);
+    }
+    window.addEventListener("orbinho:iniciar-tutorial", iniciarTutorialSolicitado);
+    return () => window.removeEventListener("orbinho:iniciar-tutorial", iniciarTutorialSolicitado);
+  }, [iniciarTutorial]);
 
   useEffect(() => {
     function fecharComEscape(evento) {

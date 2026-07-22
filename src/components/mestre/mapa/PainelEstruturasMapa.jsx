@@ -1,17 +1,30 @@
 function PainelEstruturasMapa({ ferramenta, paredes, portas, bloqueada, aoEscolher, aoAlterar, aoRemover, aoFechar }) {
+  const contadores = { parede: 0, porta: 0, janela: 0 };
   const itens = [
-    ...paredes.map((item, indice) => ({ ...item, tipo: "parede", nome: `Parede ${indice + 1}` })),
-    ...portas.map((item, indice) => ({ ...item, tipo: "porta", nome: `Porta ${indice + 1}` })),
+    ...paredes.map((item) => ({ ...item, tipo: "parede" })),
+    ...portas.map((item) => ({ ...item, tipo: item.tipoEstrutura === "janela" ? "janela" : "porta" })),
+  ].map((item) => {
+    contadores[item.tipo] += 1;
+    const rotulo = item.tipo === "janela" ? "Janela" : item.tipo === "porta" ? "Porta" : "Parede";
+    return { ...item, nome: `${rotulo} ${contadores[item.tipo]}` };
+  });
+  const ferramentas = [
+    { id: "parede", simbolo: "╱", nome: "Desenhar parede" },
+    { id: "porta", simbolo: "▯", nome: "Desenhar porta" },
+    { id: "janela", simbolo: "▤", nome: "Desenhar janela" },
   ];
   return (
     <section className="painel-mapa__config-grid painel-estruturas-mapa" data-assistente="mapa-painel-paredes">
-      <header><h3>Paredes e portas</h3><button type="button" aria-label="Fechar painel" onClick={aoFechar}><span aria-hidden="true">×</span> Fechar</button></header>
-      <p className="painel-mapa__token-ajuda">Trace segmentos diretamente no mapa. Paredes e portas fechadas bloqueiam visão e luz; portas abertas liberam a passagem.</p>
+      <header><h3>Paredes, portas e janelas</h3><button type="button" aria-label="Fechar painel" onClick={aoFechar}><span aria-hidden="true">×</span> Fechar</button></header>
+      <p className="painel-mapa__token-ajuda">Paredes e aberturas fechadas bloqueiam visão e luz. Dê dois cliques numa porta ou janela para abrir/fechar. Portas trancadas só podem ser liberadas pelo mestre.</p>
       <div className="painel-estruturas-mapa__acoes">
-        <button className="painel-mapa__botao-ferramenta" type="button" disabled={bloqueada} aria-pressed={ferramenta === "parede"} onClick={() => aoEscolher(ferramenta === "parede" ? "" : "parede")}><span aria-hidden="true">╱</span> Desenhar parede</button>
-        <button className="painel-mapa__botao-ferramenta" type="button" disabled={bloqueada} aria-pressed={ferramenta === "porta"} onClick={() => aoEscolher(ferramenta === "porta" ? "" : "porta")}><span aria-hidden="true">▯</span> Desenhar porta</button>
+        {ferramentas.map((item) => (
+          <button className="painel-mapa__botao-ferramenta" key={item.id} type="button" disabled={bloqueada} aria-pressed={ferramenta === item.id} onClick={() => aoEscolher(ferramenta === item.id ? "" : item.id)}>
+            <span aria-hidden="true">{item.simbolo}</span> {item.nome}
+          </button>
+        ))}
       </div>
-      {bloqueada ? <p className="painel-mapa__token-ajuda">Destrave a camada “Paredes e portas” para editar.</p> : null}
+      {bloqueada ? <p className="painel-mapa__token-ajuda">Destrave a camada “Paredes, portas e janelas” para editar.</p> : null}
       <div className="painel-estruturas-mapa__lista">
         {itens.length === 0 ? <p>Nenhuma estrutura desenhada.</p> : itens.map((item) => (
           <article key={item.id}>
@@ -23,7 +36,8 @@ function PainelEstruturasMapa({ ferramenta, paredes, portas, bloqueada, aoEscolh
               <label>X2 <input type="number" value={Math.round(item.fim.x)} onChange={(e) => aoAlterar(item.tipo, item.id, { fim: { ...item.fim, x: Number(e.target.value) } })} /></label>
               <label>Y2 <input type="number" value={Math.round(item.fim.y)} onChange={(e) => aoAlterar(item.tipo, item.id, { fim: { ...item.fim, y: Number(e.target.value) } })} /></label>
             </div>
-            {item.tipo === "porta" ? <button type="button" onClick={() => aoAlterar(item.tipo, item.id, { aberta: !item.aberta })}>{item.aberta ? "Fechar" : "Abrir"}</button> : null}
+            {item.tipo !== "parede" ? <button type="button" onClick={() => aoAlterar(item.tipo, item.id, { aberta: !item.aberta })}>{item.aberta ? "Fechar" : "Abrir"}</button> : null}
+            {item.tipo === "porta" ? <button type="button" onClick={() => aoAlterar(item.tipo, item.id, { trancada: !item.trancada, aberta: item.trancada ? item.aberta : false })}>{item.trancada ? "Destrancar" : "Trancar"}</button> : null}
             <button type="button" onClick={() => aoAlterar(item.tipo, item.id, { oculta: !item.oculta })}>{item.oculta ? "Mostrar" : "Ocultar de jogadores"}</button>
             <button className="painel-mapa__botao-perigo" type="button" onClick={() => aoRemover(item.tipo, item.id)}>Remover</button>
           </article>

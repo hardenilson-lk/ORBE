@@ -1,0 +1,9 @@
+.mesa-sonora-jogador { border: 1px solid #76552d; background: linear-gradient(180deg, #ead4a5, #cfad72); padding: 14px; color: #27170e; }
+.mesa-sonora-jogador header { border-bottom: 1px dashed #8b6a3e; margin-bottom: 10px; }
+.mesa-sonora-jogador header span, .mesa-sonora-jogador__agora small { display: block; color: #8b241f; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; }
+.mesa-sonora-jogador h2 { margin: 3px 0 8px; }
+.mesa-sonora-jogador__agora { display: grid; gap: 3px; margin-bottom: 12px; }
+.mesa-sonora-jogador label { display: grid; grid-template-columns: 1fr auto; gap: 6px; align-items: center; font-size: 11px; text-transform: uppercase; }
+.mesa-sonora-jogador label input { grid-column: 1 / -1; width: 100%; }
+.mesa-sonora-jogador button { width: 100%; margin-top: 8px; border: 1px solid #6d3c22; background: #351c13; color: #f2d597; padding: 9px; }
+.mesa-sonora-jogador p { margin: 10px 0 0; font-size: 11px; }

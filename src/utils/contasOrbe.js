@@ -100,6 +100,7 @@ export async function criarContaOrbeConectada(dados) {
   if (!orbeOnlineHabilitado()) return criarContaOrbe(dados);
   if (!String(dados.email || "").includes("@")) throw new Error("Informe um e-mail válido para criar a conta online.");
   const conta = await criarContaRemota(dados);
+  if (conta?.confirmacaoPendente) return conta;
   return armazenarEspelhoConta({ ...conta, nome: dados.nome, usuario: dados.usuario });
 }
 

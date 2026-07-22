@@ -47,6 +47,35 @@
   text-align: center;
 }
 
+.menu-contextual-token__visibilidade {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  padding: 5px 0;
+  border-bottom: 1px dashed rgba(211, 176, 105, 0.28);
+}
+
+.menu-contextual-token__visibilidade small {
+  grid-column: 1 / -1;
+  color: #d8b66d;
+  font: 800 0.54rem "Courier Prime", "Courier New", monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.menu-contextual-token__visibilidade button {
+  min-height: 30px;
+  padding: 5px 3px;
+  font-size: 0.48rem;
+  text-align: center;
+}
+
+.menu-contextual-token__visibilidade button[aria-pressed="true"] {
+  border-color: #e2b85f;
+  background: linear-gradient(145deg, #765527, #422b15);
+  color: #fff1bb;
+}
+
 .mini-ficha-token__fundo,
 .editor-token-mapa__fundo,
 .painel-npcs-mapa__fundo {
@@ -58,6 +87,19 @@
   padding: 18px;
   background: rgba(8, 5, 3, 0.64);
   backdrop-filter: blur(2px);
+}
+
+.mini-ficha-token__encaixe {
+  display: grid;
+  place-items: center;
+  padding: 14px;
+  background: rgba(52, 31, 17, 0.16);
+}
+
+.mini-ficha-token__encaixe .mini-ficha-token {
+  width: min(760px, 100%);
+  max-height: none;
+  box-shadow: 0 12px 28px rgba(44, 25, 13, 0.28);
 }
 
 .mini-ficha-token,

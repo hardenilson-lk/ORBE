@@ -19,9 +19,22 @@ function MenuJogador({
   aoSelecionarMenu,
   aoTrocarPersonagem,
   aoAtualizar,
+  recolhido = false,
+  aoAlternarRecolhido,
 }) {
+  if (recolhido) {
+    return (
+      <aside className="menu-jogador menu-jogador--recolhido">
+        <button className="menu-jogador__mostrar" type="button" onClick={aoAlternarRecolhido} aria-label="Mostrar menu principal" title="Mostrar menu principal">
+          <span aria-hidden="true">☰</span><small>Menu</small>
+        </button>
+      </aside>
+    );
+  }
+
   return (
     <aside className="menu-jogador">
+      <button className="menu-jogador__recolher" type="button" onClick={aoAlternarRecolhido} aria-label="Esconder menu principal" title="Esconder menu principal">‹ Esconder menu</button>
       <header className="menu-jogador__marca">
         <span>ARQ</span>
         <div>
@@ -50,6 +63,7 @@ function MenuJogador({
             type="button"
             className={menuAtivo === id ? "ativo" : ""}
             key={id}
+            data-assistente={id === "ficha" ? "menu-fichas" : undefined}
             onClick={() => aoSelecionarMenu(id)}
           >
             <span aria-hidden="true">{icone}</span>

@@ -121,6 +121,10 @@
   transform: translateY(-1px);
 }
 
+.painel-fichas__acoes-cabecalho { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+.painel-fichas__acoes-cabecalho button:first-child { border-color: #8a602d; background: linear-gradient(180deg, #8b3a31, #3e1814); }
+.ficha-arquivos__aviso-distribuicao { margin: 0; padding: 11px 14px; border: 1px solid #9e3a31; border-left-width: 5px; background: #efd7b0; color: #7b211e; font: 800 0.72rem/1.4 "Courier Prime", monospace; }
+
 /* =========================
    LISTA DE FICHAS
 ========================= */
@@ -457,6 +461,17 @@
     ),
     rgba(255, 248, 232, 0.24);
 }
+
+.ficha-arquivos__titulo-com-saldo { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.ficha-arquivos__titulo-com-saldo > div { display: grid; gap: 8px; }
+.ficha-arquivos__titulo-com-saldo > div > small,
+.tabela-pericias__titulo small { max-width: 560px; color: #604932; font: 0.68rem/1.45 "Courier Prime", monospace; }
+.ficha-arquivos__titulo-com-saldo h3 { margin-inline: 0; }
+.saldo-pontos { flex: 0 0 auto; padding: 8px 10px; border: 1px solid #a9782d; background: #fff0bd; color: #6f4815; font: 900 0.66rem/1.2 "Courier Prime", monospace; text-transform: uppercase; }
+.saldo-pontos--completo { border-color: #4f7b50; background: #dce6bd; color: #355a36; }
+.saldo-pontos--erro { border-color: #a23831; background: #f0c4ad; color: #7e1d1a; }
+.ficha-arquivos__cola-regra,
+.tabela-pericias__cola-regra { margin: 0; padding: 8px 10px; border-left: 3px solid #9b6c2e; background: rgba(255, 243, 201, 0.5); color: #5d432a; font: 0.65rem/1.45 "Courier Prime", monospace; }
 
 .ficha-arquivos__atributos h3,
 .ficha-arquivos__recursos h3 {
@@ -1436,9 +1451,13 @@
 
 .tabela-pericias__titulo {
   display: flex;
-  justify-content: center;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
   padding-bottom: 2px;
 }
+
+.tabela-pericias__titulo > div { display: grid; gap: 8px; }
 
 .tabela-pericias__titulo h3 {
   margin: 0;

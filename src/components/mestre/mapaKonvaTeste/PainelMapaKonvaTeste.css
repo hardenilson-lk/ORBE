@@ -1,0 +1,110 @@
+.mapa-konva-teste {
+  display: grid;
+  gap: 14px;
+  color: #2b1b13;
+  font-family: "Courier New", monospace;
+}
+
+.mapa-konva-teste__cabecalho {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 18px;
+  border: 1px solid #8b6630;
+  background: linear-gradient(90deg, #eed8ad, #d2ae76);
+  box-shadow: inset 0 0 24px rgba(87, 47, 17, .13);
+}
+
+.mapa-konva-teste__cabecalho span,
+.mapa-konva-teste__cabecalho small { display: block; color: #8f2024; font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; }
+.mapa-konva-teste__cabecalho h2 { margin: 4px 0; font: 700 1.55rem Georgia, serif; }
+.mapa-konva-teste__cabecalho > strong { padding: 8px 12px; transform: rotate(-2deg); border: 2px solid #9e272b; color: #9e272b; letter-spacing: .12em; }
+
+.mapa-konva-teste__controles {
+  display: grid;
+  grid-template-columns: 1.4fr .8fr 1.2fr;
+  gap: 10px;
+}
+
+.mapa-konva-teste fieldset {
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 8px;
+  padding: 11px;
+  border: 1px solid #80602d;
+  background: rgba(231, 205, 157, .9);
+}
+
+.mapa-konva-teste legend { padding: 0 7px; color: #781e20; font-weight: 700; text-transform: uppercase; }
+.mapa-konva-teste label { display: grid; gap: 4px; font-size: .63rem; font-weight: 700; text-transform: uppercase; }
+.mapa-konva-teste input { box-sizing: border-box; width: 76px; min-height: 31px; padding: 4px 7px; border: 1px solid #8f703e; color: #2b1b13; background: #f8e8c8; }
+.mapa-konva-teste input[type="color"] { width: 46px; padding: 2px; }
+.mapa-konva-teste input[type="range"] { width: 100px; }
+.mapa-konva-teste__check { display: flex !important; flex-direction: row; align-items: center; padding-bottom: 7px; }
+.mapa-konva-teste__check input { width: 18px; min-height: 18px; }
+.mapa-konva-teste button { min-height: 34px; padding: 6px 11px; border: 1px solid #7e5a25; color: #f6e4ba; background: linear-gradient(#704713, #3d260e); font: 700 .68rem "Courier New", monospace; text-transform: uppercase; cursor: pointer; }
+.mapa-konva-teste button:hover:not(:disabled) { filter: brightness(1.15); }
+.mapa-konva-teste button:disabled { opacity: .45; cursor: not-allowed; }
+.mapa-konva-teste output { min-width: 52px; align-self: center; text-align: center; font-weight: 700; }
+.mapa-konva-teste button.mapa-konva-teste__perigo { border-color: #721d20; background: linear-gradient(#872d2d, #511719); }
+
+.mapa-konva-teste__fundo-campos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 10px;
+  padding: 10px 12px;
+  border-left: 4px solid #9f762d;
+  background: #e7c996;
+}
+
+.mapa-konva-teste__fundo-campos span { margin-left: auto; align-self: center; font-size: .7rem; }
+.mapa-konva-teste__area {
+  position: relative;
+  min-height: 560px;
+  height: min(64vh, 720px);
+  overflow: hidden;
+  border: 8px solid #20150e;
+  outline: 1px solid #a77d37;
+  background-color: #0c0a09;
+  background-image: radial-gradient(rgba(229, 184, 92, .07) 1px, transparent 1px);
+  background-size: 18px 18px;
+  box-shadow: inset 0 0 35px #000, 0 10px 24px rgba(39, 23, 11, .25);
+  cursor: grab;
+}
+
+.mapa-konva-teste__area:active { cursor: grabbing; }
+.mapa-konva-teste footer { display: flex; justify-content: space-between; gap: 20px; padding: 8px 10px; border-top: 1px dashed #8f703e; color: #6f4b21; font-size: .68rem; }
+
+.pagina-mestre__troca-mapa {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
+.pagina-mestre__troca-mapa button {
+  min-height: 38px;
+  padding: 8px 14px;
+  border: 1px solid #9a6b28;
+  color: #f4deb0;
+  background: linear-gradient(#6f4817, #301d0c);
+  font: 700 .72rem "Courier New", monospace;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(43, 24, 10, .2);
+}
+
+.pagina-mestre__troca-mapa button:hover { filter: brightness(1.12); }
+
+@media (max-width: 1050px) {
+  .mapa-konva-teste__controles { grid-template-columns: 1fr; }
+  .mapa-konva-teste__area { min-height: 480px; height: 58vh; }
+}
+
+@media (max-width: 680px) {
+  .mapa-konva-teste__cabecalho { align-items: flex-start; }
+  .mapa-konva-teste__fundo-campos span { width: 100%; margin-left: 0; }
+  .mapa-konva-teste footer { flex-direction: column; }
+}

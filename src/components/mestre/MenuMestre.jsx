@@ -31,7 +31,7 @@ const ITENS_MENU = [
   {
     id: "trilha-sonora",
     simbolo: "♫",
-    texto: "Trilha sonora",
+    texto: "Mesa Sonora",
   },
   {
     id: "anotacoes",

@@ -5,6 +5,8 @@
   background: radial-gradient(circle at 48% 8%, rgba(115, 70, 34, 0.2), transparent 30rem), linear-gradient(145deg, #17110d, #080706 72%);
 }
 
+.pagina-jogador--menu-recolhido { grid-template-columns: 62px minmax(0, 1fr); }
+
 .pagina-jogador__conteudo { min-width: 0; padding: 18px; }
 
 .pagina-jogador__topo {

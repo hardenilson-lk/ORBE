@@ -1,4 +1,5 @@
 import { useState } from "react";
+import MiniFichaToken from "./mapa/MiniFichaToken.jsx";
 
 import "./EscudoMestre.css";
 
@@ -155,14 +156,20 @@ function EscudoMestre({
   aoCriarFicha,
   aoAbrirFicha,
   aoAbrirInventario,
+  miniFichaAberta,
+  aoFecharMiniFicha,
 }) {
   const jogadoresOnline = jogadores.filter((jogador) => jogador?.online !== false).length;
   const tokens = Array.isArray(mapa?.tokens) ? mapa.tokens : [];
   const npcs = Array.isArray(mapa?.npcs) ? mapa.npcs : [];
-  const tokensOcultos = tokens.filter((token) => token?.oculto).length;
+  const tokensOcultos = tokens.filter((token) => (token?.modoVisibilidade || (token?.oculto === false ? "visivel" : "oculto")) === "oculto").length;
+  const tokensProximidade = tokens.filter((token) => token?.modoVisibilidade === "proximidade").length;
   const representacoesJogadores = [];
   const fichasUsadas = new Set();
   const identidadesJogadores = new Set();
+  const entidadeMiniFicha = miniFichaAberta?.tipo === "npc"
+    ? npcs.find((npc) => npc.id === miniFichaAberta.id) || null
+    : fichas.find((ficha) => ficha.id === miniFichaAberta?.id) || null;
 
   if (jogadores.length) {
     jogadores.forEach((jogador) => {
@@ -229,8 +236,27 @@ function EscudoMestre({
             <article><span>Jogadores</span><strong>{jogadoresOnline}/{jogadores.length}</strong><small>conectados</small></article>
             <article><span>Fichas</span><strong>{fichas.length}</strong><small>na campanha</small></article>
             <article><span>NPCs</span><strong>{npcs.length}</strong><small>na cena</small></article>
-            <article><span>Tokens</span><strong>{tokens.length}</strong><small>{tokensOcultos} ocultos</small></article>
+            <article><span>Tokens</span><strong>{tokens.length}</strong><small>{tokensOcultos} ocultos · {tokensProximidade} por proximidade</small></article>
           </section>
+
+          {entidadeMiniFicha ? (
+            <section className="escudo-mestre__mini-ficha-area" aria-label="Mini ficha selecionada no mapa">
+              <header>
+                <div><span>Token selecionado</span><h3>Ficha rápida no escudo</h3></div>
+                <small>Duplo clique no token abre esta área</small>
+              </header>
+              <MiniFichaToken
+                ficha={entidadeMiniFicha}
+                tipo={miniFichaAberta.tipo}
+                embutida
+                aoAlterar={(alteracoes) => {
+                  if (miniFichaAberta.tipo === "npc") atualizarNpc(entidadeMiniFicha.id, alteracoes);
+                  else aoAtualizarFicha?.({ ...entidadeMiniFicha, ...alteracoes });
+                }}
+                aoFechar={aoFecharMiniFicha}
+              />
+            </section>
+          ) : null}
 
           <section className="escudo-mestre__arquivo">
             <header>

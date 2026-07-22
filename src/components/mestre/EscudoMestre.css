@@ -82,6 +82,10 @@
 .escudo-mestre__resumo strong { display: block; margin: 2px 0; color: #291a10; font: 900 1.08rem "Special Elite", serif; }
 
 .escudo-mestre__arquivo { border: 1px solid rgba(76, 49, 25, 0.52); background: rgba(255, 248, 225, 0.25); box-shadow: inset 0 0 0 2px rgba(255, 250, 232, 0.14); }
+.escudo-mestre__mini-ficha-area { border: 1px solid rgba(76, 49, 25, 0.52); background: rgba(255, 248, 225, 0.3); box-shadow: inset 0 0 0 2px rgba(255, 250, 232, 0.14); }
+.escudo-mestre__mini-ficha-area > header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 13px; border-bottom: 1px solid rgba(76, 49, 25, 0.42); background: linear-gradient(90deg, rgba(112, 34, 29, 0.16), rgba(255, 246, 216, 0.22)); }
+.escudo-mestre__mini-ficha-area > header span, .escudo-mestre__mini-ficha-area > header small { color: #684c32; font: 700 0.57rem "Courier Prime", monospace; text-transform: uppercase; }
+.escudo-mestre__mini-ficha-area > header h3 { margin: 3px 0 0; font: 900 0.96rem Cinzel, Georgia, serif; text-transform: uppercase; }
 .escudo-mestre__arquivo > header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 13px; border-bottom: 1px solid rgba(76, 49, 25, 0.42); background: linear-gradient(90deg, rgba(112, 34, 29, 0.13), rgba(255, 246, 216, 0.22)); }
 .escudo-mestre__arquivo > header h3 { margin: 3px 0 0; font: 900 0.96rem Cinzel, Georgia, serif; text-transform: uppercase; }
 .escudo-mestre__arquivo > header small { color: #684c32; font: 700 0.59rem "Courier Prime", monospace; }

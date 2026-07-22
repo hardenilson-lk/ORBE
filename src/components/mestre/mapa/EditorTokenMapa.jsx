@@ -74,6 +74,20 @@ function EditorTokenMapa({ token, ficha, grid, aoAlterar, aoAlterarTamanho, aoFe
         </div>
 
         <div className="editor-token-mapa__opcoes">
+          <label>Visibilidade para jogadores
+            <select value={token.modoVisibilidade || "oculto"} onChange={(evento) => aoAlterar({
+              modoVisibilidade: evento.target.value,
+              oculto: evento.target.value !== "visivel",
+            })}>
+              <option value="oculto">Oculto</option>
+              <option value="proximidade">Por proximidade</option>
+              <option value="visivel">Sempre visível</option>
+            </select>
+          </label>
+          {token.modoVisibilidade === "proximidade" ? <label>Alcance da proximidade
+            <input type="number" min="1" max="20" value={token.alcanceProximidade || 3} onChange={(evento) => aoAlterar({ alcanceProximidade: Math.min(20, Math.max(1, Number(evento.target.value) || 3)) })} />
+            <small>Quantidade de casas para o token ser revelado.</small>
+          </label> : null}
           <label><input type="checkbox" checked={token.mostrarNome} onChange={(evento) => aoAlterar({ mostrarNome: evento.target.checked })} /> Mostrar nome</label>
           <label><input type="checkbox" checked={token.mostrarPv} onChange={(evento) => aoAlterar({ mostrarPv: evento.target.checked })} /> Mostrar PV, PE e SAN</label>
         </div>

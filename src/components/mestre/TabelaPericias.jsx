@@ -12,6 +12,7 @@ function numeroSeguro(valor) {
 
 function TabelaPericias({
   valores = {},
+  regra = null,
   aoAlterarPericia,
   aoRolarPericia,
 }) {
@@ -80,8 +81,22 @@ function TabelaPericias({
   return (
     <section className="tabela-pericias" data-assistente="ficha-pericias">
       <header className="tabela-pericias__titulo">
-        <h3>Perícias</h3>
+        <div>
+          <h3>Perícias</h3>
+          <small>Cada ponto adiciona +5 em Treino. “Outros” fica livre para bônus de item, condição ou habilidade.</small>
+        </div>
+        {regra ? (
+          <strong className={regra.excedentes ? "saldo-pontos saldo-pontos--erro" : regra.restantes ? "saldo-pontos" : "saldo-pontos saldo-pontos--completo"}>
+            {regra.excedentes ? `${regra.excedentes} acima do limite` : `${regra.restantes} ponto(s) restante(s)`}
+          </strong>
+        ) : null}
       </header>
+
+      {regra ? (
+        <p className="tabela-pericias__cola-regra">
+          NEX {regra.nex}% · {regra.limitePontos} ponto(s) disponíveis · treino máximo +{regra.grauMaximo}. No 35% libera Veterano (+10) e no 70% Expert (+15).
+        </p>
+      ) : null}
 
       {GRUPOS_PERICIAS_ARQUIVOS.map(
         (grupo) => (
@@ -131,6 +146,9 @@ function TabelaPericias({
 
                       <input
                         type="number"
+                        min="0"
+                        max={regra?.grauMaximo || 15}
+                        step="5"
                         aria-label={`Treino de ${pericia.nome}`}
                         value={
                           valoresPericia.treino

@@ -7,7 +7,7 @@ function limitarNumero(valor, minimo, maximo) {
   return Math.min(maximo, Math.max(minimo, numero));
 }
 
-function MiniFichaToken({ ficha, tipo = "jogador", aoAlterar, aoFechar }) {
+function MiniFichaToken({ ficha, tipo = "jogador", embutida = false, aoAlterar, aoFechar }) {
   const dialogoRef = useRef(null);
   const aoFecharRef = useRef(aoFechar);
 
@@ -42,7 +42,7 @@ function MiniFichaToken({ ficha, tipo = "jogador", aoAlterar, aoFechar }) {
 
   return (
     <div
-      className="mini-ficha-token__fundo"
+      className={embutida ? "mini-ficha-token__encaixe" : "mini-ficha-token__fundo"}
       onPointerDown={(evento) => {
         if (evento.target === evento.currentTarget) aoFechar();
       }}
@@ -51,7 +51,7 @@ function MiniFichaToken({ ficha, tipo = "jogador", aoAlterar, aoFechar }) {
         ref={dialogoRef}
         className="mini-ficha-token"
         role="dialog"
-        aria-modal="true"
+        aria-modal={embutida ? undefined : "true"}
         aria-labelledby="mini-ficha-token-titulo"
         tabIndex="-1"
       >

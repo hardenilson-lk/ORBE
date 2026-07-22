@@ -22,9 +22,11 @@ import PainelFichas from "../components/mestre/PainelFichas.jsx";
 import PainelGerenciarFichas from "../components/mestre/PainelGerenciarFichas.jsx";
 import PainelInventario from "../components/mestre/PainelInventario.jsx";
 import PainelMapa from "../components/mestre/PainelMapa.jsx";
+import PainelMapaKonvaTeste from "../components/mestre/mapaKonvaTeste/PainelMapaKonvaTeste.jsx";
 import PainelMissoes from "../components/mestre/PainelMissoes.jsx";
 import PainelRituais from "../components/mestre/PainelRituais.jsx";
-import PainelTrilhaSonora from "../components/mestre/PainelTrilhaSonora.jsx";
+import MesaSonora from "../components/mestre/mesaSonora/MesaSonora.jsx";
+import { MesaSonoraLiveKitProvider } from "../components/mestre/mesaSonora/livekit/MesaSonoraLiveKitContext.jsx";
 
 import {
   criarFichaArquivosVazia,
@@ -56,7 +58,7 @@ const TITULOS_MENU = {
   rituais:
     "Rituais",
   "trilha-sonora":
-    "Trilha sonora",
+    "Mesa Sonora",
   anotacoes:
     "Anotações",
   missoes:
@@ -84,6 +86,8 @@ function PaginaMestre() {
     useRef(null);
 
   const [jogadorCriacaoId, setJogadorCriacaoId] = useState("");
+  const [usarMapaKonvaTeste, setUsarMapaKonvaTeste] = useState(false);
+  const [miniFichaEscudo, setMiniFichaEscudo] = useState(null);
 
   const [
     tipoDado,
@@ -933,51 +937,7 @@ function PaginaMestre() {
       menuAtivo ===
       "trilha-sonora"
     ) {
-      return (
-        <PainelTrilhaSonora
-          trilhas={
-            sessao.trilhas ||
-            []
-          }
-          volumeInicial={
-            sessao.volumeTrilha
-          }
-          aoAdicionarTrilha={(
-            trilha,
-          ) =>
-            atualizarColecaoSessao(
-              "trilhas",
-              "adicionar",
-              trilha,
-            )
-          }
-          aoRemoverTrilha={(
-            trilha,
-          ) =>
-            atualizarColecaoSessao(
-              "trilhas",
-              "remover",
-              trilha,
-            )
-          }
-          aoSelecionarTrilha={(
-            trilha,
-          ) =>
-            persistirSessao({
-              trilhaAtivaId:
-                trilha.id,
-            })
-          }
-          aoAlterarVolume={(
-            volume,
-          ) =>
-            persistirSessao({
-              volumeTrilha:
-                volume,
-            })
-          }
-        />
-      );
+      return <MesaSonora />;
     }
 
     if (
@@ -1100,36 +1060,38 @@ function PaginaMestre() {
 
     return (
       <>
-        <PainelMapa
-          papelAtual="mestre"
-          arquivoInicial={
-            arquivoAtual
-          }
-          mapa={
-            sessao.mapa
-          }
-          fichas={
-            fichas
-          }
-          aoAtualizarFicha={
-            salvarFicha
-          }
-          aoAlterarMapa={(
-            mapaAtualizado,
-          ) =>
-            persistirSessao({
-              mapa:
-                mapaAtualizado,
-            })
-          }
-          aoAlterarMensagem={(
-            mensagem,
-          ) =>
-            setMensagemSistema(
-              mensagem,
-            )
-          }
-        />
+        <div className="pagina-mestre__troca-mapa">
+          <button type="button" onClick={() => setUsarMapaKonvaTeste((ativo) => !ativo)}>
+            {usarMapaKonvaTeste ? "Voltar ao mapa atual" : "Testar mapa Konva"}
+          </button>
+        </div>
+
+        {usarMapaKonvaTeste ? (
+          <PainelMapaKonvaTeste
+            arquivoInicial={arquivoAtual}
+            mapa={sessao.mapa}
+            fichas={fichas}
+            aoAlterarMapa={(mapaAtualizado) => persistirSessao({ mapa: mapaAtualizado })}
+            aoAlterarMensagem={setMensagemSistema}
+          />
+        ) : (
+          <PainelMapa
+            papelAtual="mestre"
+            arquivoInicial={arquivoAtual}
+            mapa={sessao.mapa}
+            fichas={fichas}
+            aoAtualizarFicha={salvarFicha}
+            aoAlterarMapa={(mapaAtualizado) => persistirSessao({ mapa: mapaAtualizado })}
+            aoAlterarMensagem={setMensagemSistema}
+            aoAbrirMiniFicha={(referencia) => {
+              setMiniFichaEscudo(referencia);
+              persistirSessao({ escudoAberto: true });
+              window.requestAnimationFrame(() => {
+                document.querySelector(".escudo-mestre")?.scrollIntoView({ behavior: "smooth", block: "start" });
+              });
+            }}
+          />
+        )}
 
         <EscudoMestre
           jogadores={sessao.jogadores || []}
@@ -1162,6 +1124,8 @@ function PaginaMestre() {
           aoAbrirInventario={(fichaId) =>
             persistirSessao({ fichaAtivaId: fichaId, menuAtivo: "inventario" })
           }
+          miniFichaAberta={miniFichaEscudo}
+          aoFecharMiniFicha={() => setMiniFichaEscudo(null)}
           aoAlternarEscudo={() =>
             persistirSessao(
               (
@@ -1201,6 +1165,7 @@ function PaginaMestre() {
   }
 
   return (
+    <MesaSonoraLiveKitProvider mesaId={mesaId}>
     <div className="pagina-mestre">
       <Dados3D
         ref={
@@ -1223,12 +1188,12 @@ function PaginaMestre() {
         }
         aoSelecionarMenu={(
           menu,
-        ) =>
+        ) => {
           persistirSessao({
             menuAtivo:
               menu,
-          })
-        }
+          });
+        }}
         aoAtualizarCampanha={
           recarregarCampanha
         }
@@ -1439,6 +1404,7 @@ function PaginaMestre() {
         </div>
       </main>
     </div>
+    </MesaSonoraLiveKitProvider>
   );
 }
 
