@@ -2,6 +2,8 @@ import {
   criarContaRemota,
   entrarContaRemota,
   orbeOnlineHabilitado,
+  processarRetornoAutenticacaoRemota,
+  reenviarConfirmacaoRemota,
   sairContaRemota,
 } from "../services/supabaseOrbe.js";
 
@@ -108,6 +110,17 @@ export async function entrarContaOrbeConectada(identificador, senha) {
   if (!orbeOnlineHabilitado()) return entrarContaOrbe(identificador, senha);
   if (!String(identificador || "").includes("@")) throw new Error("No modo online, entre usando o e-mail da conta.");
   return armazenarEspelhoConta(await entrarContaRemota(identificador, senha));
+}
+
+export async function reenviarConfirmacaoOrbe(email) {
+  if (!orbeOnlineHabilitado()) throw new Error("O reenvio de confirmação está disponível apenas no modo online.");
+  return reenviarConfirmacaoRemota(email);
+}
+
+export async function processarRetornoAutenticacaoOrbe() {
+  if (!orbeOnlineHabilitado()) return null;
+  const conta = await processarRetornoAutenticacaoRemota();
+  return conta ? armazenarEspelhoConta(conta) : null;
 }
 
 export function nomeCurtoUsuario(usuario = lerUsuarioAtual()) {

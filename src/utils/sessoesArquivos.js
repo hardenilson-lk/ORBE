@@ -571,6 +571,31 @@ export function salvarSessaoArquivos(
   return sessaoNormalizada;
 }
 
+export function aplicarSessaoArquivosRemota(
+  mesaId,
+  sessaoRecebida = {},
+) {
+  const sessaoAtual = carregarSessaoArquivos(mesaId);
+  const sessaoNormalizada = criarSessaoArquivosVazia({
+    ...sessaoAtual,
+    ...(sessaoRecebida || {}),
+    mapa: criarMapaArquivosVazio({
+      ...sessaoAtual.mapa,
+      ...criarObjetoSeguro(sessaoRecebida?.mapa),
+    }),
+    criadoEm: sessaoRecebida?.criadoEm || sessaoAtual.criadoEm,
+    atualizadoEm: sessaoRecebida?.atualizadoEm || sessaoAtual.atualizadoEm || new Date().toISOString(),
+  });
+
+  if (!storageDisponivel()) return sessaoNormalizada;
+  try {
+    window.localStorage.setItem(criarChaveStorage(mesaId), JSON.stringify(sessaoNormalizada));
+  } catch {
+    return sessaoNormalizada;
+  }
+  return sessaoNormalizada;
+}
+
 export function atualizarSessaoArquivos(
   mesaId,
   alteracoes,

@@ -2,18 +2,32 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 
 import PortalLayout from "../components/portal/PortalLayout.jsx";
+import useMesasOrbe from "../hooks/useMesasOrbe.js";
+import { buscarMesaRemota, entrarMesaRemota, orbeOnlineHabilitado } from "../services/supabaseOrbe.js";
 import { lerUsuarioAtual } from "../utils/contasOrbe.js";
-import { formatarData, lerMesasSalvas } from "../utils/mesas.js";
+import { aplicarMesaRemota, formatarData } from "../utils/mesas.js";
 
 export default function PaginaPortalMesas() {
   const navegar = useNavigate();
   const [codigo, setCodigo] = useState("");
   const [erro, setErro] = useState("");
-  const mesas = lerMesasSalvas();
+  const [mesas] = useMesasOrbe();
 
-  function entrar(evento) {
+  async function entrar(evento) {
     evento.preventDefault();
     const valor = codigo.trim().toUpperCase();
+    if (orbeOnlineHabilitado()) {
+      try {
+        const mesaId = await entrarMesaRemota(valor);
+        const mesa = await buscarMesaRemota(mesaId);
+        if (mesa) aplicarMesaRemota(mesa);
+        navegar(`/arquivos/jogador/${mesaId}`);
+        return;
+      } catch (falha) {
+        setErro(falha.message || "Não foi possível entrar na mesa online.");
+        return;
+      }
+    }
     const mesa = mesas.find((item) => String(item.codigoConvite || `ORBE-${String(item.id).slice(-6).toUpperCase()}`).toUpperCase() === valor);
     if (!mesa) return setErro("Código não encontrado neste navegador.");
     navegar(`/arquivos/jogador/${mesa.id}`);

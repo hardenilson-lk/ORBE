@@ -922,3 +922,53 @@ from public;
 revoke all
 on function private.definir_updated_at_orbe()
 from public;
+
+-- =========================================================
+-- TEMPO REAL DA MESA
+-- Mantém mestre e jogadores sincronizados sem expor dados
+-- além do que as políticas RLS já permitem a cada usuário.
+-- =========================================================
+
+alter table public.mesas_orbe replica identity full;
+alter table public.mesa_membros_orbe replica identity full;
+alter table public.fichas_orbe replica identity full;
+alter table public.sessoes_orbe replica identity full;
+alter table public.segredos_mestre_orbe replica identity full;
+
+do $$
+begin
+  if not exists (
+    select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'mesas_orbe'
+  ) then
+    alter publication supabase_realtime add table public.mesas_orbe;
+  end if;
+
+  if not exists (
+    select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'mesa_membros_orbe'
+  ) then
+    alter publication supabase_realtime add table public.mesa_membros_orbe;
+  end if;
+
+  if not exists (
+    select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'fichas_orbe'
+  ) then
+    alter publication supabase_realtime add table public.fichas_orbe;
+  end if;
+
+  if not exists (
+    select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'sessoes_orbe'
+  ) then
+    alter publication supabase_realtime add table public.sessoes_orbe;
+  end if;
+
+  if not exists (
+    select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'segredos_mestre_orbe'
+  ) then
+    alter publication supabase_realtime add table public.segredos_mestre_orbe;
+  end if;
+end $$;

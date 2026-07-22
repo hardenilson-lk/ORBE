@@ -44,6 +44,7 @@ import {
   salvarSessaoArquivos,
 } from "../utils/sessoesArquivos.js";
 import { salvarSegredosMestreRemotos } from "../services/supabaseOrbe.js";
+import useRealtimeMesaOrbe from "../hooks/useRealtimeMesaOrbe.js";
 
 import "./PaginaMestre.css";
 
@@ -170,6 +171,18 @@ function PaginaMestre() {
     window.addEventListener("storage", sincronizarOutraAba);
     return () => window.removeEventListener("storage", sincronizarOutraAba);
   }, [mesaId]);
+
+  useRealtimeMesaOrbe({
+    mesaId,
+    mestre: true,
+    aoSessao: setSessao,
+    aoFichas: setFichas,
+    aoStatus: setMensagemSistema,
+    aoErro: (erro) => {
+      console.warn("Sincronização em tempo real da mesa indisponível.", erro);
+      setMensagemSistema("A mesa continua local, mas perdeu a atualização em tempo real.");
+    },
+  });
 
   const mesasSalvas =
     lerMesasSalvas();

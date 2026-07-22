@@ -1,17 +1,14 @@
-import { useState } from "react";
 import { Link } from "react-router";
 
 import Cabecalho from "../components/Cabecalho.jsx";
+import useMesasOrbe from "../hooks/useMesasOrbe.js";
 
 import {
   formatarData,
-  lerMesasSalvas,
 } from "../utils/mesas.js";
 
 function PaginaMinhasMesas() {
-  const [mesas] = useState(() =>
-    lerMesasSalvas(),
-  );
+  const [mesas] = useMesasOrbe();
 
   return (
     <div className="pagina">

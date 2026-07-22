@@ -1,11 +1,11 @@
 import { Link } from "react-router";
 
 import PortalLayout from "../components/portal/PortalLayout.jsx";
+import useMesasOrbe from "../hooks/useMesasOrbe.js";
 import { listarFichasArquivos } from "../utils/fichasArquivos.js";
-import { lerMesasSalvas } from "../utils/mesas.js";
 
 export default function PaginaInicial() {
-  const mesas = lerMesasSalvas();
+  const [mesas] = useMesasOrbe();
   const totalFichas = mesas.reduce((total, mesa) => total + listarFichasArquivos(mesa.id).length, 0);
 
   return (

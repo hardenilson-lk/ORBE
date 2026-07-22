@@ -2,7 +2,13 @@ import { useCallback, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 
 import logoOrbe from "../assets/logo.png";
-import { criarContaOrbeConectada, entrarContaOrbeConectada, lerUsuarioAtual } from "../utils/contasOrbe.js";
+import {
+  criarContaOrbeConectada,
+  entrarContaOrbeConectada,
+  lerUsuarioAtual,
+  processarRetornoAutenticacaoOrbe,
+  reenviarConfirmacaoOrbe,
+} from "../utils/contasOrbe.js";
 import { lerMesasSalvas } from "../utils/mesas.js";
 import { orbeOnlineHabilitado, verificarServidorOrbe } from "../services/supabaseOrbe.js";
 
@@ -31,6 +37,7 @@ export default function PaginaLogin() {
     ? { tipo: "aviso", texto: localizacao.state.aviso }
     : null);
   const [carregando, setCarregando] = useState(false);
+  const [emailConfirmacaoPendente, setEmailConfirmacaoPendente] = useState("");
   const [estadoServidor, setEstadoServidor] = useState({
     situacao: "verificando",
     titulo: "VERIFICANDO SERVIDOR",
@@ -57,6 +64,26 @@ export default function PaginaLogin() {
     void consultarServidor();
   }, [consultarServidor]);
 
+  useEffect(() => {
+    let ativo = true;
+
+    async function reconhecerRetorno() {
+      try {
+        const conta = await processarRetornoAutenticacaoOrbe();
+        if (!ativo || !conta) return;
+        setRetorno({ tipo: "sucesso", texto: "E-mail confirmado. Abrindo seu portal..." });
+        window.setTimeout(() => navegar("/inicio", { replace: true }), 650);
+      } catch (falha) {
+        if (!ativo) return;
+        console.warn("Falha ao processar o retorno de autenticação do ORBE.", falha);
+        setRetorno({ tipo: "erro", texto: mensagemAmigavel(falha) });
+      }
+    }
+
+    void reconhecerRetorno();
+    return () => { ativo = false; };
+  }, [navegar]);
+
   function trocarModo(proximoModo) {
     setModo(proximoModo);
     setRetorno(null);
@@ -73,6 +100,9 @@ export default function PaginaLogin() {
         : await entrarContaOrbeConectada(usuario, senha);
 
       if (conta?.confirmacaoPendente) {
+        const emailPendente = String(email || "").trim();
+        setEmailConfirmacaoPendente(emailPendente);
+        setUsuario(emailPendente);
         setRetorno({ tipo: "sucesso", texto: "Conta criada. Confirme o e-mail enviado antes de entrar." });
         setModo("entrar");
         return;
@@ -86,7 +116,26 @@ export default function PaginaLogin() {
         navegar(localizacao.state?.origem || "/inicio", { replace: true });
       }, 850);
     } catch (falha) {
+      if (String(falha?.message || "").toLowerCase().includes("email not confirmed") && String(usuario || "").includes("@")) {
+        setEmailConfirmacaoPendente(String(usuario).trim());
+      }
       console.warn("Falha de autenticação no ORBE.", falha);
+      setRetorno({ tipo: "erro", texto: mensagemAmigavel(falha) });
+    } finally {
+      setCarregando(false);
+    }
+  }
+
+  async function reenviarConfirmacao() {
+    const destino = String(emailConfirmacaoPendente || usuario || email).trim();
+    setCarregando(true);
+    setRetorno({ tipo: "processando", texto: "Reenviando a confirmação..." });
+    try {
+      await reenviarConfirmacaoOrbe(destino);
+      setEmailConfirmacaoPendente(destino);
+      setRetorno({ tipo: "sucesso", texto: "E-mail de confirmação reenviado. Verifique também a caixa de spam." });
+    } catch (falha) {
+      console.warn("Falha ao reenviar a confirmação do ORBE.", falha);
       setRetorno({ tipo: "erro", texto: mensagemAmigavel(falha) });
     } finally {
       setCarregando(false);
@@ -158,6 +207,13 @@ export default function PaginaLogin() {
             <div className="login-orbe__alternativas">
               <button type="button" onClick={() => trocarModo(modo === "criar" ? "entrar" : "criar")}>{modo === "criar" ? "Já tenho acesso" : "Criar conta"}</button>
               <button type="button" onClick={() => trocarModo(modo === "convite" ? "entrar" : "convite")}>{modo === "convite" ? "Voltar ao login" : "Entrar com convite"}</button>
+              {orbeOnlineHabilitado() && modo === "entrar" ? (
+                <button
+                  type="button"
+                  disabled={carregando || !String(emailConfirmacaoPendente || usuario).includes("@")}
+                  onClick={reenviarConfirmacao}
+                >Reenviar e-mail de confirmação</button>
+              ) : null}
             </div>
             {usuarioAtual ? <button className="login-orbe__continuar" type="button" onClick={() => navegar("/inicio")}>Continuar como {usuarioAtual.nome}</button> : null}
           </section>

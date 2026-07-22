@@ -1,18 +1,24 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router";
 
 import PortalLayout from "../components/portal/PortalLayout.jsx";
+import useMesasOrbe from "../hooks/useMesasOrbe.js";
 import { criarFichaArquivosVazia, listarFichasArquivos, salvarFichaArquivos } from "../utils/fichasArquivos.js";
 import { lerUsuarioAtual } from "../utils/contasOrbe.js";
-import { lerMesasSalvas } from "../utils/mesas.js";
 
 export default function PaginaPortalFichas() {
-  const mesas = lerMesasSalvas();
+  const [mesas] = useMesasOrbe();
   const usuario = lerUsuarioAtual();
   const [mesaId, setMesaId] = useState(mesas[0]?.id || "");
   const [nome, setNome] = useState("");
   const [versao, setVersao] = useState(0);
   const fichas = mesas.flatMap((mesa) => listarFichasArquivos(mesa.id).map((ficha) => ({ ...ficha, mesa })));
+
+  useEffect(() => {
+    if ((!mesaId || !mesas.some((mesa) => mesa.id === mesaId)) && mesas[0]?.id) {
+      setMesaId(mesas[0].id);
+    }
+  }, [mesaId, mesas]);
 
   function criar(evento) {
     evento.preventDefault();

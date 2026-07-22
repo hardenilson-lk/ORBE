@@ -2,7 +2,8 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 
 import Cabecalho from "../components/Cabecalho.jsx";
-import { lerMesasSalvas } from "../utils/mesas.js";
+import { buscarMesaRemota, entrarMesaRemota, orbeOnlineHabilitado } from "../services/supabaseOrbe.js";
+import { aplicarMesaRemota, lerMesasSalvas } from "../utils/mesas.js";
 
 export default function PaginaArquivos() {
   const navegar = useNavigate();
@@ -10,9 +11,21 @@ export default function PaginaArquivos() {
   const [codigo, setCodigo] = useState("");
   const [erroConvite, setErroConvite] = useState("");
 
-  function entrarComConvite(evento) {
+  async function entrarComConvite(evento) {
     evento.preventDefault();
     const normalizado = codigo.trim().toUpperCase();
+    if (orbeOnlineHabilitado()) {
+      try {
+        const mesaId = await entrarMesaRemota(normalizado);
+        const mesaRemota = await buscarMesaRemota(mesaId);
+        if (mesaRemota) aplicarMesaRemota(mesaRemota);
+        navegar(`/arquivos/jogador/${mesaId}`);
+        return;
+      } catch (falha) {
+        setErroConvite(falha.message || "Não foi possível entrar na campanha online.");
+        return;
+      }
+    }
     const mesa = lerMesasSalvas().find((item) => {
       const convite = item.codigoConvite || item.codigo_convite || item.inviteCode || `ORBE-${String(item.id).slice(-6).toUpperCase()}`;
       return String(convite).trim().toUpperCase() === normalizado;

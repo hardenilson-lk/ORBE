@@ -25,21 +25,36 @@ export function lerMesasSalvas() {
   }
 }
 
-export function salvarMesas(mesas) {
+export function salvarMesasLocal(mesas) {
   try {
     localStorage.setItem(
       CHAVE_MESAS,
       JSON.stringify(mesas),
     );
-    mesas.forEach((mesa) => {
-      void salvarMesaRemota(mesa).catch((falha) => console.warn("Mesa salva localmente, mas não sincronizada.", falha));
-    });
+    return mesas;
   } catch (erro) {
     console.error(
       "Não foi possível salvar as mesas:",
       erro,
     );
+    return [];
   }
+}
+
+export function salvarMesas(mesas) {
+  const mesasSalvas = salvarMesasLocal(mesas);
+  mesasSalvas.forEach((mesa) => {
+    void salvarMesaRemota(mesa).catch((falha) => console.warn("Mesa salva localmente, mas não sincronizada.", falha));
+  });
+  return mesasSalvas;
+}
+
+export function aplicarMesaRemota(mesa) {
+  if (!mesa?.id) return lerMesasSalvas();
+  const atuais = lerMesasSalvas();
+  const atualizadas = [mesa, ...atuais.filter((item) => String(item.id) !== String(mesa.id))];
+  salvarMesasLocal(atualizadas);
+  return atualizadas;
 }
 
 export function gerarIdMesa() {

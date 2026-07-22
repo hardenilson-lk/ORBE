@@ -22,6 +22,7 @@ import {
   carregarSessaoArquivos,
   salvarSessaoArquivos,
 } from "../utils/sessoesArquivos.js";
+import useRealtimeMesaOrbe from "../hooks/useRealtimeMesaOrbe.js";
 
 import "./PaginaJogador.css";
 
@@ -78,7 +79,19 @@ function PaginaJogador() {
   const fichaAtivaNome = fichaAtiva?.nome;
   const fichaAtivaJogador = fichaAtiva?.jogador;
 
+  const { online: realtimeOnline, pronto: realtimePronto } = useRealtimeMesaOrbe({
+    mesaId,
+    aoSessao: setSessao,
+    aoFichas: setFichas,
+    aoStatus: setMensagemSistema,
+    aoErro: (erro) => {
+      console.warn("Sincronização em tempo real do jogador indisponível.", erro);
+      setMensagemSistema("Conexão em tempo real indisponível. Os dados locais foram preservados.");
+    },
+  });
+
   useEffect(() => {
+    if (realtimeOnline && !realtimePronto) return;
     if (!usuarioPortalId) return;
     setSessao((anterior) => {
       const jogadores = listaSegura(anterior.jogadores);
@@ -95,7 +108,7 @@ function PaginaJogador() {
         jogadores: [...jogadores.filter((jogador) => jogador.id !== usuarioPortalId), registro],
       });
     });
-  }, [mesaId, usuarioPortalId, usuarioPortalNome]);
+  }, [mesaId, realtimeOnline, realtimePronto, usuarioPortalId, usuarioPortalNome]);
 
   useEffect(() => {
     if (!fichaId && fichasDisponiveis.length === 1) {
@@ -126,6 +139,7 @@ function PaginaJogador() {
   }, [mesaId]);
 
   useEffect(() => {
+    if (realtimeOnline && !realtimePronto) return;
     if (!fichaAtivaId) return;
 
     setSessao((anterior) => {
@@ -145,7 +159,7 @@ function PaginaJogador() {
       ];
       return salvarSessaoArquivos(mesaId, { ...anterior, jogadores: atualizados });
     });
-  }, [fichaAtivaId, fichaAtivaJogador, fichaAtivaNome, mesaId, usuarioPortalId, usuarioPortalNome]);
+  }, [fichaAtivaId, fichaAtivaJogador, fichaAtivaNome, mesaId, realtimeOnline, realtimePronto, usuarioPortalId, usuarioPortalNome]);
 
   function persistirSessao(alteracoes) {
     setSessao((anterior) => {
