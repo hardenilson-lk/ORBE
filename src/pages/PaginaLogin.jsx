@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 
 import logoOrbe from "../assets/logo.png";
+import { CONFIRMACAO_EMAIL_ATIVA } from "../config/recursosOrbe.js";
 import {
   criarContaOrbeConectada,
   entrarContaOrbeConectada,
@@ -17,7 +18,11 @@ import "./PaginaLogin.css";
 function mensagemAmigavel(falha) {
   const detalhe = String(falha?.message || "").toLowerCase();
   if (detalhe.includes("invalid login") || detalhe.includes("invalid credentials")) return "E-mail ou senha incorretos.";
-  if (detalhe.includes("email not confirmed")) return "Confirme seu e-mail antes de entrar.";
+  if (detalhe.includes("email not confirmed")) {
+    return CONFIRMACAO_EMAIL_ATIVA
+      ? "Confirme seu e-mail antes de entrar."
+      : "Não foi possível entrar. Verifique as configurações de teste e tente novamente.";
+  }
   if (detalhe.includes("already registered") || detalhe.includes("already exists")) return "Este acesso já está cadastrado.";
   if (detalhe.includes("failed to fetch") || detalhe.includes("network") || detalhe.includes("fetch")) return "O servidor não respondeu. Verifique sua conexão e tente novamente.";
   return falha?.message || "Não foi possível concluir o acesso.";
@@ -65,6 +70,8 @@ export default function PaginaLogin() {
   }, [consultarServidor]);
 
   useEffect(() => {
+    if (!CONFIRMACAO_EMAIL_ATIVA) return undefined;
+
     let ativo = true;
 
     async function reconhecerRetorno() {
@@ -100,6 +107,13 @@ export default function PaginaLogin() {
         : await entrarContaOrbeConectada(usuario, senha);
 
       if (conta?.confirmacaoPendente) {
+        if (!CONFIRMACAO_EMAIL_ATIVA) {
+          setRetorno({ tipo: "sucesso", texto: "Conta criada com sucesso." });
+          setUsuario(String(email || "").trim());
+          setModo("entrar");
+          return;
+        }
+
         const emailPendente = String(email || "").trim();
         setEmailConfirmacaoPendente(emailPendente);
         setUsuario(emailPendente);
@@ -116,7 +130,9 @@ export default function PaginaLogin() {
         navegar(localizacao.state?.origem || "/inicio", { replace: true });
       }, 850);
     } catch (falha) {
-      if (String(falha?.message || "").toLowerCase().includes("email not confirmed") && String(usuario || "").includes("@")) {
+      if (CONFIRMACAO_EMAIL_ATIVA
+        && String(falha?.message || "").toLowerCase().includes("email not confirmed")
+        && String(usuario || "").includes("@")) {
         setEmailConfirmacaoPendente(String(usuario).trim());
       }
       console.warn("Falha de autenticação no ORBE.", falha);
@@ -207,7 +223,7 @@ export default function PaginaLogin() {
             <div className="login-orbe__alternativas">
               <button type="button" onClick={() => trocarModo(modo === "criar" ? "entrar" : "criar")}>{modo === "criar" ? "Já tenho acesso" : "Criar conta"}</button>
               <button type="button" onClick={() => trocarModo(modo === "convite" ? "entrar" : "convite")}>{modo === "convite" ? "Voltar ao login" : "Entrar com convite"}</button>
-              {orbeOnlineHabilitado() && modo === "entrar" ? (
+              {CONFIRMACAO_EMAIL_ATIVA && orbeOnlineHabilitado() && modo === "entrar" ? (
                 <button
                   type="button"
                   disabled={carregando || !String(emailConfirmacaoPendente || usuario).includes("@")}

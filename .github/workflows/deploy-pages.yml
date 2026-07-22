@@ -38,6 +38,7 @@ jobs:
           VITE_ORBE_ONLINE_ENABLED: ${{ vars.VITE_ORBE_ONLINE_ENABLED }}
           VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
+          VITE_EMAIL_CONFIRMATION_ENABLED: ${{ vars.VITE_EMAIL_CONFIRMATION_ENABLED }}
 
       - name: Preparar rotas diretas da SPA
         run: cp dist/index.html dist/404.html
