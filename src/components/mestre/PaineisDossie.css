@@ -996,3 +996,86 @@
 .item-cor--consumivel { --item-cor: #4d8b62; }
 .item-cor--ferramenta { --item-cor: #8b5da8; }
 .item-cor--geral { --item-cor: #9b7b45; }
+.inventario-limites {
+  margin: 0 0 18px;
+  padding: 14px;
+  border: 1px solid rgba(103, 70, 30, 0.48);
+  background:
+    linear-gradient(135deg, rgba(255, 248, 221, 0.86), rgba(218, 183, 119, 0.28));
+  box-shadow: inset 4px 0 0 #8e6822;
+}
+
+.inventario-limites--excedido {
+  border-color: #982f2f;
+  box-shadow: inset 4px 0 0 #982f2f;
+}
+
+.inventario-limites > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.inventario-limites > header span,
+.inventario-limites > header h3 {
+  display: block;
+  margin: 0;
+}
+
+.inventario-limites > header span {
+  color: #8f2929;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.inventario-limites__categorias {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(120px, 1fr));
+  gap: 8px;
+}
+
+.inventario-limites__categoria {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid rgba(90, 62, 29, 0.35);
+  background: rgba(255, 250, 229, 0.55);
+}
+
+.inventario-limites__categoria strong {
+  color: #6c4515;
+  font-size: 1.05rem;
+}
+
+.inventario-limites__categoria small {
+  color: #66543d;
+  font-size: 0.67rem;
+  line-height: 1.35;
+}
+
+.inventario-limites__categoria--excedida {
+  border-color: #982f2f;
+  background: rgba(152, 47, 47, 0.12);
+}
+
+.inventario-limites__mensagem {
+  margin: 10px 0 0;
+  padding: 9px 11px;
+  border-left: 3px solid #8e6822;
+  background: rgba(255, 248, 221, 0.64);
+}
+
+.inventario-limites--excedido .inventario-limites__mensagem {
+  border-left-color: #982f2f;
+}
+
+@media (max-width: 900px) {
+  .inventario-limites__categorias {
+    grid-template-columns: repeat(2, minmax(120px, 1fr));
+  }
+}

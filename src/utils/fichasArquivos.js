@@ -5,6 +5,10 @@ import {
   salvarFichaRemota,
 } from "../services/supabaseOrbe.js";
 
+import {
+  calcularCapacidadeCargaBase,
+} from "./regrasInventarioArquivos.js";
+
 const PREFIXO_STORAGE =
   "orbe:arquivos:fichas";
 
@@ -217,10 +221,7 @@ function calcularBonusInventario(
 
   return itens.reduce(
     (resultado, item) => {
-      if (
-        !item ||
-        item.ativo === false
-      ) {
+      if (!item) {
         return resultado;
       }
 
@@ -260,6 +261,10 @@ function calcularBonusInventario(
 
       resultado.cargaAtual +=
         volume * quantidade;
+
+      if (item.ativo === false) {
+        return resultado;
+      }
 
       resultado.defesa +=
         defesa;
@@ -489,11 +494,10 @@ export function recalcularFichaArquivos(
     );
 
   const cargaMaxima =
-    Math.max(
-      1,
-      forca * 5 +
-        bonusInventario.bonusCarga,
-    );
+    calcularCapacidadeCargaBase(
+      forca,
+    ) +
+    bonusInventario.bonusCarga;
 
   return {
     ...ficha,

@@ -8,11 +8,19 @@ import {
 import {
   ITENS_ARQUIVOS,
   criarItemArquivos,
-} from "../../data/itensArquivos.js";
+} from "../../data/itens/itensArquivos.js";
 
 import {
   obterClasseVisualItem,
 } from "../../utils/categoriasItens.js";
+
+import {
+  CATEGORIAS_INVENTARIO_ARQUIVOS,
+  calcularResumoInventario,
+  obterDescricaoCategoriaInventario,
+  obterRotuloCategoriaNumerica,
+  validarInventarioArquivos,
+} from "../../utils/regrasInventarioArquivos.js";
 
 import "./PaineisDossie.css";
 
@@ -20,6 +28,7 @@ const ITEM_VAZIO = {
   nome: "",
   tipo: "Equipamento",
   categoria: "Personalizado",
+  categoriaNumerica: 0,
   quantidade: 1,
   volume: 1,
   dano: "",
@@ -379,6 +388,11 @@ function PainelInventario({
     setMensagemImagem,
   ] = useState("");
 
+  const [
+    mensagemLimite,
+    setMensagemLimite,
+  ] = useState("");
+
   useEffect(() => {
     const listaNormalizada =
       Array.isArray(itens)
@@ -515,11 +529,26 @@ function PainelInventario({
         itemRecebido,
       );
 
-    setItensLocais(
-      (listaAnterior) => [
-        itemCriado,
-        ...listaAnterior,
-      ],
+    const proximaLista = [
+      itemCriado,
+      ...itensLocais,
+    ];
+    const validacao =
+      validarInventarioArquivos(
+        fichaAtiva,
+        proximaLista,
+      );
+
+    if (!validacao.permitido) {
+      setMensagemLimite(
+        validacao.mensagem,
+      );
+      return false;
+    }
+
+    setItensLocais(proximaLista);
+    setMensagemLimite(
+      validacao.mensagem,
     );
 
     setItemAbertoId(
@@ -534,6 +563,8 @@ function PainelInventario({
         itemCriado,
       );
     }
+
+    return true;
   }
 
   function adicionarItemCatalogo(
@@ -544,7 +575,7 @@ function PainelInventario({
         itemCatalogo,
       );
 
-    registrarItemAdicionado(
+    return registrarItemAdicionado(
       itemCriado,
     );
   }
@@ -572,9 +603,14 @@ function PainelInventario({
           "Personalizado",
       });
 
-    registrarItemAdicionado(
+    const adicionado =
+      registrarItemAdicionado(
       itemCriado,
     );
+
+    if (!adicionado) {
+      return;
+    }
 
     setNovoItem({
       ...ITEM_VAZIO,
@@ -595,15 +631,55 @@ function PainelInventario({
       [nomeCampo]: valor,
     };
 
-    setItensLocais(
-      (listaAnterior) =>
-        listaAnterior.map(
-          (itemAtual) =>
-            itemAtual.id ===
-            item.id
-              ? itemAtualizado
-              : itemAtual,
-        ),
+    const proximaLista =
+      itensLocais.map(
+        (itemAtual) =>
+          itemAtual.id === item.id
+            ? itemAtualizado
+            : itemAtual,
+      );
+    const resumoAtual =
+      calcularResumoInventario(
+        fichaAtiva,
+        itensLocais,
+      );
+    const validacao =
+      validarInventarioArquivos(
+        fichaAtiva,
+        proximaLista,
+      );
+    const resumoNovo =
+      validacao.resumo;
+    const reduzOuMantemExcessos =
+      resumoNovo.cargaAtual <=
+        resumoAtual.cargaAtual &&
+      [1, 2, 3, 4].every(
+        (categoria) =>
+          resumoNovo
+            .usadosPorCategoria[
+              categoria
+            ] <=
+          resumoAtual
+            .usadosPorCategoria[
+              categoria
+            ],
+      );
+
+    if (
+      !validacao.permitido &&
+      !reduzOuMantemExcessos
+    ) {
+      setMensagemLimite(
+        validacao.mensagem,
+      );
+      return false;
+    }
+
+    setItensLocais(proximaLista);
+    setMensagemLimite(
+      validacao.permitido
+        ? validacao.mensagem
+        : `${validacao.mensagem} A redução foi aceita para ajudar a regularizar a ficha.`,
     );
 
     if (
@@ -614,6 +690,8 @@ function PainelInventario({
         itemAtualizado,
       );
     }
+
+    return true;
   }
 
   function atualizarNumeroItem(
@@ -674,6 +752,10 @@ function PainelInventario({
     ) {
       aoRemoverItem(item);
     }
+
+    setMensagemLimite(
+      "Item removido. Os limites foram recalculados.",
+    );
   }
 
   function abrirSeletorImagem(
@@ -783,23 +865,14 @@ function PainelInventario({
     fichaAtiva?.nome ||
     "Nenhuma ficha selecionada";
 
-  const itensAtivos =
-    itensLocais.filter(
-      (item) =>
-        item.ativo !== false,
+  const resumoInventario =
+    calcularResumoInventario(
+      fichaAtiva,
+      itensLocais,
     );
 
   const volumeTotal =
-    itensAtivos.reduce(
-      (total, item) =>
-        total +
-        (Number(item.volume) ||
-          0) *
-          (Number(
-            item.quantidade,
-          ) || 0),
-      0,
-    );
+    resumoInventario.cargaAtual;
 
   return (
     <section className="painel-dossie painel-inventario-atualizado">
@@ -1498,14 +1571,108 @@ function PainelInventario({
 
         <div className="painel-dossie__resumo">
           <span>
-            Volume em uso
+            Espaços carregados
           </span>
 
           <strong>
-            {volumeTotal}
+            {volumeTotal}/
+            {
+              resumoInventario.cargaMaxima
+            }
           </strong>
         </div>
       </header>
+
+      <section
+        className={`inventario-limites ${
+          resumoInventario.valido
+            ? "inventario-limites--valido"
+            : "inventario-limites--excedido"
+        }`}
+        aria-label="Limites do inventário"
+      >
+        <header>
+          <div>
+            <span>Regra automática</span>
+            <h3>
+              Limites de{" "}
+              {resumoInventario.patente}
+            </h3>
+          </div>
+
+          <strong>
+            Carga {volumeTotal}/
+            {
+              resumoInventario.cargaMaxima
+            }
+          </strong>
+        </header>
+
+        <div className="inventario-limites__categorias">
+          {CATEGORIAS_INVENTARIO_ARQUIVOS.map(
+            (categoria) => {
+              const limite =
+                resumoInventario
+                  .limitesPorCategoria[
+                  categoria
+                ];
+              const usados =
+                resumoInventario
+                  .usadosPorCategoria[
+                  categoria
+                ];
+              const excedida =
+                Number.isFinite(
+                  limite,
+                ) &&
+                usados > limite;
+
+              return (
+                <div
+                  className={
+                    excedida
+                      ? "inventario-limites__categoria inventario-limites__categoria--excedida"
+                      : "inventario-limites__categoria"
+                  }
+                  key={categoria}
+                  title={obterDescricaoCategoriaInventario(
+                    categoria,
+                  )}
+                >
+                  <span>
+                    Categoria{" "}
+                    {obterRotuloCategoriaNumerica(
+                      categoria,
+                    )}
+                  </span>
+                  <strong>
+                    {usados}/
+                    {Number.isFinite(
+                      limite,
+                    )
+                      ? limite
+                      : "livre"}
+                  </strong>
+                  <small>
+                    {obterDescricaoCategoriaInventario(
+                      categoria,
+                    )}
+                  </small>
+                </div>
+              );
+            },
+          )}
+        </div>
+
+        {mensagemLimite ? (
+          <p
+            className="inventario-limites__mensagem"
+            role="status"
+          >
+            {mensagemLimite}
+          </p>
+        ) : null}
+      </section>
 
       <section className="painel-dossie__formulario">
         <div className="inventario-adicao__topo">
@@ -1655,6 +1822,13 @@ function PainelInventario({
                               0}
                           </span>
 
+                          <span>
+                            Categoria{" "}
+                            {obterRotuloCategoriaNumerica(
+                              itemCatalogo.categoriaNumerica,
+                            )}
+                          </span>
+
                           {itemCatalogo.dano ? (
                             <span>
                               Dano{" "}
@@ -1780,6 +1954,39 @@ function PainelInventario({
                       <option value="Item especial">
                         Item especial
                       </option>
+                    </select>
+                  </label>
+
+                  <label>
+                    Categoria do item
+
+                    <select
+                      value={
+                        novoItem.categoriaNumerica
+                      }
+                      onChange={(
+                        evento,
+                      ) =>
+                        atualizarNumeroNovoItem(
+                          "categoriaNumerica",
+                          evento.target
+                            .value,
+                        )
+                      }
+                    >
+                      {CATEGORIAS_INVENTARIO_ARQUIVOS.map(
+                        (categoria) => (
+                          <option
+                            value={categoria}
+                            key={categoria}
+                          >
+                            Categoria{" "}
+                            {obterRotuloCategoriaNumerica(
+                              categoria,
+                            )}
+                          </option>
+                        ),
+                      )}
                     </select>
                   </label>
 
@@ -2224,6 +2431,52 @@ function PainelInventario({
                                     )
                                   }
                                 />
+                              </dd>
+                            </div>
+
+                            <div>
+                              <dt>
+                                Categoria
+                              </dt>
+
+                              <dd>
+                                <select
+                                  aria-label={`Categoria de ${item.nome}`}
+                                  value={
+                                    item.categoriaNumerica ??
+                                    0
+                                  }
+                                  onChange={(
+                                    evento,
+                                  ) =>
+                                    atualizarNumeroItem(
+                                      item,
+                                      "categoriaNumerica",
+                                      evento
+                                        .target
+                                        .value,
+                                    )
+                                  }
+                                >
+                                  {CATEGORIAS_INVENTARIO_ARQUIVOS.map(
+                                    (
+                                      categoria,
+                                    ) => (
+                                      <option
+                                        value={
+                                          categoria
+                                        }
+                                        key={
+                                          categoria
+                                        }
+                                      >
+                                        {obterRotuloCategoriaNumerica(
+                                          categoria,
+                                        )}
+                                      </option>
+                                    ),
+                                  )}
+                                </select>
                               </dd>
                             </div>
 
