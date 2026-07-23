@@ -41,6 +41,15 @@
 .mesa-sonora__audio-externo strong { color: #f5deb0; font-size: .9rem; }
 .mesa-sonora__audio-externo p { margin: 0; color: #bfae8d; font-size: .68rem; }
 .mesa-sonora__audio-externo small { color: #ed766b; font-size: .64rem; }
+.mesa-sonora__transmissao-status { display: grid; grid-template-columns: auto minmax(120px, 260px) auto; align-items: center; gap: 9px; margin-top: 6px; }
+.mesa-sonora__ao-vivo { display: inline-flex; align-items: center; gap: 6px; width: max-content; padding: 4px 7px; color: #fff1ee !important; background: #9f281f; font-size: .58rem !important; letter-spacing: .1em !important; }
+.mesa-sonora__ao-vivo i { width: 7px; height: 7px; border-radius: 50%; background: #ffb5a7; box-shadow: 0 0 0 0 rgba(255,181,167,.65); animation: mesa-sonora-ao-vivo 1.25s infinite; }
+.mesa-sonora__medidor { overflow: hidden; height: 8px; border: 1px solid #78562e; background: #0c0807; }
+.mesa-sonora__medidor i { display: block; height: 100%; background: linear-gradient(90deg, #5ab878 0%, #d9b84f 68%, #d9574b 100%); transition: width 80ms linear; }
+.mesa-sonora__transmissao-status b { font-size: .62rem; }
+.mesa-sonora__transmissao-status .tem-sinal { color: #78d693; }
+.mesa-sonora__transmissao-status .sem-sinal { color: #e8b85b; }
+@keyframes mesa-sonora-ao-vivo { 70% { box-shadow: 0 0 0 7px rgba(255,181,167,0); } 100% { box-shadow: 0 0 0 0 rgba(255,181,167,0); } }
 .mesa-sonora__controles { display: grid; grid-template-columns: minmax(220px,.7fr) auto minmax(340px,1fr); gap: 12px; padding: 14px; border: 1px solid #78562e; background: #160e0b; }
 .mesa-sonora__controle-master { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 9px; }
 .mesa-sonora label { display: grid; gap: 5px; color: #d5bd8e; font-size: .62rem; font-weight: 900; text-transform: uppercase; }
@@ -97,4 +106,4 @@
 .mesa-sonora__player-spotify { grid-column: 1 / -1; }
 .mesa-sonora__vazio { padding: 18px; border: 1px dashed #6e5234; color: #ac9b7a; font-size: .7rem; text-align: center; }
 @media (max-width: 1450px) { .mesa-sonora__cabecalho { flex-direction: column; } .mesa-sonora__cabecalho-acoes { justify-content: flex-start; } .mesa-sonora__controles { grid-template-columns: 1fr; } .mesa-sonora__filtros { grid-column: auto; } .mesa-sonora__corpo { grid-template-columns: 1fr; } }
-@media (max-width: 700px) { .mesa-sonora { padding: 10px; } .mesa-sonora__cabecalho, .mesa-sonora__audio-externo { flex-direction: column; align-items: stretch; } .mesa-sonora__cabecalho-acoes { justify-content: flex-start; } .mesa-sonora__audio-externo .botao-console { width: 100%; } .mesa-sonora__controles, .mesa-sonora__filtros, .mesa-sonora__grade-formulario { grid-template-columns: 1fr; } .mesa-sonora__campo-amplo, .mesa-sonora__filtros { grid-column: auto; } .botao-som__acoes { grid-template-columns: repeat(3,1fr); } }
+@media (max-width: 700px) { .mesa-sonora { padding: 10px; } .mesa-sonora__cabecalho, .mesa-sonora__audio-externo { flex-direction: column; align-items: stretch; } .mesa-sonora__cabecalho-acoes { justify-content: flex-start; } .mesa-sonora__audio-externo .botao-console { width: 100%; } .mesa-sonora__transmissao-status { grid-template-columns: auto 1fr; } .mesa-sonora__transmissao-status b { grid-column: 1 / -1; } .mesa-sonora__controles, .mesa-sonora__filtros, .mesa-sonora__grade-formulario { grid-template-columns: 1fr; } .mesa-sonora__campo-amplo, .mesa-sonora__filtros { grid-column: auto; } .botao-som__acoes { grid-template-columns: repeat(3,1fr); } }

@@ -22,6 +22,7 @@ export default function useTransmissaoMesaSonora({ room, conectado, volumeSala, 
   const [capturandoAudioExterno, setCapturandoAudioExterno] = useState(false);
   const [iniciandoAudioExterno, setIniciandoAudioExterno] = useState(false);
   const [erroAudioExterno, setErroAudioExterno] = useState("");
+  const [nivelAudioExterno, setNivelAudioExterno] = useState(0);
 
   const podeTransmitir = Boolean(room && conectado && participanteEhMestre(room.localParticipant));
 
@@ -82,6 +83,14 @@ export default function useTransmissaoMesaSonora({ room, conectado, volumeSala, 
         // A fonte já pode ter sido encerrada pelo navegador.
       }
     }
+    if (captura?.analisador) {
+      try {
+        captura.analisador.disconnect();
+      } catch {
+        // O analisador já pode ter sido desconectado.
+      }
+    }
+    if (captura?.medidorId) cancelAnimationFrame(captura.medidorId);
 
     if (captura?.stream) {
       captura.stream.getTracks().forEach((track) => {
@@ -92,6 +101,7 @@ export default function useTransmissaoMesaSonora({ room, conectado, volumeSala, 
 
     setCapturandoAudioExterno(false);
     setIniciandoAudioExterno(false);
+    setNivelAudioExterno(0);
   }, []);
 
   const encerrarCapturaAudioExterno = useCallback(async () => {
@@ -141,10 +151,34 @@ export default function useTransmissaoMesaSonora({ room, conectado, volumeSala, 
 
       const streamAudio = new MediaStream([faixaAudio]);
       const fonte = mixer.contexto.createMediaStreamSource(streamAudio);
+      const analisador = mixer.contexto.createAnalyser();
+      analisador.fftSize = 256;
+      analisador.smoothingTimeConstant = 0.72;
 
       // Envia a aba somente para a sala. O mestre já ouve o áudio na aba original.
-      fonte.connect(mixer.ganhoSala);
-      capturaExternaRef.current = { stream, fonte };
+      fonte.connect(analisador);
+      analisador.connect(mixer.ganhoSala);
+
+      const amostras = new Uint8Array(analisador.fftSize);
+      let ultimaAtualizacao = 0;
+      const captura = { stream, fonte, analisador, medidorId: 0 };
+      const medirAudio = (agora) => {
+        if (capturaExternaRef.current !== captura) return;
+        analisador.getByteTimeDomainData(amostras);
+        let somaQuadrados = 0;
+        for (let indice = 0; indice < amostras.length; indice += 1) {
+          const amostra = (amostras[indice] - 128) / 128;
+          somaQuadrados += amostra * amostra;
+        }
+        if (agora - ultimaAtualizacao >= 80) {
+          const rms = Math.sqrt(somaQuadrados / amostras.length);
+          setNivelAudioExterno(Math.min(100, Math.round(rms * 420)));
+          ultimaAtualizacao = agora;
+        }
+        captura.medidorId = requestAnimationFrame(medirAudio);
+      };
+      capturaExternaRef.current = captura;
+      captura.medidorId = requestAnimationFrame(medirAudio);
 
       const finalizarPeloNavegador = () => {
         pararCapturaExternaAtual(true);
@@ -310,6 +344,7 @@ export default function useTransmissaoMesaSonora({ room, conectado, volumeSala, 
     capturandoAudioExterno,
     iniciandoAudioExterno,
     erroAudioExterno,
+    nivelAudioExterno,
     criarControleArquivo,
     publicarFaixa,
     encerrarFaixa,

@@ -33,6 +33,7 @@ export default function MesaSonoraTeste({ aoVoltar }) {
         transmitindo={livekit.capturandoAudioExterno}
         iniciando={livekit.iniciandoAudioExterno}
         erro={livekit.erroAudioExterno}
+        nivel={livekit.nivelAudioExterno}
         aoIniciar={() => { void livekit.iniciarCapturaAudioExterno(); }}
         aoEncerrar={() => { void livekit.encerrarCapturaAudioExterno(); }}
       />
