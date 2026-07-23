@@ -105,7 +105,10 @@ function PaginaJogador() {
             sides: configuracao.lados,
             modifier: configuracao.modificador,
           },
-          { notificarResultado: false },
+          {
+            notificarResultado: false,
+            ocultarResultadoFisico: true,
+          },
         )
         .catch(() => {
           setResultado("A animação remota não pôde ser exibida.");

@@ -194,7 +194,10 @@ function PaginaMestre() {
             sides: configuracao.lados,
             modifier: configuracao.modificador,
           },
-          { notificarResultado: false },
+          {
+            notificarResultado: false,
+            ocultarResultadoFisico: true,
+          },
         )
         .catch(() => {
           setResultadoRolagem("A animação remota não pôde ser exibida.");

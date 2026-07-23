@@ -36,55 +36,75 @@
   left: 50%;
   display: grid;
   justify-items: center;
-  gap: 12px;
-  min-width: 180px;
-  padding: 14px 18px 16px;
-  border: 1px solid rgba(183, 132, 255, 0.82);
-  background:
-    radial-gradient(
-      circle at 50% 0,
-      rgba(155, 92, 255, 0.42),
-      transparent 65%
-    ),
-    rgba(18, 10, 29, 0.94);
+  gap: 18px;
+  min-width: 210px;
+  padding: 18px;
   color: #f8edff;
   transform: translate(-50%, -50%);
-  box-shadow:
-    0 0 28px rgba(155, 92, 255, 0.56),
-    0 18px 60px rgba(0, 0, 0, 0.72);
-  animation:
-    dados-3d-resultado-entrada 260ms ease-out;
+  perspective: 900px;
 }
 
 .dados-3d__resultado-legenda {
+  padding: 7px 11px;
+  border: 1px solid rgba(183, 132, 255, 0.72);
   color: #d9baff;
+  background: rgba(18, 10, 29, 0.88);
   font-family: "Courier New", monospace;
   font-size: 0.62rem;
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+  box-shadow: 0 0 18px rgba(155, 92, 255, 0.35);
+  animation: dados-3d-legenda-entrada 320ms ease-out both;
 }
 
 .dados-3d__faces {
   display: flex;
   justify-content: center;
-  gap: 9px;
+  align-items: center;
+  gap: 18px;
   flex-wrap: wrap;
+  transform-style: preserve-3d;
+}
+
+.dados-3d__dado-oficial {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 116px;
+  height: 126px;
+  filter:
+    drop-shadow(12px 17px 3px rgba(23, 9, 45, 0.55))
+    drop-shadow(0 0 17px rgba(155, 92, 255, 0.72));
+  transform-style: preserve-3d;
+  animation:
+    dados-3d-dado-sincronizado 1.15s
+    cubic-bezier(0.16, 0.82, 0.22, 1)
+    var(--atraso-dado, 0ms)
+    both;
 }
 
 .dados-3d__face {
+  position: relative;
+  z-index: 2;
   display: grid;
   place-items: center;
-  width: 66px;
-  min-height: 72px;
-  padding: 7px;
+  width: 104px;
+  min-height: 112px;
+  padding: 10px;
   border: 2px solid #b784ff;
   background:
+    radial-gradient(
+      circle at 42% 32%,
+      rgba(239, 218, 255, 0.58),
+      transparent 22%
+    ),
     linear-gradient(
       145deg,
-      #b784ff,
-      #6f31d2 52%,
-      #311355
+      #c89cff 0%,
+      #8241e4 38%,
+      #5422a4 70%,
+      #2a104d 100%
     );
   color: #fff;
   clip-path: polygon(
@@ -99,6 +119,54 @@
     drop-shadow(
       0 0 10px rgba(183, 132, 255, 0.72)
     );
+  text-shadow: 0 2px 3px rgba(26, 8, 52, 0.85);
+  transform: translateZ(14px);
+}
+
+.dados-3d__face::before,
+.dados-3d__face::after {
+  position: absolute;
+  inset: 8px;
+  content: "";
+  pointer-events: none;
+}
+
+.dados-3d__face::before {
+  border: 1px solid rgba(245, 228, 255, 0.42);
+  clip-path: polygon(50% 0, 100% 72%, 50% 100%, 0 72%);
+}
+
+.dados-3d__face::after {
+  background:
+    linear-gradient(
+      117deg,
+      transparent 48%,
+      rgba(234, 207, 255, 0.28) 49%,
+      transparent 51%
+    );
+  clip-path: polygon(50% 0, 100% 72%, 50% 100%, 0 72%);
+}
+
+.dados-3d__faceta {
+  position: absolute;
+  z-index: 1;
+  bottom: 7px;
+  width: 58px;
+  height: 88px;
+  border: 1px solid rgba(183, 132, 255, 0.72);
+  background: linear-gradient(160deg, #7134c7, #240d45 78%);
+}
+
+.dados-3d__faceta--esquerda {
+  left: 1px;
+  clip-path: polygon(100% 0, 100% 100%, 0 72%);
+  transform: rotateY(-42deg) translateZ(-2px);
+}
+
+.dados-3d__faceta--direita {
+  right: 1px;
+  clip-path: polygon(0 0, 100% 72%, 0 100%);
+  transform: rotateY(42deg) translateZ(-2px);
 }
 
 .dados-3d__face small {
@@ -111,30 +179,56 @@
 .dados-3d__face strong {
   align-self: start;
   font-family: Georgia, serif;
-  font-size: 1.75rem;
+  font-size: 2.4rem;
   line-height: 1;
 }
 
 .dados-3d__total {
+  padding: 7px 12px;
+  border: 1px solid rgba(183, 132, 255, 0.58);
+  color: #f5e6ff;
+  background: rgba(18, 10, 29, 0.88);
   font-family: "Courier New", monospace;
   font-size: 0.72rem;
   letter-spacing: 0.04em;
+  box-shadow: 0 0 18px rgba(155, 92, 255, 0.28);
 }
 
-@keyframes dados-3d-resultado-entrada {
+@keyframes dados-3d-dado-sincronizado {
   from {
     opacity: 0;
     transform:
-      translate(-50%, -45%)
-      scale(0.82);
+      translate3d(180px, -150px, -180px)
+      rotateX(510deg)
+      rotateY(-680deg)
+      rotateZ(420deg)
+      scale(0.45);
+  }
+
+  72% {
+    opacity: 1;
+    transform:
+      translate3d(-10px, 7px, 18px)
+      rotateX(-18deg)
+      rotateY(24deg)
+      rotateZ(-8deg)
+      scale(1.08);
   }
 
   to {
     opacity: 1;
     transform:
-      translate(-50%, -50%)
+      translate3d(0, 0, 0)
+      rotateX(0)
+      rotateY(0)
+      rotateZ(0)
       scale(1);
   }
+}
+
+@keyframes dados-3d-legenda-entrada {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .dados-3d__mensagem {

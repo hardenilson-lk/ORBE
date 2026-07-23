@@ -24,6 +24,7 @@ const Dados3D = forwardRef(
     const aoFinalizarRef = useRef(aoFinalizar);
     const temporizadorLimpezaRef = useRef(null);
     const ignorarFinalizacaoRef = useRef(false);
+    const ocultarResultadoFisicoRef = useRef(false);
 
     const [mensagem, setMensagem] = useState(
       "Carregando dados 3D...",
@@ -71,7 +72,9 @@ const Dados3D = forwardRef(
 
             onRollComplete: (resultados) => {
               const deveNotificar = !ignorarFinalizacaoRef.current;
+              const ocultarResultadoFisico = ocultarResultadoFisicoRef.current;
               ignorarFinalizacaoRef.current = false;
+              ocultarResultadoFisicoRef.current = false;
 
               if (
                 !componenteFechado &&
@@ -97,7 +100,7 @@ const Dados3D = forwardRef(
                     setResultadoVisual(null);
                     setDadosVisiveis(false);
                   }
-                }, 2500);
+                }, ocultarResultadoFisico ? 80 : 2500);
             },
           });
 
@@ -165,6 +168,8 @@ const Dados3D = forwardRef(
             Number(configuracao?.modifier) || 0;
           ignorarFinalizacaoRef.current =
             opcoes.notificarResultado === false;
+          ocultarResultadoFisicoRef.current =
+            opcoes.ocultarResultadoFisico === true;
 
           window.clearTimeout(
             temporizadorLimpezaRef.current,
@@ -192,6 +197,7 @@ const Dados3D = forwardRef(
             );
           } catch (erro) {
             ignorarFinalizacaoRef.current = false;
+            ocultarResultadoFisicoRef.current = false;
             setDadosVisiveis(false);
             throw erro;
           }
@@ -246,6 +252,11 @@ const Dados3D = forwardRef(
           }
 
           setResultadoVisual({
+            nome:
+              String(
+                rolagem.nome ||
+                  "Rolagem da mesa",
+              ),
             valores: valoresExibidos,
             lados:
               Number.isFinite(lados) &&
@@ -306,23 +317,30 @@ const Dados3D = forwardRef(
             aria-live="polite"
           >
             <span className="dados-3d__resultado-legenda">
-              Resultado da mesa
+              {resultadoVisual.nome} · resultado sincronizado
             </span>
 
             <div className="dados-3d__faces">
               {resultadoVisual.valores.map(
                 (valor, indice) => (
                   <span
-                    className="dados-3d__face"
+                    className="dados-3d__dado-oficial"
                     key={`${valor}-${indice}`}
+                    style={{
+                      "--atraso-dado": `${indice * 90}ms`,
+                    }}
                   >
-                    <small>
-                      {resultadoVisual.lados
-                        ? `d${resultadoVisual.lados}`
-                        : "dado"}
-                    </small>
+                    <i className="dados-3d__faceta dados-3d__faceta--esquerda" aria-hidden="true" />
+                    <i className="dados-3d__faceta dados-3d__faceta--direita" aria-hidden="true" />
+                    <span className="dados-3d__face">
+                      <small>
+                        {resultadoVisual.lados
+                          ? `d${resultadoVisual.lados}`
+                          : "dado"}
+                      </small>
 
-                    <strong>{valor}</strong>
+                      <strong>{valor}</strong>
+                    </span>
                   </span>
                 ),
               )}
