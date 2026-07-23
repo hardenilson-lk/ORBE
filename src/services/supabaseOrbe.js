@@ -434,21 +434,50 @@ export function mensagemErroConviteOrbe(falha) {
   return falha?.message || "Não foi possível entrar na mesa online.";
 }
 
-export async function salvarFichaRemota(mesaId, ficha) {
-  if (!supabaseOrbe) return null;
-  const { data: autenticacao } = await supabaseOrbe.auth.getUser();
-  if (!autenticacao.user) return null;
-  const { data, error } = await supabaseOrbe.from("fichas_orbe").upsert({
-    id: String(ficha.id),
-    mesa_id: mesaId,
-    responsavel_id: ficha.jogadorId || null,
+export async function salvarFichaRemota(
+  mesaId,
+  ficha,
+  { responsavelId, usarUsuarioAutenticadoComoResponsavel = false } = {},
+) {
+  const cliente = exigirCliente();
+  const {
+    data: { session },
+    error: erroSessao,
+  } = await cliente.auth.getSession();
+  const {
+    data: { user },
+    error: erroUsuario,
+  } = await cliente.auth.getUser();
+
+  if (erroSessao || !session?.user || erroUsuario || !user) {
+    throw new Error("Sua sessão expirou. Entre novamente para salvar a ficha.");
+  }
+
+  const responsavelFinal = usarUsuarioAutenticadoComoResponsavel
+    ? user.id
+    : responsavelId ?? ficha.jogadorId ?? null;
+  const dadosPermitidos = {
     nome: ficha.nome || "Agente",
-    edit_locked: ficha.editLocked === true,
-    dados: ficha,
-    updated_at: new Date().toISOString(),
-  }).select().single();
+    dados: {
+      ...ficha,
+      jogadorId: responsavelFinal || "",
+    },
+  };
+  const payload = {
+    ...dadosPermitidos,
+    id: String(ficha.id),
+    mesa_id: String(mesaId),
+    responsavel_id: responsavelFinal || null,
+    edit_locked: Boolean(ficha.editLocked),
+  };
+
+  const { data, error } = await cliente
+    .from("fichas_orbe")
+    .upsert(payload, { onConflict: "id" })
+    .select()
+    .single();
   if (error) throw error;
-  return data;
+  return normalizarFichaRemota(data);
 }
 
 export async function removerFichaRemota(fichaId) {

@@ -1,4 +1,9 @@
-import { removerFichaRemota, salvarFichaRemota } from "../services/supabaseOrbe.js";
+import {
+  listarFichasRemotas,
+  orbeOnlineHabilitado,
+  removerFichaRemota,
+  salvarFichaRemota,
+} from "../services/supabaseOrbe.js";
 
 const PREFIXO_STORAGE =
   "orbe:arquivos:fichas";
@@ -696,11 +701,39 @@ export function salvarFichaArquivos(
     listaAtualizada,
   );
 
-  void salvarFichaRemota(mesaId, fichaNormalizada).catch((falha) =>
-    console.warn("Ficha salva localmente, mas não sincronizada.", falha),
+  return fichaNormalizada;
+}
+
+export async function salvarFichaArquivosConectada(
+  mesaId,
+  fichaRecebida,
+  opcoes = {},
+) {
+  const agora = new Date().toISOString();
+  const fichaNormalizada = criarFichaArquivosVazia({
+    ...fichaRecebida,
+    id: fichaRecebida?.id || `ficha-${Date.now()}`,
+    criadoEm: fichaRecebida?.criadoEm || agora,
+    atualizadoEm: agora,
+  });
+
+  if (!orbeOnlineHabilitado()) {
+    return salvarFichaArquivos(mesaId, fichaNormalizada);
+  }
+
+  const fichaConfirmada = await salvarFichaRemota(
+    mesaId,
+    fichaNormalizada,
+    opcoes,
   );
 
-  return fichaNormalizada;
+  return salvarFichaArquivos(mesaId, fichaConfirmada);
+}
+
+export async function carregarFichasArquivosConectadas(mesaId) {
+  if (!orbeOnlineHabilitado()) return listarFichasArquivos(mesaId);
+  const fichasRemotas = await listarFichasRemotas(mesaId);
+  return salvarListaFichasArquivos(mesaId, fichasRemotas);
 }
 
 export function removerFichaArquivos(

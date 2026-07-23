@@ -13,8 +13,9 @@ import { MesaSonoraLiveKitProvider } from "../components/mestre/mesaSonora/livek
 
 import {
   criarFichaArquivosVazia,
+  carregarFichasArquivosConectadas,
   listarFichasArquivos,
-  salvarFichaArquivos,
+  salvarFichaArquivosConectada,
 } from "../utils/fichasArquivos.js";
 import { lerUsuarioAtual } from "../utils/contasOrbe.js";
 import { lerMesasSalvas } from "../utils/mesas.js";
@@ -168,17 +169,24 @@ function PaginaJogador() {
     });
   }
 
-  function salvarFicha(ficha) {
+  async function salvarFicha(ficha) {
     if (fichaAtiva?.editLocked) {
       setMensagemSistema("Esta ficha está bloqueada pelo mestre para edição.");
       return fichaAtiva;
     }
-    const salva = salvarFichaArquivos(mesaId, ficha);
-    setFichas(listarFichasArquivos(mesaId));
-    setFichaId(salva.id);
-    localStorage.setItem(`orbe:jogador:ficha:${mesaId}`, salva.id);
-    setMensagemSistema("Sua ficha foi salva.");
-    return salva;
+    try {
+      const salva = await salvarFichaArquivosConectada(mesaId, ficha, {
+        usarUsuarioAutenticadoComoResponsavel: true,
+      });
+      setFichas(listarFichasArquivos(mesaId));
+      setFichaId(salva.id);
+      localStorage.setItem(`orbe:jogador:ficha:${mesaId}`, salva.id);
+      setMensagemSistema("Sua ficha foi salva.");
+      return salva;
+    } catch (erro) {
+      setMensagemSistema(erro?.message || "Não foi possível salvar sua ficha online.");
+      return null;
+    }
   }
 
   function escolherFicha(ficha) {
@@ -188,15 +196,21 @@ function PaginaJogador() {
     setMensagemSistema(`Agente ${ficha.nome || "selecionado"} vinculado.`);
   }
 
-  function criarFicha(evento) {
+  async function criarFicha(evento) {
     evento.preventDefault();
     if (!nomePersonagem.trim()) return;
-    const ficha = salvarFichaArquivos(mesaId, criarFichaArquivosVazia({
-      nome: nomePersonagem.trim(),
-      jogador: usuarioPortalNome || nomeJogador.trim() || nomePersonagem.trim(),
-      jogadorId: usuarioPortalId,
-      origemFicha: "pessoal",
-    }));
+    let ficha;
+    try {
+      ficha = await salvarFichaArquivosConectada(mesaId, criarFichaArquivosVazia({
+        nome: nomePersonagem.trim(),
+        jogador: usuarioPortalNome || nomeJogador.trim() || nomePersonagem.trim(),
+        jogadorId: usuarioPortalId,
+        origemFicha: "pessoal",
+      }), { usarUsuarioAutenticadoComoResponsavel: true });
+    } catch (erro) {
+      setMensagemSistema(erro?.message || "Não foi possível criar sua ficha online.");
+      return;
+    }
     setFichas(listarFichasArquivos(mesaId));
     escolherFicha(ficha);
     setNomeJogador("");
@@ -251,10 +265,14 @@ function PaginaJogador() {
     }
   }
 
-  function recarregar() {
+  async function recarregar() {
     setSessao(carregarSessaoArquivos(mesaId));
-    setFichas(listarFichasArquivos(mesaId));
-    setMensagemSistema("Campanha atualizada.");
+    try {
+      setFichas(await carregarFichasArquivosConectadas(mesaId));
+      setMensagemSistema("Campanha atualizada.");
+    } catch (erro) {
+      setMensagemSistema(erro?.message || "Não foi possível carregar as fichas online.");
+    }
   }
 
   function alternarMenuPrincipal() {

@@ -17,7 +17,7 @@ function PainelGerenciarFichas({
   const [jogadorId, setJogadorId] = useState(jogadorInicialId || "");
   const [permissao, setPermissao] = useState("bloqueada");
 
-  function criarFicha(evento) {
+  async function criarFicha(evento) {
     evento.preventDefault();
     const jogadorDiretoId = evento.nativeEvent?.submitter?.name === "jogadorDireto"
       ? evento.nativeEvent.submitter.value
@@ -26,14 +26,14 @@ function PainelGerenciarFichas({
     const jogador = jogadores.find((item) => item.id === jogadorFinalId) || null;
     const nomeFinal = nome.trim() || jogador?.personagem || (jogador ? `Agente de ${jogador.nome || "jogador"}` : "");
     if (!nomeFinal) return;
-    aoCriarFicha?.({
+    const fichaCriada = await aoCriarFicha?.({
       nome: nomeFinal,
       tipo,
       jogadorId: jogadorFinalId,
       jogador: jogador?.nome || "",
       permissao,
     });
-    setNome("");
+    if (fichaCriada) setNome("");
   }
 
   return (

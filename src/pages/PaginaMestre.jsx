@@ -30,9 +30,10 @@ import { MesaSonoraLiveKitProvider } from "../components/mestre/mesaSonora/livek
 
 import {
   criarFichaArquivosVazia,
+  carregarFichasArquivosConectadas,
   listarFichasArquivos,
   removerFichaArquivos,
-  salvarFichaArquivos,
+  salvarFichaArquivosConectada,
 } from "../utils/fichasArquivos.js";
 
 import {
@@ -273,45 +274,56 @@ function PaginaMestre() {
     return listaAtualizada;
   }
 
-  function salvarFicha(
+  async function salvarFicha(
     fichaRecebida,
   ) {
-    const fichaSalva =
-      salvarFichaArquivos(
+    try {
+      const fichaSalva =
+        await salvarFichaArquivosConectada(
         mesaId,
         fichaRecebida,
+        { responsavelId: fichaRecebida?.jogadorId || null },
       );
 
-    atualizarListaFichas();
+      atualizarListaFichas();
 
-    persistirSessao({
-      fichaAtivaId:
-        fichaSalva.id,
-    });
+      persistirSessao({
+        fichaAtivaId:
+          fichaSalva.id,
+      });
 
-    setMensagemSistema(
-      `Ficha de ${
-        fichaSalva.nome ||
-        "agente"
-      } salva.`,
-    );
+      setMensagemSistema(
+        `Ficha de ${fichaSalva.nome || "agente"} salva.`,
+      );
+      return fichaSalva;
+    } catch (erro) {
+      setMensagemSistema(erro?.message || "Não foi possível salvar a ficha online.");
+      return null;
+    }
   }
 
-  function criarFichaDaSessao(configuracao = {}) {
+  async function criarFichaDaSessao(configuracao = {}) {
     const jogador = criarListaSegura(sessao.jogadores).find(
       (item) => item.id === configuracao.jogadorId,
     );
-    const fichaSalva = salvarFichaArquivos(
-      mesaId,
-      criarFichaArquivosVazia({
-        nome: configuracao.nome || jogador?.personagem || "Novo agente",
-        jogador: configuracao.jogador || jogador?.nome || "",
-        jogadorId: configuracao.jogadorId || "",
-        fichaCategoria: configuracao.tipo || "Personagem da sessão",
-        origemFicha: "sessao",
-        editLocked: configuracao.permissao !== "liberada",
-      }),
-    );
+    let fichaSalva;
+    try {
+      fichaSalva = await salvarFichaArquivosConectada(
+        mesaId,
+        criarFichaArquivosVazia({
+          nome: configuracao.nome || jogador?.personagem || "Novo agente",
+          jogador: configuracao.jogador || jogador?.nome || "",
+          jogadorId: configuracao.jogadorId || "",
+          fichaCategoria: configuracao.tipo || "Personagem da sessão",
+          origemFicha: "sessao",
+          editLocked: configuracao.permissao !== "liberada",
+        }),
+        { responsavelId: configuracao.jogadorId || null },
+      );
+    } catch (erro) {
+      setMensagemSistema(erro?.message || "Não foi possível criar a ficha online.");
+      return;
+    }
 
     const listaAtualizada = atualizarListaFichas();
     persistirSessao((anterior) => ({
@@ -326,6 +338,7 @@ function PaginaMestre() {
     setJogadorCriacaoId("");
     setFichas(listaAtualizada);
     setMensagemSistema(`Ficha de ${fichaSalva.nome} criada${jogador ? ` para ${jogador.nome}` : ""}.`);
+    return fichaSalva;
   }
 
   function removerFicha(ficha) {
@@ -661,16 +674,19 @@ function PaginaMestre() {
     );
   }
 
-  function recarregarCampanha() {
+  async function recarregarCampanha() {
     const sessaoCarregada =
       carregarSessaoArquivos(
         mesaId,
       );
 
-    const fichasCarregadas =
-      listarFichasArquivos(
-        mesaId,
-      );
+    let fichasCarregadas;
+    try {
+      fichasCarregadas = await carregarFichasArquivosConectadas(mesaId);
+    } catch (erro) {
+      setMensagemSistema(erro?.message || "Não foi possível carregar as fichas online.");
+      return;
+    }
 
     setSessao(
       sessaoCarregada,

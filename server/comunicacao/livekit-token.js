@@ -2,7 +2,7 @@ import { createServer } from "node:http";
 import { AccessToken, TrackSource } from "livekit-server-sdk";
 
 const PORTA = Number.parseInt(process.env.PORT || "3001", 10);
-const HOST = process.env.HOST || "127.0.0.1";
+const HOST = process.env.HOST || "0.0.0.0";
 const ORIGEM_PERMITIDA = process.env.ALLOWED_ORIGIN || "http://localhost:5173";
 const CAMINHO_TOKEN = "/api/livekit-token";
 const LIMITE_CORPO = 16 * 1024;
