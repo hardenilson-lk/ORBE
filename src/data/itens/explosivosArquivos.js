@@ -1,185 +1,224 @@
-const DADOS_PADRAO_PROTECAO = {
-  tipo: "Proteção",
+const DADOS_PADRAO_EXPLOSIVO = {
+  tipo: "Explosivo",
   quantidade: 1,
-  dano: "",
-  critico: "",
-  alcance: "",
-  tipoDano: "",
-  bonusCarga: 0,
-  penalidadeMovimento: 0,
+  volume: 1,
   ativo: true,
-  propriedades: [],
-  efeito: "",
+  consumivel: true,
+  usos: 1,
+  usosMaximos: 1,
 };
 
-function criarProtecao(dados) {
+function criarExplosivo(dados) {
   return {
-    ...DADOS_PADRAO_PROTECAO,
+    ...DADOS_PADRAO_EXPLOSIVO,
     ...dados,
   };
 }
 
-export const PROTECOES_ARQUIVOS = [
-  criarProtecao({
-    id: "protecao-leve",
-    nome: "Proteção Leve",
-    categoria: "Proteção leve",
-    categoriaNumerica: 1,
-    proficiencia: "Proteções leves",
-    volume: 2,
-    defesa: 5,
-    protecao: 0,
-    resistenciaDano: 0,
-    penalidadeCarga: 0,
-    empunhadura: "Vestida",
-    imagem: "colete",
+export const GRANADAS_ARQUIVOS = [
+  criarExplosivo({
+    id: "granada-de-atordoamento",
+    nome: "Granada de Atordoamento",
+
+    categoria: "Granada",
+    categoriaNumerica: 0,
+
+    alcance: "Médio",
+    area: "Raio de 6m",
+
+    acaoUso: "Ação padrão",
+    resistencia: "Fortitude",
+    atributoDt: "Agilidade",
+
+    imagem: "granada-atordoamento",
+
     propriedades: [
-      "Vestida",
-      "Proteção leve",
-      "Defesa +5",
+      "Consumível",
+      "Arremessável",
+      "Alcance médio",
+      "Área de 6m",
+      "Atordoamento",
+      "Clarão e ruído intensos",
     ],
+
     efeito:
-      "Enquanto estiver vestida e ativa, fornece +5 na Defesa. Um personagem sem proficiência em proteções leves sofre penalidade nos testes baseados em Força e Agilidade.",
+      "Para utilizar esta granada, o personagem precisa empunhá-la e gastar uma ação padrão para arremessá-la em um ponto dentro de alcance médio. Todos os seres em um raio de 6 metros ficam atordoados por 1 rodada. Um sucesso em Fortitude contra a DT baseada na Agilidade do usuário reduz o efeito: o alvo fica ofuscado e surdo por 1 rodada.",
+
     descricao:
-      "Uma proteção relativamente discreta, representada por uma jaqueta reforçada, colete de kevlar ou conjunto semelhante. É comum entre policiais, seguranças e agentes que esperam enfrentar perigo, mas ainda precisam manter mobilidade. Quando vestida, aumenta a Defesa em +5. Ocupa 2 espaços no inventário e exige proficiência com proteções leves para ser usada sem penalidades.",
+      "Também conhecida como flash-bang, esta granada produz um clarão extremamente intenso acompanhado por uma explosão ensurdecedora. Ela foi desenvolvida para desorientar pessoas em ambientes fechados e permitir invasões rápidas, resgates ou capturas. Apesar de não depender de estilhaços para causar seu efeito, ainda pode provocar lesões, queimaduras ou danos auditivos quando utilizada de maneira imprudente ou em uma distância muito curta.",
+
+    comentario:
+      "Quando o plano precisa de uma entrada dramática, mas a equipe ainda quer encontrar as paredes depois.",
   }),
 
-  criarProtecao({
-    id: "protecao-pesada",
-    nome: "Proteção Pesada",
-    categoria: "Proteção pesada",
-    categoriaNumerica: 2,
-    proficiencia: "Proteções pesadas",
-    volume: 5,
-    defesa: 10,
-    protecao: 2,
-    resistenciaDano: 2,
-    tiposResistidos: [
-      "Balístico",
-      "Corte",
-      "Impacto",
-      "Perfuração",
-    ],
-    penalidadeCarga: -5,
-    empunhadura: "Vestida",
-    imagem: "armadura",
+  criarExplosivo({
+    id: "granada-de-fragmentacao",
+    nome: "Granada de Fragmentação",
+
+    categoria: "Granada",
+    categoriaNumerica: 1,
+
+    volume: 1,
+
+    dano: "8d6",
+    tipoDano: "Perfuração",
+
+    alcance: "Médio",
+    area: "Raio de 6m",
+
+    acaoUso: "Ação padrão",
+    resistencia: "Reflexos",
+    atributoDt: "Agilidade",
+    efeitoResistencia:
+      "Reduz o dano à metade",
+
+    imagem: "granada-fragmentacao",
+
     propriedades: [
-      "Vestida",
-      "Proteção pesada",
-      "Defesa +10",
-      "Resistência física 2",
-      "Penalidade de carga –5",
+      "Consumível",
+      "Arremessável",
+      "Alcance médio",
+      "Área de 6m",
+      "Dano de perfuração",
+      "Reflexos reduz à metade",
     ],
+
     efeito:
-      "Enquanto estiver vestida e ativa, fornece +10 na Defesa e resistência 2 contra dano balístico, corte, impacto e perfuração. Impõe –5 em perícias afetadas por penalidade de carga.",
+      "Para utilizar esta granada, o personagem precisa empunhá-la e gastar uma ação padrão para arremessá-la em um ponto dentro de alcance médio. A explosão espalha fragmentos metálicos em um raio de 6 metros. Todos os seres na área sofrem 8d6 pontos de dano de perfuração. Um sucesso em Reflexos contra a DT baseada na Agilidade do usuário reduz o dano à metade.",
+
     descricao:
-      "Um conjunto completo usado por equipes militares, forças especiais e tropas preparadas para confrontos intensos. Normalmente inclui capacete, ombreiras, joelheiras, caneleiras e diversas camadas de material resistente. Quando vestida, fornece +10 na Defesa e reduz em 2 o dano balístico, de corte, de impacto e de perfuração. Por ser pesada, desconfortável e volumosa, impõe –5 nos testes de perícias que sofrem penalidade de carga. Ocupa 5 espaços e exige proficiência com proteções pesadas.",
+      "Uma granada militar construída com uma carga explosiva envolvida por uma estrutura metálica preparada para se partir em diversos fragmentos. Quando detonada, transforma a área próxima em uma tempestade de estilhaços rápidos o bastante para atravessar roupas, madeira fina e carne. É eficiente contra grupos, mas seu raio de ação não distingue inimigos, aliados, reféns ou o agente que calculou mal a distância.",
+
+    comentario:
+      "Puxe o pino, jogue longe e tente não descobrir pessoalmente por que o alcance está escrito no manual.",
   }),
 
-  criarProtecao({
-    id: "escudo",
-    nome: "Escudo",
-    categoria: "Escudo",
-    categoriaNumerica: 1,
-    proficiencia: "Proteções pesadas",
-    volume: 2,
-    defesa: 2,
-    protecao: 0,
-    resistenciaDano: 0,
-    penalidadeCarga: 0,
-    empunhadura: "Uma mão",
-    imagem: "escudo",
+  criarExplosivo({
+    id: "granada-de-fumaca",
+    nome: "Granada de Fumaça",
+
+    categoria: "Granada",
+    categoriaNumerica: 0,
+
+    alcance: "Médio",
+    area: "Raio de 6m",
+
+    duracao: "2 rodadas",
+    acaoUso: "Ação padrão",
+
+    imagem: "granada-fumaca",
+
     propriedades: [
-      "Empunhado",
-      "Ocupa uma mão",
-      "Defesa +2",
-      "Acumula com proteção",
+      "Consumível",
+      "Arremessável",
+      "Alcance médio",
+      "Área de 6m",
+      "Camuflagem total",
+      "Duração de 2 rodadas",
     ],
+
     efeito:
-      "Precisa ser empunhado em uma mão para fornecer +2 na Defesa. Esse bônus acumula com a Defesa de uma proteção vestida. Para proficiência, conta como proteção pesada.",
+      "Para utilizar esta granada, o personagem precisa empunhá-la e gastar uma ação padrão para arremessá-la em um ponto dentro de alcance médio. Ela libera uma fumaça espessa em um raio de 6 metros. Os seres dentro da área ficam cegos e sob camuflagem total. A fumaça permanece durante 2 rodadas.",
+
     descricao:
-      "Um escudo medieval, balístico ou moderno, como os utilizados por tropas de choque. Precisa permanecer empunhado em uma das mãos para conceder seu benefício, impedindo que essa mão seja usada para outro item. Enquanto estiver ativo, fornece +2 na Defesa. Esse bônus pode ser somado ao de uma Proteção Leve ou Pesada, mas não é permitido utilizar dois escudos simultaneamente. Para efeitos de proficiência e penalidades, o escudo é considerado uma proteção pesada.",
+      "Um cilindro preparado para liberar rapidamente uma grande quantidade de fumaça escura e densa. É utilizado para bloquear linhas de visão, cobrir retiradas, atravessar áreas vigiadas ou confundir adversários. A fumaça também prejudica os próprios agentes, portanto entrar na nuvem sem planejamento costuma transformar uma operação tática em várias pessoas esbarrando umas nas outras.",
+
+    comentario:
+      "Excelente para desaparecer misteriosamente. Menos excelente quando ninguém da equipe sabe para qual lado fica a saída.",
+  }),
+
+  criarExplosivo({
+    id: "granada-incendiaria",
+    nome: "Granada Incendiária",
+
+    categoria: "Granada",
+    categoriaNumerica: 1,
+
+    dano: "6d6",
+    tipoDano: "Fogo",
+
+    alcance: "Médio",
+    area: "Raio de 6m",
+
+    acaoUso: "Ação padrão",
+    resistencia: "Reflexos",
+    atributoDt: "Agilidade",
+    efeitoResistencia:
+      "Reduz o dano à metade e evita a condição em chamas",
+
+    imagem: "granada-incendiaria",
+
+    propriedades: [
+      "Consumível",
+      "Arremessável",
+      "Alcance médio",
+      "Área de 6m",
+      "Dano de fogo",
+      "Pode deixar em chamas",
+    ],
+
+    efeito:
+      "Para utilizar esta granada, o personagem precisa empunhá-la e gastar uma ação padrão para arremessá-la em um ponto dentro de alcance médio. Ela espalha labaredas em um raio de 6 metros. Todos os seres na área sofrem 6d6 pontos de dano de fogo e ficam em chamas. Um sucesso em Reflexos contra a DT baseada na Agilidade do usuário reduz o dano à metade e evita a condição em chamas.",
+
+    descricao:
+      "Uma granada carregada com substâncias capazes de produzir e espalhar fogo intenso no momento da detonação. As chamas aderem a roupas, superfícies e materiais inflamáveis, tornando o equipamento especialmente perigoso em construções de madeira, depósitos, veículos e locais fechados. Além dos alvos atingidos diretamente, o incêndio resultante pode continuar alterando o cenário muito depois da explosão.",
+
+    comentario:
+      "Todo problema parece menor quando o prédio inteiro vira um problema maior.",
   }),
 ];
 
-export const MODIFICACOES_PROTECOES_ARQUIVOS = [
-  {
-    id: "antibombas",
-    nome: "Antibombas",
-    tipo: "Modificação de proteção",
-    aumentoCategoria: 1,
-    protecoesPermitidas: [
-      "protecao-pesada",
-    ],
-    efeito:
-      "Fornece +5 em testes de resistência contra explosões e outros efeitos de área.",
-    descricao:
-      "A proteção recebe tratamento resistente ao calor, preenchimento contra estilhaços e um capacete com viseira que reduz luz intensa, impacto e ruído. Pode ser aplicada apenas em Proteção Pesada.",
-  },
+export const MINAS_ARQUIVOS = [
+  criarExplosivo({
+    id: "mina-antipessoal",
+    nome: "Mina Antipessoal",
 
-  {
-    id: "blindada",
-    nome: "Blindada",
-    tipo: "Modificação de proteção",
-    aumentoCategoria: 1,
-    protecoesPermitidas: [
-      "protecao-pesada",
-    ],
-    aumentoVolume: 1,
-    resistenciaDano: 5,
-    efeito:
-      "Aumenta a resistência a dano da Proteção Pesada para 5 e aumenta seu espaço ocupado em 1.",
-    descricao:
-      "Placas de aço e cerâmica são adicionadas entre as camadas resistentes da proteção. O reforço melhora bastante a redução de dano, mas torna o conjunto ainda mais pesado e volumoso. Pode ser aplicada apenas em Proteção Pesada.",
-  },
+    categoria: "Mina",
+    categoriaNumerica: 1,
 
-  {
-    id: "discreta",
-    nome: "Discreta",
-    tipo: "Modificação de proteção",
-    aumentoCategoria: 1,
-    protecoesPermitidas: [
-      "protecao-leve",
-    ],
-    reducaoVolume: 1,
-    bonusOcultar: 5,
-    efeito:
-      "Reduz o espaço ocupado pela Proteção Leve em 1 e fornece +5 em testes de Crime para escondê-la.",
-    descricao:
-      "A proteção é produzida com material compacto e denso, reduzindo seu volume e tornando mais fácil escondê-la sob roupas comuns. Permite realizar o teste para ocultá-la mesmo sem treinamento em Crime. Não pode ser combinada com a modificação Reforçada.",
-  },
+    dano: "12d6",
+    tipoDano: "Perfuração",
 
-  {
-    id: "reforcada",
-    nome: "Reforçada",
-    tipo: "Modificação de proteção",
-    aumentoCategoria: 1,
-    protecoesPermitidas: [
-      "protecao-leve",
-      "protecao-pesada",
-      "escudo",
+    area: "Cone de 6m",
+    alcanceControle: "Longo",
+
+    acaoInstalacao: "Ação completa",
+    periciaInstalacao: "Tática",
+    dtInstalacao: 15,
+
+    acaoDetonacao: "Ação padrão",
+    ativacao: "Controle remoto",
+
+    resistencia: "Reflexos",
+    atributoDt: "Intelecto",
+    efeitoResistencia:
+      "Reduz o dano à metade",
+
+    imagem: "mina-antipessoal",
+
+    propriedades: [
+      "Consumível",
+      "Instalação com Tática DT 15",
+      "Detonação remota",
+      "Controle em alcance longo",
+      "Cone de 6m",
+      "Reflexos reduz à metade",
     ],
-    aumentoDefesa: 2,
-    aumentoVolume: 1,
+
     efeito:
-      "Aumenta a Defesa fornecida pela proteção em +2 e aumenta seu espaço ocupado em 1.",
+      "Instalar a mina no chão exige uma ação completa e um teste de Tática DT 15. Em caso de falha, a mina é gasta, mas não funciona. Ao instalá-la, o personagem escolhe a direção de seu cone. Enquanto estiver a até alcance longo da mina, pode gastar uma ação padrão para detoná-la por controle remoto. A explosão dispara centenas de bolas de aço em um cone de 6 metros, causando 12d6 pontos de dano de perfuração em todos os seres na área. Um sucesso em Reflexos contra a DT baseada no Intelecto do instalador reduz o dano à metade. Encontrar a mina exige um teste de Percepção com DT igual ao resultado obtido no teste usado para instalá-la.",
+
     descricao:
-      "Camadas extras, placas ou estruturas resistentes são adicionadas ao equipamento. A proteção se torna mais difícil de transportar, mas oferece cobertura superior. Uma Proteção Leve não pode possuir simultaneamente as modificações Reforçada e Discreta.",
-  },
+      "Um dispositivo explosivo direcional preparado para lançar uma grande quantidade de projéteis metálicos contra uma área específica. Diferentemente de uma mina acionada simplesmente por pressão, este modelo utiliza controle remoto, permitindo que o agente escolha o momento da detonação. A direção precisa ser definida durante a instalação, o que transforma posicionamento e preparação em partes fundamentais de seu uso.",
+
+    comentario:
+      "Uma armadilha muito eficiente, desde que alguém anote onde ela foi instalada.",
+  }),
 ];
 
-export const PROTECOES_LEVES_ARQUIVOS =
-  PROTECOES_ARQUIVOS.filter(
-    (protecao) =>
-      protecao.proficiencia ===
-      "Proteções leves",
-  );
+export const EXPLOSIVOS_ARQUIVOS = [
+  ...GRANADAS_ARQUIVOS,
+  ...MINAS_ARQUIVOS,
+];
 
-export const PROTECOES_PESADAS_ARQUIVOS =
-  PROTECOES_ARQUIVOS.filter(
-    (protecao) =>
-      protecao.proficiencia ===
-      "Proteções pesadas",
-  );
-
-export default PROTECOES_ARQUIVOS;
+export default EXPLOSIVOS_ARQUIVOS;

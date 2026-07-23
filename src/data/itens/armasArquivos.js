@@ -1,14 +1,7 @@
 const DADOS_PADRAO_ARMA = {
   tipo: "Arma",
   quantidade: 1,
-  defesa: 0,
-  protecao: 0,
-  bonusCarga: 0,
-  penalidadeMovimento: 0,
   ativo: true,
-  municao: "",
-  propriedades: [],
-  efeito: "",
 };
 
 function criarArma(dados) {
@@ -44,6 +37,9 @@ export const ARMAS_ARQUIVOS = [
       "Pode usar Agilidade no lugar de Força nos testes de ataque e nas rolagens de dano. Também pode ser arremessada em alcance curto.",
     descricao:
       "Uma lâmina curta, leve e fácil de esconder. Além de servir como arma em confrontos próximos, pode ser utilizada para cortar cordas, abrir embalagens, improvisar ferramentas e realizar outras tarefas de campo. Por ser uma arma ágil, o usuário pode aplicar Agilidade no lugar de Força ao atacar e causar dano. Também pode ser arremessada contra um alvo em alcance curto.",
+
+    comentario:
+      "Pequena, discreta e sempre perto demais quando alguém percebe que ela estava ali.",
   }),
 
   criarArma({
@@ -64,6 +60,9 @@ export const ARMAS_ARQUIVOS = [
     imagem: "martelo",
     descricao:
       "Um martelo comum de trabalho, encontrado em oficinas, caixas de ferramentas e locais de construção. Não foi projetado especificamente para combate, mas sua cabeça metálica pode causar ferimentos consideráveis. É simples de manejar, ocupa pouco espaço e também pode ser usado em tarefas de reparo, para pregar, quebrar objetos frágeis ou improvisar soluções.",
+
+    comentario:
+      "Ferramenta de trabalho, solução de emergência e argumento final contra fechaduras teimosas.",
   }),
 
   criarArma({
@@ -90,6 +89,9 @@ export const ARMAS_ARQUIVOS = [
       "Pode usar Agilidade no lugar de Força nos testes de ataque e nas rolagens de dano.",
     descricao:
       "Uma lâmina estreita, longa e pontiaguda, feita para perfurar profundamente. É frequentemente associada a cerimônias antigas, cultistas e rituais, mas também pode ser usada como uma arma discreta. Seu dano básico é baixo, porém seus golpes críticos são especialmente perigosos. Por ser uma arma ágil, permite usar Agilidade no lugar de Força.",
+
+    comentario:
+      "Todo ritual parece mais sério quando alguém coloca isto sobre a mesa.",
   }),
 
   criarArma({
@@ -116,6 +118,9 @@ export const ARMAS_ARQUIVOS = [
       "Causa 1d6 de dano quando usado com uma mão ou 1d8 quando empunhado com as duas mãos.",
     descricao:
       "Um bastão resistente de madeira, metal ou material sintético. Pode representar um cassetete policial, um taco reforçado ou qualquer objeto semelhante. Quando usado com uma mão, é mais fácil manter a outra mão livre. Ao ser empunhado com as duas mãos, seus golpes ganham mais força e o dano aumenta para 1d8.",
+
+    comentario:
+      "Simples, confiável e excelente para lembrar que física também é uma forma de persuasão.",
   }),
 
   criarArma({
@@ -137,6 +142,9 @@ export const ARMAS_ARQUIVOS = [
     imagem: "machete",
     descricao:
       "Uma lâmina larga e pesada, utilizada principalmente para abrir caminho em vegetação fechada. Em combate funciona como uma arma de corte confiável, capaz de causar ferimentos profundos. Também pode ser útil durante explorações para cortar galhos, cipós, plantas densas, cordas e materiais semelhantes.",
+
+    comentario:
+      "Abre caminho na mata, em portas frágeis e, em último caso, em péssimas decisões.",
   }),
 
   criarArma({
@@ -163,6 +171,9 @@ export const ARMAS_ARQUIVOS = [
       "Pode ser usada em combate corpo a corpo ou arremessada contra um alvo em alcance curto.",
     descricao:
       "Uma haste comprida com uma ponta afiada, normalmente metálica. Apesar de sua origem antiga, ainda é utilizada em treinamentos marciais e pode ser improvisada com materiais encontrados em campo. Serve tanto para atacar oponentes próximos quanto para ser arremessada contra alvos em alcance curto.",
+
+    comentario:
+      "A humanidade inventou muitas armas desde então. Mesmo assim, uma ponta afiada numa haste ainda resolve bastante coisa.",
   }),
 
   criarArma({
@@ -191,6 +202,9 @@ export const ARMAS_ARQUIVOS = [
       "É uma arma dupla e ágil. Permite usar Agilidade no lugar de Força nos ataques e no dano.",
     descricao:
       "Uma haste longa utilizada para apoio, treinamento e combate. Seu comprimento permite golpes com ambas as extremidades, sendo representada como uma arma dupla. O cajado exige as duas mãos, mas é leve e equilibrado o bastante para permitir que um combatente use Agilidade no lugar de Força em seus ataques e rolagens de dano.",
+
+    comentario:
+      "Parece apoio para caminhada até começar a atingir alguém pelas duas extremidades.",
   }),
 
   criarArma({
@@ -217,6 +231,9 @@ export const ARMAS_ARQUIVOS = [
       "Usa um pacote de flechas. Recarregar e disparar exige o uso das duas mãos.",
     descricao:
       "Uma arma de disparo silenciosa que utiliza a tensão de uma corda para lançar flechas. Pode alcançar alvos a uma distância média e não produz o estrondo de uma arma de fogo, sendo útil em situações furtivas. Exige as duas mãos e um pacote de flechas para funcionar.",
+
+    comentario:
+      "Silencioso o bastante para manter o plano furtivo. O grito do alvo, infelizmente, não vem incluso.",
   }),
 
   criarArma({
@@ -243,6 +260,9 @@ export const ARMAS_ARQUIVOS = [
       "Usa um pacote de flechas. Recarregar exige as duas mãos.",
     descricao:
       "Uma arma de disparo formada por um arco montado sobre uma estrutura rígida. É mais fácil de manter preparada do que um arco comum e lança seus projéteis com força considerável. Possui alcance médio, causa dano de perfuração e utiliza pacotes de flechas.",
+
+    comentario:
+      "Para quem aprecia o silêncio de um arco, mas prefere que uma estrutura mecânica faça a parte difícil.",
   }),
 
   criarArma({
@@ -268,6 +288,9 @@ export const ARMAS_ARQUIVOS = [
     ],
     descricao:
       "Uma arma de fogo curta, comum entre policiais, militares e agentes de segurança. Seu carregador permite recargas práticas e sua estrutura compacta facilita o transporte. Possui uma margem de ameaça elevada, funcionando bem em confrontos de curta distância. Utiliza pacotes de balas curtas.",
+
+    comentario:
+      "Compacta, rápida e muito eficiente em transformar uma conversa ruim em silêncio.",
   }),
 
   criarArma({
@@ -293,6 +316,9 @@ export const ARMAS_ARQUIVOS = [
     ],
     descricao:
       "Uma das armas de fogo mais conhecidas e confiáveis. Seu tambor possui capacidade limitada, mas o mecanismo simples reduz a possibilidade de falhas. É fácil de transportar, causa bom dano em alcance curto e possui um multiplicador de crítico elevado. Utiliza pacotes de balas curtas.",
+
+    comentario:
+      "Seis respostas possíveis. Normalmente nenhuma delas melhora o ambiente.",
   }),
 
   criarArma({
@@ -318,6 +344,9 @@ export const ARMAS_ARQUIVOS = [
     ],
     descricao:
       "Uma arma longa popular entre caçadores, fazendeiros e praticantes de tiro esportivo. Foi projetada para disparos precisos em distâncias maiores do que armas curtas. Exige as duas mãos, possui alcance médio e utiliza pacotes de balas longas.",
+
+    comentario:
+      "Foi feito para caçar animais. O problema é quando a coisa na mira não consta em nenhum livro de zoologia.",
   }),
 
   criarArma({
@@ -344,6 +373,9 @@ export const ARMAS_ARQUIVOS = [
       "Pode ser usada em combate corpo a corpo ou arremessada em alcance curto.",
     descricao:
       "Uma pequena ferramenta de corte muito comum em fazendas, acampamentos e construções. É eficaz para partir madeira, abrir passagens e quebrar materiais leves. Em combate causa ferimentos de corte e pode ser arremessada contra um alvo em alcance curto.",
+
+    comentario:
+      "Boa para madeira, acampamentos e situações em que o alvo decidiu ficar perto demais.",
   }),
 
   criarArma({
@@ -371,6 +403,9 @@ export const ARMAS_ARQUIVOS = [
       "Pode usar Agilidade no lugar de Força nos testes de ataque e nas rolagens de dano.",
     descricao:
       "Dois bastões curtos conectados por uma corrente ou corda. O nunchaku exige treinamento para ser utilizado com segurança, mas permite ataques rápidos e imprevisíveis. É uma arma ágil, permitindo aplicar Agilidade no lugar de Força nos ataques e no dano.",
+
+    comentario:
+      "Nas mãos certas, uma arma veloz. Nas mãos erradas, uma forma muito eficiente de acertar a própria testa.",
   }),
 
   criarArma({
@@ -392,6 +427,9 @@ export const ARMAS_ARQUIVOS = [
     imagem: "corrente",
     descricao:
       "Uma corrente metálica pesada, utilizada como arma flexível de impacto. Seus movimentos são difíceis de prever e ela pode contornar parcialmente obstáculos pequenos, mas exige treinamento para não atingir o próprio usuário. Também pode ser usada para prender, amarrar ou bloquear objetos, conforme a situação e a decisão do mestre.",
+
+    comentario:
+      "Barulhenta, imprevisível e sutil como arrastar um portão pelo corredor.",
   }),
 
   criarArma({
@@ -418,6 +456,9 @@ export const ARMAS_ARQUIVOS = [
       "Causa 1d8 de dano com uma mão ou 1d10 quando empunhada com as duas mãos.",
     descricao:
       "Uma lâmina equilibrada e versátil, desenvolvida especificamente para combate. Pode ser utilizada com uma mão, mantendo a outra livre, ou empunhada com as duas mãos para aplicar golpes mais fortes. Quando usada com as duas mãos, seu dano aumenta para 1d10.",
+
+    comentario:
+      "Clássica por um motivo: monstros modernos continuam tendo partes que podem ser cortadas.",
   }),
 
   criarArma({
@@ -445,6 +486,9 @@ export const ARMAS_ARQUIVOS = [
       "Pode usar Agilidade no lugar de Força nos testes de ataque e nas rolagens de dano.",
     descricao:
       "Uma espada fina, leve e muito equilibrada, voltada para golpes rápidos e precisos. Seu dano básico é menor do que o de outras espadas, mas sua margem de ameaça é excelente. Por ser uma arma ágil, permite usar Agilidade no lugar de Força nos ataques e no dano.",
+
+    comentario:
+      "Elegante, preciso e perfeito para transformar um duelo em uma discussão sobre centímetros.",
   }),
 
   criarArma({
@@ -466,6 +510,9 @@ export const ARMAS_ARQUIVOS = [
     imagem: "machado",
     descricao:
       "Uma ferramenta pesada de corte, utilizada por lenhadores, bombeiros e equipes de resgate. Em combate, sua lâmina concentra muita força em uma área pequena, tornando seus golpes críticos especialmente destrutivos. Também pode ser usado para derrubar portas, cortar madeira e abrir passagens.",
+
+    comentario:
+      "Quando bater na porta não funciona, ele oferece uma segunda abordagem.",
   }),
 
   criarArma({
@@ -487,6 +534,9 @@ export const ARMAS_ARQUIVOS = [
     imagem: "maca",
     descricao:
       "Uma arma de impacto formada por um cabo resistente e uma cabeça pesada, frequentemente reforçada com saliências metálicas. Seus golpes distribuem o dano em múltiplos pontos e são eficazes contra alvos protegidos ou objetos frágeis. Exige treinamento por causa de seu peso e equilíbrio.",
+
+    comentario:
+      "Não precisa de fio, munição ou delicadeza. Apenas espaço para balançar.",
   }),
 
   criarArma({
@@ -508,6 +558,9 @@ export const ARMAS_ARQUIVOS = [
     imagem: "acha",
     descricao:
       "Um enorme machado de guerra projetado para ser empunhado com as duas mãos. Sua cabeça pesada produz golpes lentos, mas extremamente violentos. A arma ocupa bastante espaço, exige força e treinamento, porém possui grande potencial de dano e críticos devastadores.",
+
+    comentario:
+      "Grande o bastante para que o inimigo entenda o plano antes mesmo do primeiro golpe.",
   }),
 
   criarArma({
@@ -529,6 +582,9 @@ export const ARMAS_ARQUIVOS = [
     imagem: "gadanho",
     descricao:
       "Uma grande ferramenta agrícola criada para cortar cereais e vegetação em movimentos largos. Sua lâmina curva também pode causar ferimentos terríveis quando utilizada como arma. O dano normal é moderado, mas seu multiplicador de crítico é um dos maiores entre as armas comuns.",
+
+    comentario:
+      "Criado para a colheita. Algumas noites apenas mudam o que precisa ser colhido.",
   }),
 
   criarArma({
@@ -557,6 +613,9 @@ export const ARMAS_ARQUIVOS = [
       "Pode usar Agilidade no lugar de Força. Um personagem veterano em Luta pode empunhá-la com apenas uma mão.",
     descricao:
       "Uma espada japonesa longa, levemente curvada e cuidadosamente equilibrada. É uma arma ágil, permitindo usar Agilidade no lugar de Força nos ataques e no dano. Normalmente exige as duas mãos, mas um personagem veterano em Luta possui técnica suficiente para utilizá-la com apenas uma mão.",
+
+    comentario:
+      "Equilíbrio, precisão e séculos de tradição empregados contra algo que provavelmente não deveria existir.",
   }),
 
   criarArma({
@@ -578,6 +637,9 @@ export const ARMAS_ARQUIVOS = [
     imagem: "marreta",
     descricao:
       "Uma ferramenta de demolição com uma grande cabeça metálica presa a um cabo longo. Exige as duas mãos e bastante espaço para ser movimentada. É especialmente apropriada para destruir portas, paredes frágeis, móveis, obstáculos e outros objetos, além de causar dano pesado em combate.",
+
+    comentario:
+      "Se a investigação terminou diante de uma parede, talvez a parede seja a próxima pista.",
   }),
 
   criarArma({
@@ -599,6 +661,9 @@ export const ARMAS_ARQUIVOS = [
     imagem: "montante",
     descricao:
       "Uma espada enorme, com aproximadamente um metro e meio de comprimento. Foi criada para aplicar golpes amplos e poderosos, exigindo as duas mãos e treinamento especializado. Seu tamanho dificulta o transporte e o uso em corredores apertados, mas oferece excelente dano em combate aberto.",
+
+    comentario:
+      "Quando uma espada comum parece pouco e discrição deixou de ser parte da missão.",
   }),
 
   criarArma({
@@ -627,6 +692,9 @@ export const ARMAS_ARQUIVOS = [
       "Ligar a motosserra exige uma ação de movimento. O usuário sofre –1 dado no teste de ataque. Sempre que um dado de dano mostrar 6, role outro dado de dano adicional; novos resultados 6 continuam gerando dados adicionais.",
     descricao:
       "Uma ferramenta motorizada criada para cortar madeira, mas capaz de provocar ferimentos profundos. Antes de ser usada, precisa ser ligada com uma ação de movimento. É pesada, barulhenta e difícil de controlar, impondo uma penalidade de um dado nos testes de ataque. Quando qualquer dado de dano apresentar resultado 6, role um dado adicional do mesmo tipo, repetindo o processo caso esse novo dado também resulte em 6.",
+
+    comentario:
+      "Nada anuncia “o plano deu errado” com tanta clareza quanto o som dela ligando no escuro.",
   }),
 
   criarArma({
@@ -651,6 +719,9 @@ export const ARMAS_ARQUIVOS = [
     ],
     descricao:
       "Uma versão moderna do arco, construída com polias e materiais resistentes para aumentar a força e a estabilidade do disparo. Causa mais dano do que um arco simples, mantém alcance médio e continua sendo relativamente silencioso. Exige as duas mãos e utiliza pacotes de flechas.",
+
+    comentario:
+      "Tecnologia moderna aplicada ao antigo princípio de lançar algo pontudo muito depressa.",
   }),
 
   criarArma({
@@ -675,6 +746,9 @@ export const ARMAS_ARQUIVOS = [
     ],
     descricao:
       "Uma besta maior e mais potente, equipada com mecanismos que acumulam grande tensão. Seus disparos causam dano elevado e podem perfurar proteções leves. Entretanto, a arma é volumosa, exige as duas mãos e precisa de um pacote de flechas para continuar sendo utilizada.",
+
+    comentario:
+      "Paciência para recarregar, força para disparar e uma ótima razão para não ficar na frente.",
   }),
 
   criarArma({
@@ -703,6 +777,9 @@ export const ARMAS_ARQUIVOS = [
       "Pode disparar uma rajada: o ataque sofre –1 dado, mas causa um dado de dano adicional do mesmo tipo.",
     descricao:
       "Uma arma de fogo automática compacta, desenvolvida para combates em ambientes fechados e curtas distâncias. Pode ser empunhada com apenas uma mão, embora seu recuo dificulte o controle durante rajadas. Ao disparar em modo automático, o teste perde um dado, mas o dano recebe um dado adicional. Utiliza balas curtas.",
+
+    comentario:
+      "Pequena o bastante para corredores, rápida o bastante para transformar o corredor em um problema.",
   }),
 
   criarArma({
@@ -728,6 +805,9 @@ export const ARMAS_ARQUIVOS = [
     ],
     descricao:
       "Uma arma de fogo de grande impacto projetada para espalhar múltiplos projéteis em curta distância. É extremamente perigosa contra alvos próximos, mas perde eficiência rapidamente conforme a distância aumenta. Exige as duas mãos e utiliza pacotes de cartuchos.",
+
+    comentario:
+      "Em alcance curto, a conversa termina antes que o eco do disparo desapareça.",
   }),
 
   criarArma({
@@ -756,6 +836,9 @@ export const ARMAS_ARQUIVOS = [
       "Pode disparar uma rajada: o ataque sofre –1 dado, mas causa um dado de dano adicional do mesmo tipo.",
     descricao:
       "O armamento padrão de diversas forças militares modernas. Combina alcance médio, grande poder de fogo e capacidade de disparar rajadas. Quando utilizado no modo automático, o ataque sofre a perda de um dado, mas recebe um dado adicional de dano. Exige as duas mãos e utiliza balas longas.",
+
+    comentario:
+      "Projetado para guerras. Missões paranormais costumam encontrar maneiras de justificar o exagero.",
   }),
 
   criarArma({
@@ -783,6 +866,9 @@ export const ARMAS_ARQUIVOS = [
       "Quando um personagem veterano em Pontaria usa a ação Mirar com esta arma, recebe +5 na margem de ameaça do ataque.",
     descricao:
       "Uma arma militar criada para disparos longos e extremamente precisos. Seu uso ideal exige preparação, estabilidade e conhecimento de Pontaria. Quando um personagem veterano em Pontaria mira antes de atirar, recebe um bônus de +5 na margem de ameaça do ataque. Utiliza balas longas.",
+
+    comentario:
+      "A distância oferece segurança, silêncio e alguns segundos para questionar o que exatamente está na mira.",
   }),
 
   criarArma({
@@ -809,6 +895,9 @@ export const ARMAS_ARQUIVOS = [
     ],
     descricao:
       "Um lançador de foguetes portátil desenvolvido para destruir veículos, fortificações e alvos de grande porte. Seu disparo causa uma quantidade devastadora de dano de impacto e exige munição específica. É extremamente chamativa, pesada, perigosa em ambientes fechados e restrita a agentes com treinamento em armas pesadas.",
+
+    comentario:
+      "Quando o relatório pede “força proporcional”, alguém claramente parou de ler antes desta página.",
   }),
 
   criarArma({
@@ -837,6 +926,9 @@ export const ARMAS_ARQUIVOS = [
       "Atinge todos os seres em uma linha de 1,5 metro de largura com alcance curto. Faça um único teste de ataque e compare com a Defesa de todos os alvos. Seres atingidos também ficam em chamas.",
     descricao:
       "Um equipamento militar que lança combustível inflamável em uma linha contínua. O ataque alcança todos os seres em uma linha de 1,5 metro de largura dentro do alcance curto. Um único teste é comparado à Defesa de cada alvo. Além do dano de fogo, as criaturas atingidas ficam em chamas. Exige um pacote de combustível.",
+
+    comentario:
+      "O fogo resolve muitos problemas. Também cria vários problemas novos, maiores e mais iluminados.",
   }),
 
   criarArma({
@@ -866,6 +958,9 @@ export const ARMAS_ARQUIVOS = [
       "Para atacar sem penalidade, o usuário precisa ter Força 4 ou maior, ou gastar uma ação de movimento para apoiar a arma em um tripé ou suporte. Caso contrário, sofre –5 no ataque. Em uma rajada, perde 1 dado no teste e causa 1 dado adicional de dano.",
     descricao:
       "Uma arma de fogo pesada de uso militar, criada para manter fogo contínuo sobre uma área. Para utilizá-la adequadamente, o agente precisa ter Força 4 ou maior ou gastar uma ação de movimento para apoiá-la em um tripé ou suporte apropriado. Sem cumprir uma dessas condições, sofre –5 nos ataques. É automática e utiliza balas longas.",
+
+    comentario:
+      "Se o alvo ainda está se movendo, talvez a primeira rajada tenha sido apenas uma apresentação.",
   }),
 ];
 

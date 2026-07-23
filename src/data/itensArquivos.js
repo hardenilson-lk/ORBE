@@ -1,491 +1,720 @@
-export const ITENS_ARQUIVOS = [
+import {
+  ARMAS_ARQUIVOS,
+  ARMAS_PESADAS_ARQUIVOS,
+  ARMAS_SIMPLES_ARQUIVOS,
+  ARMAS_TATICAS_ARQUIVOS,
+} from "./itens/armasArquivos.js";
+
+import {
+  MODIFICACOES_PROTECOES_ARQUIVOS,
+  PROTECOES_ARQUIVOS,
+  PROTECOES_LEVES_ARQUIVOS,
+  PROTECOES_PESADAS_ARQUIVOS,
+} from "./itens/protecoesArquivos.js";
+
+import {
+  ACESSORIOS_ARQUIVOS,
+  EQUIPAMENTOS_ARQUIVOS,
+  ITENS_OPERACIONAIS_ARQUIVOS,
+  MODIFICACOES_ACESSORIOS_ARQUIVOS,
+} from "./itens/equipamentosArquivos.js";
+
+import {
+  EXPLOSIVOS_ARQUIVOS,
+  GRANADAS_ARQUIVOS,
+  MINAS_ARQUIVOS,
+} from "./itens/explosivosArquivos.js";
+
+import * as MODULO_MUNICOES from "./itens/municoesArquivos.js";
+
+import * as MODULO_ITENS_PARANORMAIS from "./itens/itensParanormaisArquivos.js";
+
+import * as MODULO_MODIFICACOES_ARMAS from "./itens/modificacoesArmasArquivos.js";
+
+import * as MODULO_MALDICOES_ARMAS from "./itens/amaldicoados/maldicoesArmasArquivos.js";
+
+import * as MODULO_MALDICOES_PROTECOES from "./itens/amaldicoados/maldicoesProtecoesArquivos.js";
+
+import * as MODULO_MALDICOES_ACESSORIOS from "./itens/amaldicoados/maldicoesAcessoriosArquivos.js";
+
+import * as MODULO_ITENS_AMALDICOADOS_ESPECIAIS from "./itens/amaldicoados/itensAmaldicoadosEspeciaisArquivos.js";
+
+function criarListaSegura(valor) {
+  return Array.isArray(valor)
+    ? valor
+    : [];
+}
+
+function obterListaModulo(
+  modulo,
+  nomeExportacao,
+) {
+  const listaNomeada =
+    modulo?.[nomeExportacao];
+
+  if (Array.isArray(listaNomeada)) {
+    return listaNomeada;
+  }
+
+  if (Array.isArray(modulo?.default)) {
+    return modulo.default;
+  }
+
+  return [];
+}
+
+function combinarListasUnicas(
+  ...listas
+) {
+  const resultado = [];
+  const identificadores =
+    new Set();
+
+  listas.forEach(
+    (listaRecebida) => {
+      criarListaSegura(
+        listaRecebida,
+      ).forEach(
+        (item) => {
+          if (
+            !item ||
+            typeof item !== "object"
+          ) {
+            return;
+          }
+
+          const identificador =
+            String(
+              item.id || "",
+            ).trim();
+
+          if (
+            identificador &&
+            identificadores.has(
+              identificador,
+            )
+          ) {
+            return;
+          }
+
+          if (identificador) {
+            identificadores.add(
+              identificador,
+            );
+          }
+
+          resultado.push(item);
+        },
+      );
+    },
+  );
+
+  return resultado;
+}
+
+function normalizarTexto(valor) {
+  return String(valor || "")
+    .normalize("NFD")
+    .replace(
+      /[\u0300-\u036f]/g,
+      "",
+    )
+    .toLowerCase()
+    .trim();
+}
+
+function transformarEmTextoBusca(
+  valor,
+) {
+  if (
+    valor === null ||
+    valor === undefined
+  ) {
+    return "";
+  }
+
+  if (Array.isArray(valor)) {
+    return valor
+      .map(
+        transformarEmTextoBusca,
+      )
+      .join(" ");
+  }
+
+  if (
+    typeof valor === "object"
+  ) {
+    return Object.values(valor)
+      .map(
+        transformarEmTextoBusca,
+      )
+      .join(" ");
+  }
+
+  return String(valor);
+}
+
+function criarIdItem() {
+  return `item-${Date.now()}-${Math.random()
+    .toString(36)
+    .slice(2, 8)}`;
+}
+
+export const MUNICOES_ARQUIVOS =
+  obterListaModulo(
+    MODULO_MUNICOES,
+    "MUNICOES_ARQUIVOS",
+  );
+
+export const ITENS_PARANORMAIS_ARQUIVOS =
+  obterListaModulo(
+    MODULO_ITENS_PARANORMAIS,
+    "ITENS_PARANORMAIS_ARQUIVOS",
+  );
+
+export const MODIFICACOES_ARMAS_ARQUIVOS =
+  obterListaModulo(
+    MODULO_MODIFICACOES_ARMAS,
+    "MODIFICACOES_ARMAS_ARQUIVOS",
+  );
+
+export const MODIFICACOES_MUNICOES_ARQUIVOS =
+  obterListaModulo(
+    MODULO_MODIFICACOES_ARMAS,
+    "MODIFICACOES_MUNICOES_ARQUIVOS",
+  );
+
+export const MALDICOES_ARMAS_ARQUIVOS =
+  obterListaModulo(
+    MODULO_MALDICOES_ARMAS,
+    "MALDICOES_ARMAS_ARQUIVOS",
+  );
+
+export const MALDICOES_PROTECOES_ARQUIVOS =
+  obterListaModulo(
+    MODULO_MALDICOES_PROTECOES,
+    "MALDICOES_PROTECOES_ARQUIVOS",
+  );
+
+export const MALDICOES_ACESSORIOS_ARQUIVOS =
+  obterListaModulo(
+    MODULO_MALDICOES_ACESSORIOS,
+    "MALDICOES_ACESSORIOS_ARQUIVOS",
+  );
+
+export const ITENS_AMALDICOADOS_ESPECIAIS_ARQUIVOS =
+  obterListaModulo(
+    MODULO_ITENS_AMALDICOADOS_ESPECIAIS,
+    "ITENS_AMALDICOADOS_ESPECIAIS_ARQUIVOS",
+  );
+
+export const PRECO_MALDICAO_POR_ELEMENTO =
+  MODULO_MALDICOES_ARMAS
+    ?.PRECO_MALDICAO_POR_ELEMENTO ||
+  {};
+
+export const ITENS_AMALDICOADOS_ESPECIAIS_POR_ELEMENTO_ARQUIVOS =
+  MODULO_ITENS_AMALDICOADOS_ESPECIAIS
+    ?.ITENS_AMALDICOADOS_ESPECIAIS_POR_ELEMENTO_ARQUIVOS ||
+  {};
+
+export {
+  ARMAS_ARQUIVOS,
+  ARMAS_PESADAS_ARQUIVOS,
+  ARMAS_SIMPLES_ARQUIVOS,
+  ARMAS_TATICAS_ARQUIVOS,
+
+  PROTECOES_ARQUIVOS,
+  PROTECOES_LEVES_ARQUIVOS,
+  PROTECOES_PESADAS_ARQUIVOS,
+  MODIFICACOES_PROTECOES_ARQUIVOS,
+
+  ACESSORIOS_ARQUIVOS,
+  ITENS_OPERACIONAIS_ARQUIVOS,
+  EQUIPAMENTOS_ARQUIVOS,
+  MODIFICACOES_ACESSORIOS_ARQUIVOS,
+
+  EXPLOSIVOS_ARQUIVOS,
+  GRANADAS_ARQUIVOS,
+  MINAS_ARQUIVOS,
+};
+
+export const ITENS_ARQUIVOS =
+  combinarListasUnicas(
+    ARMAS_ARQUIVOS,
+    MUNICOES_ARQUIVOS,
+    PROTECOES_ARQUIVOS,
+    EQUIPAMENTOS_ARQUIVOS,
+    EXPLOSIVOS_ARQUIVOS,
+    ITENS_PARANORMAIS_ARQUIVOS,
+    ITENS_AMALDICOADOS_ESPECIAIS_ARQUIVOS,
+  );
+
+export const MODIFICACOES_ITENS_ARQUIVOS =
+  combinarListasUnicas(
+    MODIFICACOES_ARMAS_ARQUIVOS,
+    MODIFICACOES_MUNICOES_ARQUIVOS,
+    MODIFICACOES_PROTECOES_ARQUIVOS,
+    MODIFICACOES_ACESSORIOS_ARQUIVOS,
+  );
+
+export const MALDICOES_ITENS_ARQUIVOS =
+  combinarListasUnicas(
+    MALDICOES_ARMAS_ARQUIVOS,
+    MALDICOES_PROTECOES_ARQUIVOS,
+    MALDICOES_ACESSORIOS_ARQUIVOS,
+  );
+
+export const TODOS_RECURSOS_ITENS_ARQUIVOS =
+  combinarListasUnicas(
+    ITENS_ARQUIVOS,
+    MODIFICACOES_ITENS_ARQUIVOS,
+    MALDICOES_ITENS_ARQUIVOS,
+  );
+
+export const GRUPOS_ITENS_ARQUIVOS = [
   {
-    id: "revolver",
-    nome: "Revólver",
-    tipo: "Arma",
-    categoria: "Arma de fogo",
-    quantidade: 1,
-    volume: 1,
-    dano: "2d6",
-    alcance: "Médio",
-    defesa: 0,
-    protecao: 0,
-    bonusCarga: 0,
-    penalidadeMovimento: 0,
-    ativo: true,
-    imagem: "revolver",
-    descricao:
-      "Arma de fogo simples e confiável, boa para combates de curta a média distância.",
+    id: "armas",
+    nome: "Armas",
+    itens: ARMAS_ARQUIVOS,
   },
+
   {
-    id: "pistola",
-    nome: "Pistola",
-    tipo: "Arma",
-    categoria: "Arma de fogo",
-    quantidade: 1,
-    volume: 1,
-    dano: "2d6",
-    alcance: "Médio",
-    defesa: 0,
-    protecao: 0,
-    bonusCarga: 0,
-    penalidadeMovimento: 0,
-    ativo: true,
-    imagem: "pistola",
-    descricao:
-      "Arma de fogo leve, prática e fácil de ocultar.",
+    id: "municoes",
+    nome: "Munições",
+    itens: MUNICOES_ARQUIVOS,
   },
+
   {
-    id: "espingarda",
-    nome: "Espingarda",
-    tipo: "Arma",
-    categoria: "Arma de fogo",
-    quantidade: 1,
-    volume: 2,
-    dano: "4d6",
-    alcance: "Curto",
-    defesa: 0,
-    protecao: 0,
-    bonusCarga: 0,
-    penalidadeMovimento: 0,
-    ativo: true,
-    imagem: "espingarda",
-    descricao:
-      "Arma de alto impacto em curta distância, forte contra alvos próximos.",
+    id: "protecoes",
+    nome: "Proteções",
+    itens: PROTECOES_ARQUIVOS,
   },
+
   {
-    id: "fuzil",
-    nome: "Fuzil",
-    tipo: "Arma",
-    categoria: "Arma de fogo",
-    quantidade: 1,
-    volume: 2,
-    dano: "3d8",
-    alcance: "Longo",
-    defesa: 0,
-    protecao: 0,
-    bonusCarga: 0,
-    penalidadeMovimento: 0,
-    ativo: true,
-    imagem: "fuzil",
-    descricao:
-      "Arma de fogo longa para combates a distância, exige preparo e controle.",
+    id: "acessorios",
+    nome: "Acessórios",
+    itens: ACESSORIOS_ARQUIVOS,
   },
+
   {
-    id: "faca",
-    nome: "Faca",
-    tipo: "Arma",
-    categoria: "Arma corpo a corpo",
-    quantidade: 1,
-    volume: 1,
-    dano: "1d4",
-    alcance: "Corpo a corpo",
-    defesa: 0,
-    protecao: 0,
-    bonusCarga: 0,
-    penalidadeMovimento: 0,
-    ativo: true,
-    imagem: "faca",
-    descricao:
-      "Arma corpo a corpo pequena, discreta e versátil.",
+    id: "itens-operacionais",
+    nome: "Itens Operacionais",
+    itens:
+      ITENS_OPERACIONAIS_ARQUIVOS,
   },
+
   {
-    id: "bastao",
-    nome: "Bastão",
-    tipo: "Arma",
-    categoria: "Arma corpo a corpo",
-    quantidade: 1,
-    volume: 1,
-    dano: "1d6",
-    alcance: "Corpo a corpo",
-    defesa: 0,
-    protecao: 0,
-    bonusCarga: 0,
-    penalidadeMovimento: 0,
-    ativo: true,
-    imagem: "bastao",
-    descricao:
-      "Arma simples de impacto, útil para defesa e controle.",
+    id: "explosivos",
+    nome: "Explosivos",
+    itens: EXPLOSIVOS_ARQUIVOS,
   },
+
   {
-    id: "katana",
-    nome: "Katana",
-    tipo: "Arma",
-    categoria: "Arma corpo a corpo",
-    quantidade: 1,
-    volume: 2,
-    dano: "1d10",
-    alcance: "Corpo a corpo",
-    defesa: 0,
-    protecao: 0,
-    bonusCarga: 0,
-    penalidadeMovimento: 0,
-    ativo: true,
-    imagem: "katana",
-    descricao:
-      "Lâmina longa e precisa, perigosa em combate corpo a corpo.",
+    id: "itens-paranormais",
+    nome: "Itens Paranormais",
+    itens:
+      ITENS_PARANORMAIS_ARQUIVOS,
   },
+
   {
-    id: "protecao-leve",
-    nome: "Proteção Leve",
-    tipo: "Proteção",
-    categoria: "Proteção",
-    quantidade: 1,
-    volume: 2,
-    dano: "",
-    alcance: "",
-    defesa: 5,
-    protecao: 2,
-    bonusCarga: 0,
-    penalidadeMovimento: 0,
-    ativo: true,
-    imagem: "colete",
-    descricao:
-      "Equipamento defensivo discreto que protege sem comprometer muito a mobilidade.",
-  },
-  {
-    id: "protecao-pesada",
-    nome: "Proteção Pesada",
-    tipo: "Proteção",
-    categoria: "Proteção",
-    quantidade: 1,
-    volume: 5,
-    dano: "",
-    alcance: "",
-    defesa: 10,
-    protecao: 5,
-    bonusCarga: 0,
-    penalidadeMovimento: 1,
-    ativo: true,
-    imagem: "armadura",
-    descricao:
-      "Proteção robusta para confrontos esperados, mas reduz a mobilidade.",
-  },
-  {
-    id: "kit-de-pericia",
-    nome: "Kit de Perícia",
-    tipo: "Equipamento",
-    categoria: "Ferramenta",
-    quantidade: 1,
-    volume: 1,
-    dano: "",
-    alcance: "",
-    defesa: 0,
-    protecao: 0,
-    bonusCarga: 0,
-    penalidadeMovimento: 0,
-    ativo: true,
-    imagem: "kit",
-    descricao:
-      "Conjunto de ferramentas para uma perícia específica.",
-  },
-  {
-    id: "lanterna-tatica",
-    nome: "Lanterna Tática",
-    tipo: "Equipamento",
-    categoria: "Geral",
-    quantidade: 1,
-    volume: 1,
-    dano: "",
-    alcance: "",
-    defesa: 0,
-    protecao: 0,
-    bonusCarga: 0,
-    penalidadeMovimento: 0,
-    ativo: true,
-    imagem: "lanterna",
-    descricao:
-      "Fonte de luz resistente para investigação e exploração de locais escuros.",
-  },
-  {
-    id: "algemas",
-    nome: "Algemas",
-    tipo: "Equipamento",
-    categoria: "Geral",
-    quantidade: 1,
-    volume: 1,
-    dano: "",
-    alcance: "",
-    defesa: 0,
-    protecao: 0,
-    bonusCarga: 0,
-    penalidadeMovimento: 0,
-    ativo: true,
-    imagem: "algemas",
-    descricao:
-      "Usadas para conter suspeitos rendidos ou criaturas humanas dominadas.",
-  },
-  {
-    id: "camera",
-    nome: "Câmera",
-    tipo: "Equipamento",
-    categoria: "Investigação",
-    quantidade: 1,
-    volume: 1,
-    dano: "",
-    alcance: "",
-    defesa: 0,
-    protecao: 0,
-    bonusCarga: 0,
-    penalidadeMovimento: 0,
-    ativo: true,
-    imagem: "camera",
-    descricao:
-      "Registra cenas, provas e fenômenos para análise posterior.",
-  },
-  {
-    id: "cicatrizante",
-    nome: "Cicatrizante",
-    tipo: "Consumível",
-    categoria: "Médico",
-    quantidade: 1,
-    volume: 1,
-    dano: "",
-    alcance: "",
-    defesa: 0,
-    protecao: 0,
-    bonusCarga: 0,
-    penalidadeMovimento: 0,
-    ativo: true,
-    imagem: "medkit",
-    descricao:
-      "Recurso médico usado para estabilizar e tratar ferimentos leves.",
-  },
-  {
-    id: "mochila-militar",
-    nome: "Mochila Militar",
-    tipo: "Equipamento",
-    categoria: "Geral",
-    quantidade: 1,
-    volume: 1,
-    dano: "",
-    alcance: "",
-    defesa: 0,
-    protecao: 0,
-    bonusCarga: 5,
-    penalidadeMovimento: 0,
-    ativo: true,
-    imagem: "mochila",
-    descricao:
-      "Mochila reforçada que aumenta a capacidade de carga do agente.",
-  },
-  {
-    id: "smartphone",
-    nome: "Smartphone",
-    tipo: "Equipamento",
-    categoria: "Tecnologia",
-    quantidade: 1,
-    volume: 0,
-    dano: "",
-    alcance: "",
-    defesa: 0,
-    protecao: 0,
-    bonusCarga: 0,
-    penalidadeMovimento: 0,
-    ativo: true,
-    imagem: "celular",
-    descricao:
-      "Ferramenta de comunicação, pesquisa, mapas, fotos e registros digitais.",
-  },
-  {
-    id: "arpeu",
-    nome: "Arpéu",
-    tipo: "Equipamento",
-    categoria: "Exploração",
-    quantidade: 1,
-    volume: 1,
-    dano: "",
-    alcance: "",
-    defesa: 0,
-    protecao: 0,
-    bonusCarga: 0,
-    penalidadeMovimento: 0,
-    ativo: true,
-    imagem: "arpeu",
-    descricao:
-      "Gancho com cabo usado para escalada, travessias e acesso a locais elevados.",
-  },
-  {
-    id: "binoculos",
-    nome: "Binóculos",
-    tipo: "Equipamento",
-    categoria: "Investigação",
-    quantidade: 1,
-    volume: 1,
-    dano: "",
-    alcance: "",
-    defesa: 0,
-    protecao: 0,
-    bonusCarga: 0,
-    penalidadeMovimento: 0,
-    ativo: true,
-    imagem: "binoculos",
-    descricao:
-      "Permite observar alvos, trilhas e movimentações a distância.",
-  },
-  {
-    id: "corda",
-    nome: "Corda",
-    tipo: "Equipamento",
-    categoria: "Exploração",
-    quantidade: 1,
-    volume: 1,
-    dano: "",
-    alcance: "",
-    defesa: 0,
-    protecao: 0,
-    bonusCarga: 0,
-    penalidadeMovimento: 0,
-    ativo: true,
-    imagem: "corda",
-    descricao:
-      "Equipamento básico para escalada, resgate, amarras e improvisos.",
-  },
-  {
-    id: "equipamento-de-sobrevivencia",
-    nome: "Equipamento de Sobrevivência",
-    tipo: "Equipamento",
-    categoria: "Sobrevivência",
-    quantidade: 1,
-    volume: 2,
-    dano: "",
-    alcance: "",
-    defesa: 0,
-    protecao: 0,
-    bonusCarga: 0,
-    penalidadeMovimento: 0,
-    ativo: true,
-    imagem: "sobrevivencia",
-    descricao:
-      "Conjunto de campo para abrigo, orientação, fogo e pequenas emergências.",
-  },
-  {
-    id: "mascara-de-gas",
-    nome: "Máscara de Gás",
-    tipo: "Proteção",
-    categoria: "Proteção",
-    quantidade: 1,
-    volume: 1,
-    dano: "",
-    alcance: "",
-    defesa: 0,
-    protecao: 0,
-    bonusCarga: 0,
-    penalidadeMovimento: 0,
-    ativo: true,
-    imagem: "mascara",
-    descricao:
-      "Protege contra fumaça, toxinas e ar contaminado por tempo limitado.",
-  },
-  {
-    id: "detector-de-sinais",
-    nome: "Detector de Sinais",
-    tipo: "Equipamento",
-    categoria: "Tecnologia",
-    quantidade: 1,
-    volume: 1,
-    dano: "",
-    alcance: "",
-    defesa: 0,
-    protecao: 0,
-    bonusCarga: 0,
-    penalidadeMovimento: 0,
-    ativo: true,
-    imagem: "detector",
-    descricao:
-      "Ajuda a localizar transmissões, rastreadores e interferências.",
-  },
-  {
-    id: "bloqueador-de-sinal",
-    nome: "Bloqueador de Sinal",
-    tipo: "Equipamento",
-    categoria: "Tecnologia",
-    quantidade: 1,
-    volume: 1,
-    dano: "",
-    alcance: "",
-    defesa: 0,
-    protecao: 0,
-    bonusCarga: 0,
-    penalidadeMovimento: 0,
-    ativo: true,
-    imagem: "bloqueador",
-    descricao:
-      "Dificulta comunicação e rastreamento eletrônico em uma área próxima.",
-  },
-  {
-    id: "spray-de-pimenta",
-    nome: "Spray de Pimenta",
-    tipo: "Consumível",
-    categoria: "Contenção",
-    quantidade: 1,
-    volume: 0,
-    dano: "Efeito de contenção",
-    alcance: "Curto",
-    defesa: 0,
-    protecao: 0,
-    bonusCarga: 0,
-    penalidadeMovimento: 0,
-    ativo: true,
-    imagem: "spray",
-    descricao:
-      "Item de contenção que prejudica a visão e a reação de um alvo próximo.",
-  },
-  {
-    id: "granada-de-fragmentacao",
-    nome: "Granada de Fragmentação",
-    tipo: "Explosivo",
-    categoria: "Explosivo",
-    quantidade: 1,
-    volume: 1,
-    dano: "6d6",
-    alcance: "Curto",
-    defesa: 0,
-    protecao: 0,
-    bonusCarga: 0,
-    penalidadeMovimento: 0,
-    ativo: true,
-    imagem: "granada",
-    descricao:
-      "Explosivo de área utilizado em situações extremas de combate.",
-  },
-  {
-    id: "molotov",
-    nome: "Molotov",
-    tipo: "Explosivo",
-    categoria: "Explosivo",
-    quantidade: 1,
-    volume: 1,
-    dano: "2d6 de fogo",
-    alcance: "Curto",
-    defesa: 0,
-    protecao: 0,
-    bonusCarga: 0,
-    penalidadeMovimento: 0,
-    ativo: true,
-    imagem: "molotov",
-    descricao:
-      "Incendiário improvisado que cria fogo e pressiona uma área.",
+    id:
+      "itens-amaldicoados-especiais",
+
+    nome:
+      "Itens Amaldiçoados Especiais",
+
+    itens:
+      ITENS_AMALDICOADOS_ESPECIAIS_ARQUIVOS,
   },
 ];
 
-export function criarItemArquivos(
-  itemCatalogo,
+export const GRUPOS_MODIFICACOES_ITENS_ARQUIVOS =
+  [
+    {
+      id:
+        "modificacoes-armas",
+
+      nome:
+        "Modificações de Armas",
+
+      itens:
+        MODIFICACOES_ARMAS_ARQUIVOS,
+    },
+
+    {
+      id:
+        "modificacoes-municoes",
+
+      nome:
+        "Modificações de Munições",
+
+      itens:
+        MODIFICACOES_MUNICOES_ARQUIVOS,
+    },
+
+    {
+      id:
+        "modificacoes-protecoes",
+
+      nome:
+        "Modificações de Proteções",
+
+      itens:
+        MODIFICACOES_PROTECOES_ARQUIVOS,
+    },
+
+    {
+      id:
+        "modificacoes-acessorios",
+
+      nome:
+        "Modificações de Acessórios",
+
+      itens:
+        MODIFICACOES_ACESSORIOS_ARQUIVOS,
+    },
+  ];
+
+export const GRUPOS_MALDICOES_ITENS_ARQUIVOS =
+  [
+    {
+      id:
+        "maldicoes-armas",
+
+      nome:
+        "Maldições de Armas",
+
+      itens:
+        MALDICOES_ARMAS_ARQUIVOS,
+    },
+
+    {
+      id:
+        "maldicoes-protecoes",
+
+      nome:
+        "Maldições de Proteções",
+
+      itens:
+        MALDICOES_PROTECOES_ARQUIVOS,
+    },
+
+    {
+      id:
+        "maldicoes-acessorios",
+
+      nome:
+        "Maldições de Acessórios",
+
+      itens:
+        MALDICOES_ACESSORIOS_ARQUIVOS,
+    },
+  ];
+
+export function obterItemCatalogoArquivos(
+  itemId,
 ) {
-  return {
-    ...itemCatalogo,
-    id:
-      `item-${Date.now()}-${Math.random()
-        .toString(36)
-        .slice(2, 8)}`,
-    quantidade:
+  const identificador =
+    String(itemId || "").trim();
+
+  if (!identificador) {
+    return null;
+  }
+
+  return (
+    ITENS_ARQUIVOS.find(
+      (item) =>
+        String(item?.id || "") ===
+        identificador,
+    ) || null
+  );
+}
+
+export function obterModificacaoCatalogoArquivos(
+  modificacaoId,
+) {
+  const identificador =
+    String(
+      modificacaoId || "",
+    ).trim();
+
+  if (!identificador) {
+    return null;
+  }
+
+  return (
+    MODIFICACOES_ITENS_ARQUIVOS.find(
+      (modificacao) =>
+        String(
+          modificacao?.id || "",
+        ) === identificador,
+    ) || null
+  );
+}
+
+export function obterMaldicaoCatalogoArquivos(
+  maldicaoId,
+) {
+  const identificador =
+    String(
+      maldicaoId || "",
+    ).trim();
+
+  if (!identificador) {
+    return null;
+  }
+
+  return (
+    MALDICOES_ITENS_ARQUIVOS.find(
+      (maldicao) =>
+        String(
+          maldicao?.id || "",
+        ) === identificador,
+    ) || null
+  );
+}
+
+export function buscarItensArquivos(
+  termo,
+  listaRecebida = ITENS_ARQUIVOS,
+) {
+  const lista =
+    criarListaSegura(
+      listaRecebida,
+    );
+
+  const busca =
+    normalizarTexto(termo);
+
+  if (!busca) {
+    return lista;
+  }
+
+  return lista.filter(
+    (item) => {
+      const textoItem =
+        normalizarTexto(
+          transformarEmTextoBusca({
+            nome: item?.nome,
+            tipo: item?.tipo,
+            categoria:
+              item?.categoria,
+            categoriaOficial:
+              item?.categoriaOficial,
+            categoriaNumerica:
+              item?.categoriaNumerica,
+            grupo: item?.grupo,
+            elemento: item?.elemento,
+            proficiencia:
+              item?.proficiencia,
+            empunhadura:
+              item?.empunhadura,
+            funcionamento:
+              item?.funcionamento,
+            dano: item?.dano,
+            danoAdicional:
+              item?.danoAdicional,
+            critico: item?.critico,
+            alcance: item?.alcance,
+            tipoDano:
+              item?.tipoDano,
+            municao: item?.municao,
+            pericia: item?.pericia,
+            resistencia:
+              item?.resistencia,
+            efeito: item?.efeito,
+            descricao:
+              item?.descricao,
+            comentario:
+              item?.comentario,
+            propriedades:
+              item?.propriedades,
+            patenteMinima:
+              item?.patenteMinima,
+          }),
+        );
+
+      return textoItem.includes(
+        busca,
+      );
+    },
+  );
+}
+
+export function obterItensPorTipoArquivos(
+  tipo,
+) {
+  const tipoNormalizado =
+    normalizarTexto(tipo);
+
+  if (!tipoNormalizado) {
+    return ITENS_ARQUIVOS;
+  }
+
+  return ITENS_ARQUIVOS.filter(
+    (item) =>
+      normalizarTexto(
+        item?.tipo,
+      ) === tipoNormalizado,
+  );
+}
+
+export function obterItensPorGrupoArquivos(
+  grupoId,
+) {
+  const identificador =
+    normalizarTexto(
+      grupoId,
+    );
+
+  if (!identificador) {
+    return ITENS_ARQUIVOS;
+  }
+
+  const grupoEncontrado =
+    GRUPOS_ITENS_ARQUIVOS.find(
+      (grupo) =>
+        normalizarTexto(
+          grupo.id,
+        ) === identificador ||
+        normalizarTexto(
+          grupo.nome,
+        ) === identificador,
+    );
+
+  return grupoEncontrado
+    ? criarListaSegura(
+        grupoEncontrado.itens,
+      )
+    : [];
+}
+
+export function obterItensPorElementoArquivos(
+  elemento,
+) {
+  const elementoNormalizado =
+    normalizarTexto(
+      elemento,
+    );
+
+  if (!elementoNormalizado) {
+    return ITENS_ARQUIVOS;
+  }
+
+  return ITENS_ARQUIVOS.filter(
+    (item) =>
+      normalizarTexto(
+        item?.elemento,
+      ) === elementoNormalizado,
+  );
+}
+
+export function criarItemArquivos(
+  itemCatalogo = {},
+) {
+  const itemSeguro =
+    itemCatalogo &&
+    typeof itemCatalogo ===
+      "object"
+      ? itemCatalogo
+      : {};
+
+  const quantidade =
+    Math.max(
+      1,
       Number(
-        itemCatalogo?.quantidade,
+        itemSeguro.quantidade,
       ) || 1,
+    );
+
+  return {
+    ...itemSeguro,
+
+    id: criarIdItem(),
+
+    itemCatalogoId:
+      itemSeguro.itemCatalogoId ||
+      itemSeguro.id ||
+      "",
+
+    quantidade,
+
     ativo:
-      itemCatalogo?.ativo !==
-      false,
+      itemSeguro.ativo !== false,
+
+    guardado:
+      itemSeguro.guardado === true,
+
+    modificacoes:
+      criarListaSegura(
+        itemSeguro.modificacoes,
+      ).map(
+        (modificacao) => ({
+          ...modificacao,
+        }),
+      ),
+
+    maldicoes:
+      criarListaSegura(
+        itemSeguro.maldicoes,
+      ).map(
+        (maldicao) => ({
+          ...maldicao,
+        }),
+      ),
+
+    propriedades:
+      criarListaSegura(
+        itemSeguro.propriedades,
+      ),
+
+    criadoEm:
+      new Date().toISOString(),
   };
+}
+
+export function criarItemManualArquivos(
+  dadosRecebidos = {},
+) {
+  return criarItemArquivos({
+    tipo:
+      "Equipamento manual",
+
+    categoria:
+      "Personalizado",
+
+    categoriaNumerica: 0,
+    categoriaOficial: "0",
+
+    quantidade: 1,
+    volume: 1,
+
+    dano: "",
+    critico: "",
+    alcance: "",
+    tipoDano: "",
+
+    defesa: 0,
+    protecao: 0,
+    bonusCarga: 0,
+    penalidadeMovimento: 0,
+
+    ativo: true,
+    guardado: false,
+
+    propriedades: [],
+    modificacoes: [],
+    maldicoes: [],
+
+    efeito: "",
+    descricao: "",
+    comentario: "",
+
+    ...dadosRecebidos,
+
+    itemCatalogoId: "",
+  });
 }
 
 export default ITENS_ARQUIVOS;

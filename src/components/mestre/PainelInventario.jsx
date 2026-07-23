@@ -8,19 +8,20 @@ import {
 import {
   ITENS_ARQUIVOS,
   criarItemArquivos,
-} from "../../data/itens/itensArquivos.js";
+} from "../../data/itensArquivos.js";
+
+import {
+  CATEGORIAS_ITENS_ARQUIVOS,
+  calcularResumoInventario,
+  formatarCategoriaItem,
+  obterCategoriaItem,
+  obterTextoSituacaoCarga,
+  validarAlteracaoInventario,
+} from "../../data/regrasInventarioArquivos.js";
 
 import {
   obterClasseVisualItem,
 } from "../../utils/categoriasItens.js";
-
-import {
-  CATEGORIAS_INVENTARIO_ARQUIVOS,
-  calcularResumoInventario,
-  obterDescricaoCategoriaInventario,
-  obterRotuloCategoriaNumerica,
-  validarInventarioArquivos,
-} from "../../utils/regrasInventarioArquivos.js";
 
 import "./PaineisDossie.css";
 
@@ -28,7 +29,6 @@ const ITEM_VAZIO = {
   nome: "",
   tipo: "Equipamento",
   categoria: "Personalizado",
-  categoriaNumerica: 0,
   quantidade: 1,
   volume: 1,
   dano: "",
@@ -42,6 +42,20 @@ const ITEM_VAZIO = {
   efeito: "",
   propriedades: [],
   imagemPersonalizada: "",
+};
+
+const NOVO_ITEM_VAZIO = {
+  ...ITEM_VAZIO,
+  categoria: "Item personalizado",
+  categoriaNumerica: 0,
+};
+
+const NUMEROS_CATEGORIAS = {
+  "0": 0,
+  I: 1,
+  II: 2,
+  III: 3,
+  IV: 4,
 };
 
 function criarListaSegura(valor) {
@@ -59,6 +73,90 @@ function normalizarTexto(valor) {
     )
     .toLowerCase()
     .trim();
+}
+
+function resumirTexto(
+  valor,
+  limite = 120,
+) {
+  const texto = String(
+    valor || "",
+  )
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (!texto) {
+    return "";
+  }
+
+  if (texto.length <= limite) {
+    return texto;
+  }
+
+  return `${texto
+    .slice(0, limite - 1)
+    .trim()}…`;
+}
+
+function obterResumoCatalogo(
+  item = {},
+) {
+  const informacoes = [];
+
+  if (item.dano) {
+    informacoes.push(
+      `Dano ${item.dano}`,
+    );
+  }
+
+  if (
+    Number(item.defesa) > 0
+  ) {
+    informacoes.push(
+      `Defesa +${item.defesa}`,
+    );
+  }
+
+  if (
+    Number(item.protecao) > 0
+  ) {
+    informacoes.push(
+      `Proteção ${item.protecao}`,
+    );
+  }
+
+  if (
+    Number(item.bonusCarga) > 0
+  ) {
+    informacoes.push(
+      `Carga +${item.bonusCarga}`,
+    );
+  }
+
+  if (item.alcance) {
+    informacoes.push(
+      item.alcance,
+    );
+  }
+
+  if (informacoes.length > 0) {
+    return informacoes.join(
+      " · ",
+    );
+  }
+
+  return (
+    resumirTexto(
+      item.efeito ||
+        item.descricao ||
+        criarListaSegura(
+          item.propriedades,
+        )[0] ||
+        "Item disponível no catálogo.",
+      110,
+    ) ||
+    "Item disponível no catálogo."
+  );
 }
 
 function normalizarItem(item = {}) {
@@ -340,7 +438,7 @@ function PainelInventario({
 
   const [novoItem, setNovoItem] =
     useState({
-      ...ITEM_VAZIO,
+      ...NOVO_ITEM_VAZIO,
     });
 
   const [
@@ -389,8 +487,8 @@ function PainelInventario({
   ] = useState("");
 
   const [
-    mensagemLimite,
-    setMensagemLimite,
+    mensagemInventario,
+    setMensagemInventario,
   ] = useState("");
 
   useEffect(() => {
@@ -521,6 +619,54 @@ function PainelInventario({
     );
   }
 
+  function obterValidacaoLista(
+    listaProposta,
+  ) {
+    const validacao =
+      validarAlteracaoInventario({
+        ficha: fichaAtiva || {},
+        itensAtuais: itensLocais,
+        itensPropostos:
+          listaProposta,
+      });
+
+    const criouExcessoAbsoluto =
+      !validacao.resumoAtual
+        .cargaExcedida &&
+      validacao.resumoProposto
+        .cargaExcedida;
+
+    if (criouExcessoAbsoluto) {
+      const resumo =
+        validacao.resumoProposto;
+
+      return {
+        ...validacao,
+        permitido: false,
+        mensagem:
+          `A carga máxima absoluta é de ${resumo.limiteAbsoluto} espaços. Este inventário chegaria a ${resumo.espacosUsados} espaços.`,
+      };
+    }
+
+    return validacao;
+  }
+
+  function mostrarErroInventario(
+    validacao,
+  ) {
+    const mensagem =
+      validacao.motivos?.length
+        ? validacao.motivos.join(
+            " ",
+          )
+        : validacao.mensagem;
+
+    setMensagemInventario(
+      mensagem ||
+        "Esta alteração ultrapassa os limites do inventário.",
+    );
+  }
+
   function registrarItemAdicionado(
     itemRecebido,
   ) {
@@ -529,26 +675,28 @@ function PainelInventario({
         itemRecebido,
       );
 
-    const proximaLista = [
+    const listaProposta = [
       itemCriado,
       ...itensLocais,
     ];
+
     const validacao =
-      validarInventarioArquivos(
-        fichaAtiva,
-        proximaLista,
+      obterValidacaoLista(
+        listaProposta,
       );
 
     if (!validacao.permitido) {
-      setMensagemLimite(
-        validacao.mensagem,
+      mostrarErroInventario(
+        validacao,
       );
+
       return false;
     }
 
-    setItensLocais(proximaLista);
-    setMensagemLimite(
-      validacao.mensagem,
+    setMensagemInventario("");
+
+    setItensLocais(
+      listaProposta,
     );
 
     setItemAbertoId(
@@ -575,7 +723,7 @@ function PainelInventario({
         itemCatalogo,
       );
 
-    return registrarItemAdicionado(
+    registrarItemAdicionado(
       itemCriado,
     );
   }
@@ -586,6 +734,10 @@ function PainelInventario({
     evento.preventDefault();
 
     if (!novoItem.nome.trim()) {
+      setMensagemInventario(
+        "Informe o nome do item.",
+      );
+
       return;
     }
 
@@ -600,20 +752,32 @@ function PainelInventario({
 
         categoria:
           novoItem.categoria ||
-          "Personalizado",
+          "Item personalizado",
+
+        categoriaNumerica:
+          Math.max(
+            0,
+            Math.min(
+              4,
+              Number(
+                novoItem
+                  .categoriaNumerica,
+              ) || 0,
+            ),
+          ),
       });
 
-    const adicionado =
+    const foiAdicionado =
       registrarItemAdicionado(
-      itemCriado,
-    );
+        itemCriado,
+      );
 
-    if (!adicionado) {
+    if (!foiAdicionado) {
       return;
     }
 
     setNovoItem({
-      ...ITEM_VAZIO,
+      ...NOVO_ITEM_VAZIO,
     });
 
     setPainelAdicaoAberto(
@@ -631,55 +795,48 @@ function PainelInventario({
       [nomeCampo]: valor,
     };
 
-    const proximaLista =
+    const listaProposta =
       itensLocais.map(
         (itemAtual) =>
-          itemAtual.id === item.id
+          itemAtual.id ===
+          item.id
             ? itemAtualizado
             : itemAtual,
       );
-    const resumoAtual =
-      calcularResumoInventario(
-        fichaAtiva,
-        itensLocais,
-      );
-    const validacao =
-      validarInventarioArquivos(
-        fichaAtiva,
-        proximaLista,
-      );
-    const resumoNovo =
-      validacao.resumo;
-    const reduzOuMantemExcessos =
-      resumoNovo.cargaAtual <=
-        resumoAtual.cargaAtual &&
-      [1, 2, 3, 4].every(
-        (categoria) =>
-          resumoNovo
-            .usadosPorCategoria[
-              categoria
-            ] <=
-          resumoAtual
-            .usadosPorCategoria[
-              categoria
-            ],
-      );
+
+    const camposQueAfetamLimites =
+      [
+        "quantidade",
+        "volume",
+        "categoriaNumerica",
+        "bonusCarga",
+        "ativo",
+        "modificacoes",
+      ];
 
     if (
-      !validacao.permitido &&
-      !reduzOuMantemExcessos
+      camposQueAfetamLimites.includes(
+        nomeCampo,
+      )
     ) {
-      setMensagemLimite(
-        validacao.mensagem,
-      );
-      return false;
+      const validacao =
+        obterValidacaoLista(
+          listaProposta,
+        );
+
+      if (!validacao.permitido) {
+        mostrarErroInventario(
+          validacao,
+        );
+
+        return false;
+      }
     }
 
-    setItensLocais(proximaLista);
-    setMensagemLimite(
-      validacao.permitido
-        ? validacao.mensagem
-        : `${validacao.mensagem} A redução foi aceita para ajudar a regularizar a ficha.`,
+    setMensagemInventario("");
+
+    setItensLocais(
+      listaProposta,
     );
 
     if (
@@ -699,7 +856,7 @@ function PainelInventario({
     nomeCampo,
     valor,
   ) {
-    atualizarItem(
+    return atualizarItem(
       item,
       nomeCampo,
       Math.max(
@@ -707,6 +864,21 @@ function PainelInventario({
         Number(valor) || 0,
       ),
     );
+  }
+
+  function obterValidacaoCatalogo(
+    itemCatalogo,
+  ) {
+    const itemProposto =
+      normalizarItem({
+        ...itemCatalogo,
+        quantidade: 1,
+      });
+
+    return obterValidacaoLista([
+      itemProposto,
+      ...itensLocais,
+    ]);
   }
 
   function alternarDetalhesItem(
@@ -729,6 +901,8 @@ function PainelInventario({
   }
 
   function removerItem(item) {
+    setMensagemInventario("");
+
     setItensLocais(
       (listaAnterior) =>
         listaAnterior.filter(
@@ -752,10 +926,6 @@ function PainelInventario({
     ) {
       aoRemoverItem(item);
     }
-
-    setMensagemLimite(
-      "Item removido. Os limites foram recalculados.",
-    );
   }
 
   function abrirSeletorImagem(
@@ -866,13 +1036,35 @@ function PainelInventario({
     "Nenhuma ficha selecionada";
 
   const resumoInventario =
-    calcularResumoInventario(
-      fichaAtiva,
-      itensLocais,
+    useMemo(
+      () =>
+        calcularResumoInventario({
+          ficha: fichaAtiva || {},
+          itens: itensLocais,
+        }),
+      [
+        fichaAtiva,
+        itensLocais,
+      ],
     );
 
-  const volumeTotal =
-    resumoInventario.cargaAtual;
+  const textoSituacaoCarga =
+    obterTextoSituacaoCarga(
+      resumoInventario
+        .situacaoCarga,
+    );
+
+  const possuiAvisoInventario =
+    resumoInventario
+      .situacaoCarga !==
+      "normal" ||
+    resumoInventario
+      .categoriasExcedidas
+      .length > 0 ||
+    resumoInventario
+      .totalSemCategoria > 0 ||
+    resumoInventario
+      .totalAcimaCategoriaIV > 0;
 
   return (
     <section className="painel-dossie painel-inventario-atualizado">
@@ -908,6 +1100,163 @@ function PainelInventario({
               "Courier Prime",
               "Courier New",
               monospace;
+          }
+
+          .painel-inventario-atualizado
+          .inventario-limites {
+            display: grid;
+            gap: 14px;
+            margin: 0 0 18px;
+            padding: 16px;
+            border: 1px solid rgba(70, 47, 27, 0.42);
+            border-left: 7px solid #6e5738;
+            background:
+              linear-gradient(
+                180deg,
+                rgba(255, 248, 231, 0.96),
+                rgba(236, 219, 185, 0.92)
+              );
+          }
+
+          .painel-inventario-atualizado
+          .inventario-limites--sobrecarregado {
+            border-left-color: #b06f19;
+            background:
+              linear-gradient(
+                180deg,
+                rgba(255, 239, 197, 0.97),
+                rgba(229, 194, 127, 0.94)
+              );
+          }
+
+          .painel-inventario-atualizado
+          .inventario-limites--limite-excedido {
+            border-left-color: #991f24;
+            background:
+              linear-gradient(
+                180deg,
+                rgba(255, 226, 214, 0.97),
+                rgba(224, 174, 151, 0.94)
+              );
+          }
+
+          .painel-inventario-atualizado
+          .inventario-limites__topo {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 14px;
+            flex-wrap: wrap;
+          }
+
+          .painel-inventario-atualizado
+          .inventario-limites__topo h3 {
+            margin: 0 0 5px;
+            color: #24160f;
+            font-size: 1.18rem;
+          }
+
+          .painel-inventario-atualizado
+          .inventario-limites__topo p {
+            margin: 0;
+            color: #57351f;
+            font-size: 0.82rem;
+          }
+
+          .painel-inventario-atualizado
+          .inventario-limites__identidade {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+          }
+
+          .painel-inventario-atualizado
+          .inventario-limites__identidade span,
+          .painel-inventario-atualizado
+          .inventario-limites__categorias span {
+            padding: 6px 9px;
+            border: 1px solid rgba(72, 48, 27, 0.3);
+            background: rgba(255, 255, 255, 0.34);
+            color: #352116;
+            font-size: 0.73rem;
+            font-weight: 700;
+          }
+
+          .painel-inventario-atualizado
+          .inventario-limites__grade {
+            display: grid;
+            grid-template-columns:
+              repeat(
+                auto-fit,
+                minmax(150px, 1fr)
+              );
+            gap: 10px;
+          }
+
+          .painel-inventario-atualizado
+          .inventario-limites__dado {
+            display: grid;
+            gap: 5px;
+            padding: 11px;
+            border: 1px solid rgba(72, 48, 27, 0.22);
+            background: rgba(255, 255, 255, 0.28);
+          }
+
+          .painel-inventario-atualizado
+          .inventario-limites__dado small {
+            color: #713a20;
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+          }
+
+          .painel-inventario-atualizado
+          .inventario-limites__dado strong {
+            color: #24160f;
+            font-size: 1.05rem;
+          }
+
+          .painel-inventario-atualizado
+          .inventario-limites__categorias {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+          }
+
+          .painel-inventario-atualizado
+          .inventario-limites__categoria--excedida {
+            border-color: #97252a !important;
+            background: rgba(151, 37, 42, 0.14) !important;
+            color: #77161a !important;
+          }
+
+          .painel-inventario-atualizado
+          .inventario-limites__alerta,
+          .painel-inventario-atualizado
+          .inventario-mensagem {
+            margin: 0;
+            padding: 10px 12px;
+            border: 1px solid rgba(132, 30, 30, 0.5);
+            background: rgba(139, 31, 31, 0.12);
+            color: #711a1a;
+            font-size: 0.78rem;
+            font-weight: 700;
+            line-height: 1.5;
+          }
+
+          .painel-inventario-atualizado
+          .inventario-limites__penalidades {
+            margin: 0;
+            color: #6e281f;
+            font-size: 0.76rem;
+            font-weight: 700;
+          }
+
+          .painel-inventario-atualizado
+          button:disabled {
+            cursor: not-allowed;
+            filter: grayscale(0.8);
+            opacity: 0.55;
           }
 
           .painel-inventario-atualizado
@@ -1052,12 +1401,8 @@ function PainelInventario({
           .painel-inventario-atualizado
           .inventario-catalogo__lista {
             display: grid;
-            grid-template-columns:
-              repeat(
-                auto-fit,
-                minmax(270px, 1fr)
-              );
-            gap: 14px;
+            grid-template-columns: 1fr;
+            gap: 8px;
             max-height: 560px;
             overflow-y: auto;
             padding-right: 6px;
@@ -1066,15 +1411,21 @@ function PainelInventario({
           .painel-inventario-atualizado
           .inventario-catalogo__item {
             display: grid;
-            gap: 12px;
-            padding: 14px;
+            grid-template-columns:
+              minmax(230px, 1.15fr)
+              minmax(220px, 1fr)
+              180px;
+            align-items: center;
+            gap: 14px;
+            min-height: 74px;
+            padding: 10px 12px;
             border: 1px solid rgba(67, 45, 25, 0.42);
             border-left: 7px solid var(--item-cor, #8b6b3e);
             background:
               linear-gradient(
-                115deg,
+                100deg,
                 var(--item-cor-clara, rgba(128, 109, 85, 0.14)),
-                transparent 38%
+                transparent 34%
               ),
               linear-gradient(
                 180deg,
@@ -1083,18 +1434,18 @@ function PainelInventario({
               );
             box-shadow:
               inset 0 1px 0 rgba(255, 255, 255, 0.48),
-              0 2px 8px rgba(0, 0, 0, 0.08);
+              0 2px 6px rgba(0, 0, 0, 0.07);
           }
 
           .painel-inventario-atualizado
-          .inventario-catalogo__item
-          header {
+          .inventario-catalogo__identidade {
             display: grid;
             grid-template-columns:
               42px
               minmax(0, 1fr);
             align-items: center;
             gap: 10px;
+            min-width: 0;
           }
 
           .painel-inventario-atualizado
@@ -1111,53 +1462,79 @@ function PainelInventario({
           }
 
           .painel-inventario-atualizado
-          .inventario-catalogo__item
-          header div {
+          .inventario-catalogo__nome {
             display: grid;
             gap: 3px;
             min-width: 0;
           }
 
           .painel-inventario-atualizado
-          .inventario-catalogo__item
-          header small {
+          .inventario-catalogo__nome small {
+            overflow: hidden;
             color: #7b2b22;
-            font-size: 0.72rem;
+            font-size: 0.69rem;
             font-weight: 700;
+            text-overflow: ellipsis;
+            white-space: nowrap;
           }
 
           .painel-inventario-atualizado
-          .inventario-catalogo__item
-          header strong {
+          .inventario-catalogo__nome strong {
+            overflow: hidden;
             color: #21140d;
-            font-size: 1.12rem;
-            line-height: 1.1;
+            font-size: 1rem;
+            line-height: 1.15;
+            text-overflow: ellipsis;
+            white-space: nowrap;
           }
 
           .painel-inventario-atualizado
-          .inventario-catalogo__item p {
-            margin: 0;
-            color: #372116;
-            font-size: 0.85rem;
-            line-height: 1.55;
+          .inventario-catalogo__resumo {
+            display: grid;
+            gap: 7px;
+            min-width: 0;
           }
 
           .painel-inventario-atualizado
           .inventario-catalogo__dados {
             display: flex;
-            gap: 7px;
+            gap: 6px;
             flex-wrap: wrap;
           }
 
           .painel-inventario-atualizado
           .inventario-catalogo__dados span {
-            padding: 4px 8px;
+            padding: 4px 7px;
             border: 1px solid rgba(76, 50, 28, 0.28);
             background:
               rgba(255, 255, 255, 0.34);
             color: #2e1c12;
-            font-size: 0.72rem;
+            font-size: 0.68rem;
             font-weight: 700;
+            white-space: nowrap;
+          }
+
+          .painel-inventario-atualizado
+          .inventario-catalogo__descricao-curta {
+            display: -webkit-box;
+            overflow: hidden;
+            margin: 0;
+            color: #4a2b1a;
+            font-size: 0.76rem;
+            line-height: 1.35;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+          }
+
+          .painel-inventario-atualizado
+          .inventario-catalogo__item
+          > button {
+            width: 180px;
+            min-width: 180px;
+            min-height: 42px;
+            justify-self: end;
+            padding: 0 10px;
+            white-space: nowrap;
           }
 
           .painel-inventario-atualizado
@@ -1485,6 +1862,28 @@ function PainelInventario({
           }
 
           .painel-inventario-atualizado
+          .inventario-arquivos__propriedades {
+            display: grid;
+            gap: 8px;
+            margin: 0;
+            padding: 12px 14px 12px 32px;
+            border: 1px solid rgba(72, 48, 27, 0.18);
+            background: rgba(255, 255, 255, 0.2);
+            color: #352116;
+            font-size: 0.84rem;
+            line-height: 1.45;
+          }
+
+          .painel-inventario-atualizado
+          .inventario-arquivos__comentario {
+            padding: 11px 13px;
+            border-left: 4px solid #8a2a24;
+            background: rgba(138, 42, 36, 0.08);
+            color: #54251f !important;
+            font-style: italic;
+          }
+
+          .painel-inventario-atualizado
           .painel-dossie__vazio {
             padding: 14px;
             border: 1px dashed rgba(68, 45, 26, 0.36);
@@ -1493,6 +1892,21 @@ function PainelInventario({
           }
 
           @media (max-width: 900px) {
+            .painel-inventario-atualizado
+            .inventario-catalogo__item {
+              grid-template-columns:
+                minmax(210px, 1fr)
+                minmax(180px, 0.9fr)
+                150px;
+            }
+
+            .painel-inventario-atualizado
+            .inventario-catalogo__item
+            > button {
+              width: 150px;
+              min-width: 150px;
+            }
+
             .painel-inventario-atualizado
             .inventario-arquivos__abrir {
               grid-template-columns:
@@ -1517,6 +1931,20 @@ function PainelInventario({
             .painel-inventario-atualizado
             .inventario-catalogo__filtros {
               grid-template-columns: 1fr;
+            }
+
+            .painel-inventario-atualizado
+            .inventario-catalogo__item {
+              grid-template-columns: 1fr;
+              align-items: stretch;
+            }
+
+            .painel-inventario-atualizado
+            .inventario-catalogo__item
+            > button {
+              width: 100%;
+              min-width: 0;
+              justify-self: stretch;
             }
 
             .painel-inventario-atualizado
@@ -1575,101 +2003,182 @@ function PainelInventario({
           </span>
 
           <strong>
-            {volumeTotal}/
             {
-              resumoInventario.cargaMaxima
+              resumoInventario
+                .espacosUsados
+            }
+            {" / "}
+            {
+              resumoInventario
+                .limiteCarga
             }
           </strong>
+
+          <small>
+            {textoSituacaoCarga}
+          </small>
         </div>
       </header>
 
       <section
-        className={`inventario-limites ${
-          resumoInventario.valido
-            ? "inventario-limites--valido"
-            : "inventario-limites--excedido"
-        }`}
-        aria-label="Limites do inventário"
+        className={`inventario-limites inventario-limites--${resumoInventario.situacaoCarga}`}
       >
-        <header>
+        <div className="inventario-limites__topo">
           <div>
-            <span>Regra automática</span>
             <h3>
-              Limites de{" "}
-              {resumoInventario.patente}
+              Limites do inventário
             </h3>
+
+            <p>
+              Todos os itens carregados
+              ocupam espaços, inclusive
+              os guardados.
+            </p>
           </div>
 
-          <strong>
-            Carga {volumeTotal}/
-            {
-              resumoInventario.cargaMaxima
-            }
-          </strong>
-        </header>
+          <div className="inventario-limites__identidade">
+            <span>
+              Força {resumoInventario.forca}
+            </span>
+
+            <span>
+              {resumoInventario.patente}
+            </span>
+          </div>
+        </div>
+
+        <div className="inventario-limites__grade">
+          <div className="inventario-limites__dado">
+            <small>
+              Carga normal
+            </small>
+
+            <strong>
+              {resumoInventario.espacosUsados}
+              {" / "}
+              {resumoInventario.limiteCarga}
+            </strong>
+          </div>
+
+          <div className="inventario-limites__dado">
+            <small>
+              Máximo absoluto
+            </small>
+
+            <strong>
+              {resumoInventario.limiteAbsoluto}
+              {" espaços"}
+            </strong>
+          </div>
+
+          <div className="inventario-limites__dado">
+            <small>
+              Bônus de carga
+            </small>
+
+            <strong>
+              +{resumoInventario.bonusCarga}
+            </strong>
+          </div>
+
+          <div className="inventario-limites__dado">
+            <small>
+              Situação
+            </small>
+
+            <strong>
+              {textoSituacaoCarga}
+            </strong>
+          </div>
+        </div>
 
         <div className="inventario-limites__categorias">
-          {CATEGORIAS_INVENTARIO_ARQUIVOS.map(
+          <span>
+            Categoria 0: {resumoInventario.contagemCategorias["0"]} / livre
+          </span>
+
+          {[
+            "I",
+            "II",
+            "III",
+            "IV",
+          ].map(
             (categoria) => {
-              const limite =
-                resumoInventario
-                  .limitesPorCategoria[
-                  categoria
-                ];
-              const usados =
-                resumoInventario
-                  .usadosPorCategoria[
-                  categoria
-                ];
               const excedida =
-                Number.isFinite(
-                  limite,
-                ) &&
-                usados > limite;
+                resumoInventario
+                  .contagemCategorias[
+                    categoria
+                  ] >
+                resumoInventario
+                  .limitesCategorias[
+                    categoria
+                  ];
 
               return (
-                <div
+                <span
                   className={
                     excedida
-                      ? "inventario-limites__categoria inventario-limites__categoria--excedida"
-                      : "inventario-limites__categoria"
+                      ? "inventario-limites__categoria--excedida"
+                      : ""
                   }
                   key={categoria}
-                  title={obterDescricaoCategoriaInventario(
-                    categoria,
-                  )}
                 >
-                  <span>
-                    Categoria{" "}
-                    {obterRotuloCategoriaNumerica(
-                      categoria,
-                    )}
-                  </span>
-                  <strong>
-                    {usados}/
-                    {Number.isFinite(
-                      limite,
-                    )
-                      ? limite
-                      : "livre"}
-                  </strong>
-                  <small>
-                    {obterDescricaoCategoriaInventario(
-                      categoria,
-                    )}
-                  </small>
-                </div>
+                  Categoria {categoria}:{" "}
+                  {
+                    resumoInventario
+                      .contagemCategorias[
+                        categoria
+                      ]
+                  }
+                  {" / "}
+                  {
+                    resumoInventario
+                      .limitesCategorias[
+                        categoria
+                      ]
+                  }
+                </span>
               );
             },
           )}
         </div>
 
-        {mensagemLimite ? (
-          <p
-            className="inventario-limites__mensagem"
-            role="status"
-          >
-            {mensagemLimite}
+        {resumoInventario.situacaoCarga !==
+        "normal" ? (
+          <p className="inventario-limites__penalidades">
+            Sobrecarregado: –5 na
+            Defesa, –5 nas perícias
+            afetadas por carga e –3m de
+            deslocamento.
+          </p>
+        ) : null}
+
+        {possuiAvisoInventario ? (
+          <p className="inventario-limites__alerta">
+            {resumoInventario.cargaExcedida
+              ? "O inventário atual ultrapassa o máximo absoluto. Remova itens ou reduza quantidades. "
+              : ""}
+
+            {resumoInventario.categoriasExcedidas.length >
+            0
+              ? "Uma ou mais categorias ultrapassam o limite da patente. "
+              : ""}
+
+            {resumoInventario.totalSemCategoria >
+            0
+              ? `${resumoInventario.totalSemCategoria} item(ns) estão sem categoria oficial. `
+              : ""}
+
+            {resumoInventario.totalAcimaCategoriaIV >
+            0
+              ? `${resumoInventario.totalAcimaCategoriaIV} item(ns) ficaram acima da categoria IV. `
+              : ""}
+          </p>
+        ) : null}
+
+        {mensagemInventario ? (
+          <p className="inventario-mensagem">
+            {mensagemInventario}
           </p>
         ) : null}
       </section>
@@ -1786,97 +2295,97 @@ function PainelInventario({
 
                 <div className="inventario-catalogo__lista">
                   {itensCatalogoFiltrados.map(
-                    (itemCatalogo) => (
+                    (itemCatalogo) => {
+                      const validacaoCatalogo =
+                        obterValidacaoCatalogo(
+                          itemCatalogo,
+                        );
+
+                      return (
                       <article
                         className={`inventario-catalogo__item ${obterClasseVisualItem(itemCatalogo)}`}
                         key={
                           itemCatalogo.id
                         }
                       >
-                        <header>
+                        <div className="inventario-catalogo__identidade">
                           <span className="inventario-catalogo__icone">
                             {obterIconeItem(
                               itemCatalogo.tipo,
                             )}
                           </span>
 
-                          <div>
+                          <div className="inventario-catalogo__nome">
                             <small>
-                              {itemCatalogo.tipo}
+                              {itemCatalogo.tipo ||
+                                "Equipamento"}
                               {" — "}
-                              {itemCatalogo.categoria}
+                              {itemCatalogo.categoria ||
+                                itemCatalogo.grupo ||
+                                "Item"}
                             </small>
 
-                            <strong>
+                            <strong
+                              title={
+                                itemCatalogo.nome
+                              }
+                            >
                               {
                                 itemCatalogo.nome
                               }
                             </strong>
                           </div>
-                        </header>
-
-                        <div className="inventario-catalogo__dados">
-                          <span>
-                            Volume{" "}
-                            {itemCatalogo.volume ??
-                              0}
-                          </span>
-
-                          <span>
-                            Categoria{" "}
-                            {obterRotuloCategoriaNumerica(
-                              itemCatalogo.categoriaNumerica,
-                            )}
-                          </span>
-
-                          {itemCatalogo.dano ? (
-                            <span>
-                              Dano{" "}
-                              {
-                                itemCatalogo.dano
-                              }
-                            </span>
-                          ) : null}
-
-                          {itemCatalogo.alcance ? (
-                            <span>
-                              {
-                                itemCatalogo.alcance
-                              }
-                            </span>
-                          ) : null}
-
-                          {Number(
-                            itemCatalogo.defesa,
-                          ) > 0 ? (
-                            <span>
-                              Defesa +
-                              {
-                                itemCatalogo.defesa
-                              }
-                            </span>
-                          ) : null}
                         </div>
 
-                        <p>
-                          {itemCatalogo.efeito ||
-                            itemCatalogo.descricao ||
-                            "Sem descrição."}
-                        </p>
+                        <div className="inventario-catalogo__resumo">
+                          <div className="inventario-catalogo__dados">
+                            <span>
+                              {formatarCategoriaItem(
+                                obterCategoriaItem(
+                                  itemCatalogo,
+                                ),
+                              )}
+                            </span>
+
+                            <span>
+                              Volume{" "}
+                              {itemCatalogo.volume ??
+                                0}
+                            </span>
+                          </div>
+
+                          <p className="inventario-catalogo__descricao-curta">
+                            {obterResumoCatalogo(
+                              itemCatalogo,
+                            )}
+                          </p>
+                        </div>
 
                         <button
                           className="painel-dossie__botao-principal"
                           type="button"
+                          disabled={
+                            !validacaoCatalogo
+                              .permitido
+                          }
+                          title={
+                            validacaoCatalogo
+                              .mensagem || ""
+                          }
                           onClick={() =>
                             adicionarItemCatalogo(
                               itemCatalogo,
                             )
                           }
                         >
-                          Adicionar ao inventário
+                          {validacaoCatalogo
+                            .permitido
+                            ? "Adicionar"
+                            : "Limite atingido"}
                         </button>
                       </article>
-                    ),
+                      );
+                    },
                   )}
                 </div>
               </div>
@@ -1958,11 +2467,12 @@ function PainelInventario({
                   </label>
 
                   <label>
-                    Categoria do item
+                    Categoria oficial
 
                     <select
                       value={
-                        novoItem.categoriaNumerica
+                        novoItem
+                          .categoriaNumerica
                       }
                       onChange={(
                         evento,
@@ -1974,19 +2484,25 @@ function PainelInventario({
                         )
                       }
                     >
-                      {CATEGORIAS_INVENTARIO_ARQUIVOS.map(
-                        (categoria) => (
-                          <option
-                            value={categoria}
-                            key={categoria}
-                          >
-                            Categoria{" "}
-                            {obterRotuloCategoriaNumerica(
-                              categoria,
-                            )}
-                          </option>
-                        ),
-                      )}
+                      <option value="0">
+                        Categoria 0
+                      </option>
+
+                      <option value="1">
+                        Categoria I
+                      </option>
+
+                      <option value="2">
+                        Categoria II
+                      </option>
+
+                      <option value="3">
+                        Categoria III
+                      </option>
+
+                      <option value="4">
+                        Categoria IV
+                      </option>
                     </select>
                   </label>
 
@@ -2271,6 +2787,12 @@ function PainelInventario({
                       <span className="inventario-arquivos__nome-resumo">
                         <small>
                           {item.tipo} —{" "}
+                          {formatarCategoriaItem(
+                            obterCategoriaItem(
+                              item,
+                            ),
+                          )}
+                          {" — "}
                           {item.ativo !==
                           false
                             ? "Em uso"
@@ -2286,8 +2808,13 @@ function PainelInventario({
                         Qtd.{" "}
                         {item.quantidade}
                         {" · "}
-                        Volume{" "}
-                        {item.volume}
+                        Espaços{" "}
+                        {(Number(
+                          item.volume,
+                        ) || 0) *
+                          (Number(
+                            item.quantidade,
+                          ) || 0)}
                       </span>
 
                       <span className="inventario-arquivos__acao-resumo">
@@ -2382,6 +2909,12 @@ function PainelInventario({
                               <span>
                                 {item.tipo}
                                 {" — "}
+                                {formatarCategoriaItem(
+                                  obterCategoriaItem(
+                                    item,
+                                  ),
+                                )}
+                                {" — "}
                                 {item.ativo !==
                                 false
                                   ? "Em uso"
@@ -2436,15 +2969,28 @@ function PainelInventario({
 
                             <div>
                               <dt>
-                                Categoria
+                                Categoria base
                               </dt>
 
                               <dd>
                                 <select
-                                  aria-label={`Categoria de ${item.nome}`}
+                                  aria-label={`Categoria base de ${item.nome}`}
                                   value={
-                                    item.categoriaNumerica ??
-                                    0
+                                    Number.isFinite(
+                                      Number(
+                                        item.categoriaNumerica,
+                                      ),
+                                    )
+                                      ? Math.max(
+                                          0,
+                                          Math.min(
+                                            4,
+                                            Number(
+                                              item.categoriaNumerica,
+                                            ),
+                                          ),
+                                        )
+                                      : ""
                                   }
                                   onChange={(
                                     evento,
@@ -2452,31 +2998,44 @@ function PainelInventario({
                                     atualizarNumeroItem(
                                       item,
                                       "categoriaNumerica",
-                                      evento
-                                        .target
+                                      evento.target
                                         .value,
                                     )
                                   }
                                 >
-                                  {CATEGORIAS_INVENTARIO_ARQUIVOS.map(
-                                    (
-                                      categoria,
-                                    ) => (
+                                  <option value="" disabled>
+                                    Selecione
+                                  </option>
+
+                                  {CATEGORIAS_ITENS_ARQUIVOS.map(
+                                    (categoria) => (
                                       <option
                                         value={
-                                          categoria
+                                          NUMEROS_CATEGORIAS[
+                                            categoria
+                                          ]
                                         }
-                                        key={
-                                          categoria
-                                        }
+                                        key={categoria}
                                       >
-                                        {obterRotuloCategoriaNumerica(
-                                          categoria,
-                                        )}
+                                        Categoria {categoria}
                                       </option>
                                     ),
                                   )}
                                 </select>
+                              </dd>
+                            </div>
+
+                            <div>
+                              <dt>
+                                Categoria final
+                              </dt>
+
+                              <dd>
+                                {formatarCategoriaItem(
+                                  obterCategoriaItem(
+                                    item,
+                                  ),
+                                )}
                               </dd>
                             </div>
 
@@ -2660,16 +3219,149 @@ function PainelInventario({
                               </dd>
                             </div>
 
-                            <div>
-                              <dt>
-                                Alcance
-                              </dt>
+                            {item.alcance ? (
+                              <div>
+                                <dt>
+                                  Alcance
+                                </dt>
 
-                              <dd>
-                                {item.alcance ||
-                                  "—"}
-                              </dd>
-                            </div>
+                                <dd>
+                                  {item.alcance}
+                                </dd>
+                              </div>
+                            ) : null}
+
+                            {item.critico ? (
+                              <div>
+                                <dt>
+                                  Crítico
+                                </dt>
+
+                                <dd>
+                                  {item.critico}
+                                </dd>
+                              </div>
+                            ) : null}
+
+                            {item.tipoDano ? (
+                              <div>
+                                <dt>
+                                  Tipo de dano
+                                </dt>
+
+                                <dd>
+                                  {item.tipoDano}
+                                </dd>
+                              </div>
+                            ) : null}
+
+                            {item.municao ? (
+                              <div>
+                                <dt>
+                                  Munição
+                                </dt>
+
+                                <dd>
+                                  {item.municao}
+                                </dd>
+                              </div>
+                            ) : null}
+
+                            {item.empunhadura ? (
+                              <div>
+                                <dt>
+                                  Empunhadura
+                                </dt>
+
+                                <dd>
+                                  {item.empunhadura}
+                                </dd>
+                              </div>
+                            ) : null}
+
+                            {item.funcionamento ? (
+                              <div>
+                                <dt>
+                                  Funcionamento
+                                </dt>
+
+                                <dd>
+                                  {item.funcionamento}
+                                </dd>
+                              </div>
+                            ) : null}
+
+                            {item.proficiencia ? (
+                              <div>
+                                <dt>
+                                  Proficiência
+                                </dt>
+
+                                <dd>
+                                  {item.proficiencia}
+                                </dd>
+                              </div>
+                            ) : null}
+
+                            {item.elemento ? (
+                              <div>
+                                <dt>
+                                  Elemento
+                                </dt>
+
+                                <dd>
+                                  {item.elemento}
+                                </dd>
+                              </div>
+                            ) : null}
+
+                            {item.resistencia ? (
+                              <div>
+                                <dt>
+                                  Resistência
+                                </dt>
+
+                                <dd>
+                                  {item.resistencia}
+                                </dd>
+                              </div>
+                            ) : null}
+
+                            {item.acao ? (
+                              <div>
+                                <dt>
+                                  Ação
+                                </dt>
+
+                                <dd>
+                                  {item.acao}
+                                </dd>
+                              </div>
+                            ) : null}
+
+                            {item.duracao ? (
+                              <div>
+                                <dt>
+                                  Duração
+                                </dt>
+
+                                <dd>
+                                  {item.duracao}
+                                </dd>
+                              </div>
+                            ) : null}
+
+                            {item.teste ? (
+                              <div>
+                                <dt>
+                                  Teste
+                                </dt>
+
+                                <dd>
+                                  {item.teste}
+                                </dd>
+                              </div>
+                            ) : null}
                           </dl>
 
                           {item.efeito ? (
@@ -2681,10 +3373,48 @@ function PainelInventario({
                             </p>
                           ) : null}
 
-                          <p>
-                            {item.descricao ||
-                              "Nenhuma descrição informada."}
-                          </p>
+                          {item.descricao ? (
+                            <p>
+                              {item.descricao}
+                            </p>
+                          ) : null}
+
+                          {item.propriedades.length >
+                          0 ? (
+                            <>
+                              <p>
+                                <strong>
+                                  Propriedades:
+                                </strong>
+                              </p>
+
+                              <ul className="inventario-arquivos__propriedades">
+                                {item.propriedades.map(
+                                  (
+                                    propriedade,
+                                    indice,
+                                  ) => (
+                                    <li
+                                      key={`${item.id}-propriedade-${indice}`}
+                                    >
+                                      {
+                                        propriedade
+                                      }
+                                    </li>
+                                  ),
+                                )}
+                              </ul>
+                            </>
+                          ) : null}
+
+                          {item.comentario ? (
+                            <p className="inventario-arquivos__comentario">
+                              <strong>
+                                Anotação de campo:{" "}
+                              </strong>
+                              {item.comentario}
+                            </p>
+                          ) : null}
                         </div>
                       </div>
                     ) : null}
