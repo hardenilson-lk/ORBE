@@ -10,8 +10,13 @@ import {
   processarRetornoAutenticacaoOrbe,
   reenviarConfirmacaoOrbe,
 } from "../utils/contasOrbe.js";
-import { lerMesasSalvas } from "../utils/mesas.js";
-import { orbeOnlineHabilitado, verificarServidorOrbe } from "../services/supabaseOrbe.js";
+import { aplicarMesaRemota, lerMesasSalvas } from "../utils/mesas.js";
+import {
+  entrarMesaRemota,
+  mensagemErroConviteOrbe,
+  orbeOnlineHabilitado,
+  verificarServidorOrbe,
+} from "../services/supabaseOrbe.js";
 
 import "./PaginaLogin.css";
 
@@ -158,7 +163,7 @@ export default function PaginaLogin() {
     }
   }
 
-  function entrarComConvite(evento) {
+  async function entrarComConvite(evento) {
     evento.preventDefault();
     if (!lerUsuarioAtual()) {
       setRetorno({ tipo: "aviso", texto: "Entre na sua conta antes de usar um convite de campanha." });
@@ -167,6 +172,22 @@ export default function PaginaLogin() {
     }
 
     const normalizado = codigo.trim().toUpperCase();
+    if (orbeOnlineHabilitado()) {
+      if (carregando) return;
+      setCarregando(true);
+      setRetorno({ tipo: "processando", texto: "Localizando a campanha..." });
+      try {
+        const mesaRemota = await entrarMesaRemota(normalizado);
+        aplicarMesaRemota(mesaRemota);
+        navegar(`/arquivos/jogador/${mesaRemota.id}`);
+      } catch (falha) {
+        setRetorno({ tipo: "erro", texto: mensagemErroConviteOrbe(falha) });
+      } finally {
+        setCarregando(false);
+      }
+      return;
+    }
+
     const mesa = lerMesasSalvas().find((item) => {
       const convite = item.codigoConvite || `ORBE-${String(item.id).slice(-6).toUpperCase()}`;
       return String(convite).trim().toUpperCase() === normalizado;
@@ -204,7 +225,7 @@ export default function PaginaLogin() {
             {modo === "convite" ? (
               <form className="login-orbe__form" onSubmit={entrarComConvite}>
                 <label>Código da campanha<input autoFocus required value={codigo} onChange={(e) => setCodigo(e.target.value)} placeholder="ORBE-000000" /></label>
-                <button className="login-orbe__principal" type="submit">Localizar mesa <span>→</span></button>
+                <button className="login-orbe__principal" type="submit" disabled={carregando}>{carregando ? "Localizando..." : "Localizar mesa"} <span>→</span></button>
               </form>
             ) : (
               <form className="login-orbe__form" onSubmit={enviar}>

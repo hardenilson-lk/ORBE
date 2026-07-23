@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 
 import Cabecalho from "../components/Cabecalho.jsx";
-import { buscarMesaRemota, entrarMesaRemota, orbeOnlineHabilitado } from "../services/supabaseOrbe.js";
+import { entrarMesaRemota, mensagemErroConviteOrbe, orbeOnlineHabilitado } from "../services/supabaseOrbe.js";
 import { aplicarMesaRemota, lerMesasSalvas } from "../utils/mesas.js";
 
 export default function PaginaArquivos() {
@@ -10,20 +10,24 @@ export default function PaginaArquivos() {
   const [conviteAberto, setConviteAberto] = useState(false);
   const [codigo, setCodigo] = useState("");
   const [erroConvite, setErroConvite] = useState("");
+  const [carregandoConvite, setCarregandoConvite] = useState(false);
 
   async function entrarComConvite(evento) {
     evento.preventDefault();
     const normalizado = codigo.trim().toUpperCase();
     if (orbeOnlineHabilitado()) {
+      if (carregandoConvite) return;
+      setCarregandoConvite(true);
       try {
-        const mesaId = await entrarMesaRemota(normalizado);
-        const mesaRemota = await buscarMesaRemota(mesaId);
-        if (mesaRemota) aplicarMesaRemota(mesaRemota);
-        navegar(`/arquivos/jogador/${mesaId}`);
+        const mesaRemota = await entrarMesaRemota(normalizado);
+        aplicarMesaRemota(mesaRemota);
+        navegar(`/arquivos/jogador/${mesaRemota.id}`);
         return;
       } catch (falha) {
-        setErroConvite(falha.message || "Não foi possível entrar na campanha online.");
+        setErroConvite(mensagemErroConviteOrbe(falha));
         return;
+      } finally {
+        setCarregandoConvite(false);
       }
     }
     const mesa = lerMesasSalvas().find((item) => {
@@ -142,7 +146,7 @@ export default function PaginaArquivos() {
                 <label htmlFor="codigo-convite">Código da campanha</label>
                 <div>
                   <input id="codigo-convite" required value={codigo} onChange={(evento) => { setCodigo(evento.target.value); setErroConvite(""); }} placeholder="ORBE-000000" />
-                  <button type="submit">Entrar</button>
+                  <button type="submit" disabled={carregandoConvite}>{carregandoConvite ? "Entrando..." : "Entrar"}</button>
                 </div>
                 {erroConvite ? <small>{erroConvite}</small> : null}
               </form>

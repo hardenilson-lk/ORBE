@@ -2,11 +2,13 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 
 import Cabecalho from "../components/Cabecalho.jsx";
+import { orbeOnlineHabilitado, salvarMesaRemota } from "../services/supabaseOrbe.js";
 
 import {
+  aplicarMesaRemota,
   gerarIdMesa,
   lerMesasSalvas,
-  salvarMesas,
+  salvarMesasLocal,
 } from "../utils/mesas.js";
 
 function PaginaNovaMesa() {
@@ -18,7 +20,11 @@ function PaginaNovaMesa() {
   const [descricao, setDescricao] =
     useState("");
 
-  function criarMesa(evento) {
+  const [idMesa] = useState(() => gerarIdMesa());
+  const [criando, setCriando] = useState(false);
+  const [erroCriacao, setErroCriacao] = useState("");
+
+  async function criarMesa(evento) {
     evento.preventDefault();
 
     const nomeFinal = nomeCampanha.trim();
@@ -28,19 +34,35 @@ function PaginaNovaMesa() {
     }
 
     const novaMesa = {
-      id: gerarIdMesa(),
+      id: idMesa,
       nomeCampanha: nomeFinal,
       descricao: descricao.trim(),
       arquivoInicial: "ARQUIVO 0001",
+      codigoConvite: `ORBE-${String(idMesa).slice(-6).toUpperCase()}`,
       criadaEm: new Date().toISOString(),
     };
 
     const mesasAtuais = lerMesasSalvas();
 
-    salvarMesas([
+    salvarMesasLocal([
       novaMesa,
-      ...mesasAtuais,
+      ...mesasAtuais.filter((mesa) => String(mesa.id) !== String(novaMesa.id)),
     ]);
+
+    if (orbeOnlineHabilitado()) {
+      setCriando(true);
+      setErroCriacao("");
+      try {
+        const mesaRemota = await salvarMesaRemota(novaMesa);
+        aplicarMesaRemota(mesaRemota);
+      } catch (falha) {
+        console.warn("A mesa foi salva localmente, mas não foi criada no Supabase.", falha);
+        setErroCriacao(falha?.message || "Não foi possível criar a mesa online. Tente novamente.");
+        setCriando(false);
+        return;
+      }
+      setCriando(false);
+    }
 
     navigate(
       `/arquivos/mesa/${novaMesa.id}`,
@@ -124,10 +146,12 @@ function PaginaNovaMesa() {
               <button
                 className="formulario-mesa__criar"
                 type="submit"
+                disabled={criando}
               >
-                Criar arquivo
+                {criando ? "Criando arquivo..." : "Criar arquivo"}
               </button>
             </div>
+            {erroCriacao ? <p className="formulario-mesa__erro" role="alert">{erroCriacao}</p> : null}
           </form>
         </section>
       </main>

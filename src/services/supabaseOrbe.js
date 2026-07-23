@@ -358,14 +358,38 @@ export async function salvarMesaRemota(mesa) {
     updated_at: new Date().toISOString(),
   }).select().single();
   if (error) throw error;
-  return data;
+  return normalizarMesaRemota(data);
 }
 
 export async function entrarMesaRemota(codigoConvite) {
   const cliente = exigirCliente();
-  const { data, error } = await cliente.rpc("entrar_mesa_orbe", { codigo_informado: String(codigoConvite || "").trim().toUpperCase() });
+  const codigoNormalizado = String(codigoConvite || "").trim().toUpperCase();
+  const { data, error } = await cliente.rpc("entrar_mesa_por_codigo", {
+    codigo_informado: codigoNormalizado,
+  });
   if (error) throw error;
-  return data;
+  const registro = Array.isArray(data) ? data[0] : data;
+  if (!registro?.id) throw new Error("A mesa foi localizada, mas o servidor não retornou seus dados.");
+  return normalizarMesaRemota(registro);
+}
+
+export function mensagemErroConviteOrbe(falha) {
+  const codigoErro = String(falha?.code || "").toUpperCase();
+  const detalhe = String(falha?.message || "").toLowerCase();
+
+  if (codigoErro === "P0002" || detalhe.includes("não encontrado") || detalhe.includes("nao encontrado")) {
+    return "Código de convite não encontrado.";
+  }
+  if (codigoErro === "28000" || detalhe.includes("faça login") || detalhe.includes("jwt")) {
+    return "Sua sessão expirou. Entre novamente antes de usar o convite.";
+  }
+  if (codigoErro === "42501" || detalhe.includes("permission") || detalhe.includes("permissão")) {
+    return "Sua conta não tem permissão para entrar nesta mesa.";
+  }
+  if (codigoErro === "42883" || detalhe.includes("entrar_mesa_por_codigo")) {
+    return "A atualização do convite online ainda não foi aplicada no Supabase.";
+  }
+  return falha?.message || "Não foi possível entrar na mesa online.";
 }
 
 export async function salvarFichaRemota(mesaId, ficha) {
