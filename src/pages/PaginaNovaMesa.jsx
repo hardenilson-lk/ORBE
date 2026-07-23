@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 
 import Cabecalho from "../components/Cabecalho.jsx";
-import { orbeOnlineHabilitado, salvarMesaRemota } from "../services/supabaseOrbe.js";
+import { criarMesaRemota, orbeOnlineHabilitado } from "../services/supabaseOrbe.js";
 
 import {
   aplicarMesaRemota,
@@ -42,26 +42,24 @@ function PaginaNovaMesa() {
       criadaEm: new Date().toISOString(),
     };
 
-    const mesasAtuais = lerMesasSalvas();
-
-    salvarMesasLocal([
-      novaMesa,
-      ...mesasAtuais.filter((mesa) => String(mesa.id) !== String(novaMesa.id)),
-    ]);
-
     if (orbeOnlineHabilitado()) {
       setCriando(true);
       setErroCriacao("");
       try {
-        const mesaRemota = await salvarMesaRemota(novaMesa);
+        const mesaRemota = await criarMesaRemota(novaMesa);
         aplicarMesaRemota(mesaRemota);
       } catch (falha) {
-        console.warn("A mesa foi salva localmente, mas não foi criada no Supabase.", falha);
         setErroCriacao(falha?.message || "Não foi possível criar a mesa online. Tente novamente.");
         setCriando(false);
         return;
       }
       setCriando(false);
+    } else {
+      const mesasAtuais = lerMesasSalvas();
+      salvarMesasLocal([
+        novaMesa,
+        ...mesasAtuais.filter((mesa) => String(mesa.id) !== String(novaMesa.id)),
+      ]);
     }
 
     navigate(

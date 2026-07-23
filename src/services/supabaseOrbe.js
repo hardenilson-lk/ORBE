@@ -361,6 +361,37 @@ export async function salvarMesaRemota(mesa) {
   return normalizarMesaRemota(data);
 }
 
+export async function criarMesaRemota(mesa) {
+  const cliente = exigirCliente();
+  const {
+    data: { user },
+    error: erroUsuario,
+  } = await cliente.auth.getUser();
+
+  if (erroUsuario || !user) {
+    throw new Error("Sua sessão expirou. Entre novamente para criar a mesa.");
+  }
+
+  const payload = {
+    id: mesa.id,
+    owner_id: user.id,
+    nome: mesa.nomeCampanha || mesa.nome || "Campanha",
+    codigo_convite: mesa.codigoConvite || `ORBE-${String(mesa.id).slice(-6).toUpperCase()}`,
+    sistema: "arquivos",
+    dados: mesa,
+    updated_at: new Date().toISOString(),
+  };
+
+  const { data, error } = await cliente
+    .from("mesas_orbe")
+    .insert(payload)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return normalizarMesaRemota(data);
+}
+
 export async function entrarMesaRemota(codigoConvite) {
   const cliente = exigirCliente();
   const codigoNormalizado = String(codigoConvite || "").trim().toUpperCase();
