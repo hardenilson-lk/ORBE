@@ -33,6 +33,49 @@ function normalizarTexto(valor) {
     .trim();
 }
 
+function obterClasseElementoRitual(
+  ritual = {},
+) {
+  const elemento =
+    normalizarTexto(
+      ritual.elemento,
+    );
+
+  if (
+    elemento.includes("sangue")
+  ) {
+    return "ritual-elemento--sangue";
+  }
+
+  if (
+    elemento.includes("morte")
+  ) {
+    return "ritual-elemento--morte";
+  }
+
+  if (
+    elemento.includes(
+      "conhecimento",
+    )
+  ) {
+    return "ritual-elemento--conhecimento";
+  }
+
+  if (
+    elemento.includes("energia")
+  ) {
+    return "ritual-elemento--energia";
+  }
+
+  if (
+    elemento.includes("medo")
+  ) {
+    return "ritual-elemento--medo";
+  }
+
+  return "ritual-elemento--neutro";
+}
+
 function textoPreenchido(valor) {
   return String(valor || "").trim();
 }
@@ -378,6 +421,7 @@ function PainelRituais({
   aoAdicionarRitual,
   aoRemoverRitual,
   modoCompleto = null,
+  somenteLeitura = false,
 }) {
   const [
     catalogoAberto,
@@ -819,12 +863,14 @@ function PainelRituais({
                       {rituaisFiltrados.map(
                         (ritual) => (
                           <button
-                            className={
+                            className={`${
                               ritualSelecionado ===
                               ritual.id
                                 ? "painel-rituais__opcao painel-rituais__opcao--ativa"
                                 : "painel-rituais__opcao"
-                            }
+                            } ${obterClasseElementoRitual(
+                              ritual,
+                            )}`}
                             type="button"
                             key={
                               ritual.id
@@ -864,7 +910,15 @@ function PainelRituais({
                       ) : null}
                     </div>
 
-                    <div className="painel-rituais__detalhes">
+                    <div
+                      className={`painel-rituais__detalhes ${
+                        ritualEmDestaque
+                          ? obterClasseElementoRitual(
+                              ritualEmDestaque,
+                            )
+                          : "ritual-elemento--neutro"
+                      }`}
+                    >
                       {ritualEmDestaque ? (
                         <>
                           <div className="painel-rituais__detalhes-topo">
@@ -1397,6 +1451,48 @@ function PainelRituais({
               1fr;
           }
 
+          .ritual-elemento--sangue {
+            --elemento-principal: #a62c35;
+            --elemento-escuro: #420b11;
+            --elemento-claro: rgba(166, 44, 53, 0.18);
+            --elemento-texto: #ffe9e9;
+          }
+
+          .ritual-elemento--morte {
+            --elemento-principal: #4d595a;
+            --elemento-escuro: #14191a;
+            --elemento-claro: rgba(62, 75, 77, 0.2);
+            --elemento-texto: #edf4ef;
+          }
+
+          .ritual-elemento--conhecimento {
+            --elemento-principal: #bd8d1f;
+            --elemento-escuro: #503606;
+            --elemento-claro: rgba(189, 141, 31, 0.2);
+            --elemento-texto: #fff5c9;
+          }
+
+          .ritual-elemento--energia {
+            --elemento-principal: #7d3aa3;
+            --elemento-escuro: #2b0d38;
+            --elemento-claro: rgba(125, 58, 163, 0.2);
+            --elemento-texto: #faeaff;
+          }
+
+          .ritual-elemento--medo {
+            --elemento-principal: #d8d8d8;
+            --elemento-escuro: #252525;
+            --elemento-claro: rgba(216, 216, 216, 0.34);
+            --elemento-texto: #ffffff;
+          }
+
+          .ritual-elemento--neutro {
+            --elemento-principal: #806d55;
+            --elemento-escuro: #33271d;
+            --elemento-claro: rgba(128, 109, 85, 0.16);
+            --elemento-texto: #fff3dc;
+          }
+
           .painel-rituais__cartao {
             display: grid;
             align-content: start;
@@ -1405,13 +1501,19 @@ function PainelRituais({
             padding: 12px;
             border: 1px solid
               rgba(75, 54, 35, 0.56);
-            border-left: 4px solid
-              var(--ritual-violeta);
+            border-left: 6px solid
+              var(
+                --elemento-principal,
+                var(--ritual-violeta)
+              );
             background:
               linear-gradient(
                 90deg,
-                rgba(88, 39, 105, 0.12),
-                transparent 45px
+                var(
+                  --elemento-claro,
+                  rgba(88, 39, 105, 0.12)
+                ),
+                transparent 70px
               ),
               repeating-linear-gradient(
                 0deg,
@@ -1438,7 +1540,11 @@ function PainelRituais({
           }
 
           .painel-rituais__cartao > header strong {
-            color: #271b12;
+            color:
+              var(
+                --elemento-escuro,
+                #271b12
+              );
             font-family:
               "Courier Prime",
               "Courier New",
@@ -1449,7 +1555,31 @@ function PainelRituais({
           }
 
           .painel-rituais__cartao > header span {
-            color: #725a40;
+            display: inline-block;
+            width: fit-content;
+            padding: 4px 7px;
+            border: 1px solid
+              var(
+                --elemento-principal,
+                #725a40
+              );
+            background:
+              linear-gradient(
+                180deg,
+                var(
+                  --elemento-principal,
+                  #725a40
+                ),
+                var(
+                  --elemento-escuro,
+                  #392718
+                )
+              );
+            color:
+              var(
+                --elemento-texto,
+                #fff4df
+              );
             font-family:
               "Courier Prime",
               "Courier New",
@@ -1549,9 +1679,15 @@ function PainelRituais({
             margin: 0;
             padding: 9px;
             border-left: 3px solid
-              var(--ritual-violeta);
+              var(
+                --elemento-principal,
+                var(--ritual-violeta)
+              );
             background:
-              rgba(88, 39, 105, 0.08);
+              var(
+                --elemento-claro,
+                rgba(88, 39, 105, 0.08)
+              );
             color: #5a3e2e;
             font-family:
               "Courier Prime",
@@ -1567,9 +1703,15 @@ function PainelRituais({
             margin-top: 2px;
             padding: 10px;
             border: 1px solid
-              rgba(108, 50, 129, 0.36);
+              var(
+                --elemento-principal,
+                rgba(108, 50, 129, 0.36)
+              );
             background:
-              rgba(108, 50, 129, 0.07);
+              var(
+                --elemento-claro,
+                rgba(108, 50, 129, 0.07)
+              );
           }
 
           .painel-rituais__versao header {
@@ -1582,7 +1724,10 @@ function PainelRituais({
           .painel-rituais__versao strong,
           .painel-rituais__versao span {
             color:
-              var(--ritual-violeta);
+              var(
+                --elemento-principal,
+                var(--ritual-violeta)
+              );
             font-family:
               "Courier Prime",
               "Courier New",
@@ -1755,12 +1900,18 @@ function PainelRituais({
             min-height: 49px;
             padding: 5px 9px;
             border: 1px solid
-              #744489;
+              var(
+                --elemento-principal,
+                #744489
+              );
             background:
               linear-gradient(
                 90deg,
-                #291331,
-                #160b1b
+                var(
+                  --elemento-escuro,
+                  #291331
+                ),
+                #120a15
               );
             color:
               var(--ritual-claro);
@@ -1770,12 +1921,22 @@ function PainelRituais({
 
           .painel-rituais__opcao:hover,
           .painel-rituais__opcao--ativa {
-            border-color: #d595e7;
+            border-color:
+              var(
+                --elemento-texto,
+                #d595e7
+              );
             background:
               linear-gradient(
                 90deg,
-                #74328a,
-                #35143f
+                var(
+                  --elemento-principal,
+                  #74328a
+                ),
+                var(
+                  --elemento-escuro,
+                  #35143f
+                )
               );
           }
 
@@ -1789,10 +1950,20 @@ function PainelRituais({
             background:
               radial-gradient(
                 circle,
-                #8e4ba3,
-                #371642 72%
+                var(
+                  --elemento-principal,
+                  #8e4ba3
+                ),
+                var(
+                  --elemento-escuro,
+                  #371642
+                ) 72%
               );
-            color: #fff0ff;
+            color:
+              var(
+                --elemento-texto,
+                #fff0ff
+              );
             font-size: 1.35rem;
           }
 
@@ -1808,7 +1979,11 @@ function PainelRituais({
           }
 
           .painel-rituais__opcao small {
-            color: #e3a8f2;
+            color:
+              var(
+                --elemento-texto,
+                #e3a8f2
+              );
             font-family:
               "Courier Prime",
               "Courier New",
@@ -1832,7 +2007,10 @@ function PainelRituais({
           .painel-rituais__detalhes h5 {
             margin: 0 0 12px;
             color:
-              var(--ritual-roxo-escuro);
+              var(
+                --elemento-escuro,
+                var(--ritual-roxo-escuro)
+              );
             font-family:
               Georgia,
               "Times New Roman",
@@ -1855,7 +2033,10 @@ function PainelRituais({
 
           .painel-rituais__detalhes-topo span {
             color:
-              var(--ritual-violeta);
+              var(
+                --elemento-principal,
+                var(--ritual-violeta)
+              );
             font-family:
               "Courier Prime",
               "Courier New",
@@ -2001,7 +2182,8 @@ function PainelRituais({
             Rituais conhecidos
           </h3>
 
-          {podeUsarRituais ? (
+          {podeUsarRituais &&
+          !somenteLeitura ? (
             <button
               className="painel-rituais__botao"
               type="button"
@@ -2039,7 +2221,9 @@ function PainelRituais({
           {rituaisVisiveis.map(
             (ritual) => (
               <article
-                className="painel-rituais__cartao"
+                className={`painel-rituais__cartao ${obterClasseElementoRitual(
+                  ritual,
+                )}`}
                 key={ritual.id}
               >
                 <header>
@@ -2056,16 +2240,18 @@ function PainelRituais({
                     </span>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() =>
-                      removerRitual(
-                        ritual,
-                      )
-                    }
-                  >
-                    Remover
-                  </button>
+                  {!somenteLeitura ? (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        removerRitual(
+                          ritual,
+                        )
+                      }
+                    >
+                      Remover
+                    </button>
+                  ) : null}
                 </header>
 
                 <MetadadosRitual
@@ -2129,10 +2315,9 @@ function PainelRituais({
         rituaisVisiveis.length ===
           0 ? (
           <p className="painel-rituais__vazio">
-            Nenhum ritual liberado foi
-            adicionado. Pressione
-            “Adicionar” para abrir o
-            catálogo permitido pelo NEX.
+            {somenteLeitura
+              ? "Nenhum ritual foi adicionado a esta ficha."
+              : "Nenhum ritual liberado foi adicionado. Pressione “Adicionar” para abrir o catálogo permitido pelo NEX."}
           </p>
         ) : null}
       </section>

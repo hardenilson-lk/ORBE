@@ -3,13 +3,60 @@ import { Link } from "react-router";
 import "./MenuJogador.css";
 
 const ITENS = [
-  ["mapa", "▣", "Mapa"],
-  ["ficha", "☷", "Minha ficha"],
-  ["inventario", "▤", "Inventário"],
-  ["anotacoes", "✎", "Anotações"],
-  ["missoes", "◎", "Missões"],
-  ["arquivos", "⌘", "Arquivos"],
+  [
+    "mapa",
+    "▣",
+    "Mapa",
+  ],
+
+  [
+    "ficha",
+    "☷",
+    "Minha ficha",
+  ],
+
+  [
+    "inventario",
+    "▤",
+    "Inventário",
+  ],
+
+  [
+    "rituais",
+    "✦",
+    "Rituais",
+  ],
+
+  [
+    "anotacoes",
+    "✎",
+    "Anotações",
+  ],
+
+  [
+    "missoes",
+    "◎",
+    "Missões",
+  ],
+
+  [
+    "arquivos",
+    "⌘",
+    "Arquivos",
+  ],
 ];
+
+const ASSISTENTE_POR_MENU = {
+  mapa: "menu-mapa",
+  ficha: "menu-fichas",
+  inventario:
+    "menu-inventario",
+  rituais: "menu-rituais",
+  anotacoes:
+    "menu-anotacoes",
+  missoes: "menu-missoes",
+  arquivos: "menu-arquivos",
+};
 
 function MenuJogador({
   nomeCampanha,
@@ -25,8 +72,22 @@ function MenuJogador({
   if (recolhido) {
     return (
       <aside className="menu-jogador menu-jogador--recolhido">
-        <button className="menu-jogador__mostrar" type="button" onClick={aoAlternarRecolhido} aria-label="Mostrar menu principal" title="Mostrar menu principal">
-          <span aria-hidden="true">☰</span><small>Menu</small>
+        <button
+          className="menu-jogador__mostrar"
+          type="button"
+          onClick={
+            aoAlternarRecolhido
+          }
+          aria-label="Mostrar menu principal"
+          title="Mostrar menu principal"
+        >
+          <span aria-hidden="true">
+            ☰
+          </span>
+
+          <small>
+            Menu
+          </small>
         </button>
       </aside>
     );
@@ -34,49 +95,150 @@ function MenuJogador({
 
   return (
     <aside className="menu-jogador">
-      <button className="menu-jogador__recolher" type="button" onClick={aoAlternarRecolhido} aria-label="Esconder menu principal" title="Esconder menu principal">‹ Esconder menu</button>
+      <button
+        className="menu-jogador__recolher"
+        type="button"
+        onClick={
+          aoAlternarRecolhido
+        }
+        aria-label="Esconder menu principal"
+        title="Esconder menu principal"
+      >
+        ‹ Esconder menu
+      </button>
+
       <header className="menu-jogador__marca">
-        <span>ARQ</span>
+        <span>
+          ARQ
+        </span>
+
         <div>
-          <h1>arquivos</h1>
-          <p>Campanha: {nomeCampanha}</p>
-          <p>Arquivo atual: {arquivoAtual}</p>
+          <h1>
+            arquivos
+          </h1>
+
+          <p>
+            Campanha:{" "}
+            {nomeCampanha}
+          </p>
+
+          <p>
+            Arquivo atual:{" "}
+            {arquivoAtual}
+          </p>
         </div>
       </header>
 
-      <div className="menu-jogador__acesso">Nível de acesso: Agente</div>
+      <div className="menu-jogador__acesso">
+        Nível de acesso: Agente
+      </div>
 
       {ficha ? (
         <section className="menu-jogador__agente">
-          {ficha.foto ? <img src={ficha.foto} alt="" /> : <span>{String(ficha.nome || "AG").slice(0, 2).toUpperCase()}</span>}
+          {ficha.foto ? (
+            <img
+              src={ficha.foto}
+              alt=""
+            />
+          ) : (
+            <span>
+              {String(
+                ficha.nome ||
+                  "AG",
+              )
+                .slice(0, 2)
+                .toUpperCase()}
+            </span>
+          )}
+
           <div>
-            <small>Agente vinculado</small>
-            <strong>{ficha.nome || "Sem identificação"}</strong>
-            <p>{ficha.classe || "Classe indefinida"} · NEX {ficha.nex || "5%"}</p>
+            <small>
+              Agente vinculado
+            </small>
+
+            <strong>
+              {ficha.nome ||
+                "Sem identificação"}
+            </strong>
+
+            <p>
+              {ficha.classe ||
+                "Classe indefinida"}
+              {" · NEX "}
+              {ficha.nex || "5%"}
+            </p>
           </div>
         </section>
       ) : null}
 
       <nav aria-label="Menu do jogador">
-        {ITENS.map(([id, icone, rotulo]) => (
-          <button
-            type="button"
-            className={menuAtivo === id ? "ativo" : ""}
-            key={id}
-            data-assistente={id === "ficha" ? "menu-fichas" : undefined}
-            onClick={() => aoSelecionarMenu(id)}
-          >
-            <span aria-hidden="true">{icone}</span>
-            {rotulo}
-          </button>
-        ))}
+        {ITENS.map(
+          ([
+            id,
+            icone,
+            rotulo,
+          ]) => (
+            <button
+              type="button"
+              className={
+                menuAtivo === id
+                  ? "ativo"
+                  : ""
+              }
+              key={id}
+              data-assistente={
+                ASSISTENTE_POR_MENU[
+                  id
+                ]
+              }
+              onClick={() =>
+                aoSelecionarMenu(
+                  id,
+                )
+              }
+            >
+              <span aria-hidden="true">
+                {icone}
+              </span>
 
-        <Link to="/mesas"><span aria-hidden="true">↩</span> Portal</Link>
+              {rotulo}
+            </button>
+          ),
+        )}
+
+        <Link to="/mesas">
+          <span aria-hidden="true">
+            ↩
+          </span>
+
+          Portal
+        </Link>
       </nav>
 
       <footer>
-        <button type="button" onClick={aoAtualizar}><span aria-hidden="true">↻</span> Atualizar campanha</button>
-        <button type="button" onClick={aoTrocarPersonagem}><span aria-hidden="true">⇄</span> Trocar personagem</button>
+        <button
+          type="button"
+          onClick={aoAtualizar}
+        >
+          <span aria-hidden="true">
+            ↻
+          </span>
+
+          Atualizar campanha
+        </button>
+
+        <button
+          type="button"
+          onClick={
+            aoTrocarPersonagem
+          }
+        >
+          <span aria-hidden="true">
+            ⇄
+          </span>
+
+          Trocar personagem
+        </button>
       </footer>
     </aside>
   );

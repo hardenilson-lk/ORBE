@@ -10,6 +10,7 @@ import { ComunicacaoMesa } from "../comunicacao/index.js";
 import PainelFichas from "../components/mestre/PainelFichas.jsx";
 import PainelInventario from "../components/mestre/PainelInventario.jsx";
 import PainelMapa from "../components/mestre/PainelMapa.jsx";
+import PainelRituais from "../components/mestre/PainelRituais.jsx";
 import MenuJogador from "../components/jogador/MenuJogador.jsx";
 import PaineisJogador from "../components/jogador/PaineisJogador.jsx";
 import MesaSonoraJogador from "../components/jogador/MesaSonoraJogador.jsx";
@@ -39,6 +40,7 @@ const TITULOS = {
   mapa: "Mapa de combate",
   ficha: "Ficha do agente",
   inventario: "Inventário",
+  rituais: "Rituais conhecidos",
   anotacoes: "Anotações pessoais",
   missoes: "Missões da equipe",
   arquivos: "Arquivos liberados",
@@ -265,6 +267,15 @@ function PaginaJogador() {
     salvarFicha({ ...fichaAtiva, inventario: atualizado });
   }
 
+  function atualizarRituais(novosRituais) {
+    if (!fichaAtiva) return;
+
+    salvarFicha({
+      ...fichaAtiva,
+      rituais: listaSegura(novosRituais),
+    });
+  }
+
   function finalizarRolagem(resultados) {
     const grupo = Array.isArray(resultados) ? resultados[0] : resultados;
     const valores = listaSegura(grupo?.rolls).map((item) => Number(item.value)).filter(Number.isFinite);
@@ -347,6 +358,25 @@ function PaginaJogador() {
 
     if (menuAtivo === "inventario") {
       return <PainelInventario fichaAtiva={fichaAtiva} itens={fichaAtiva.inventario || []} aoAdicionarItem={(item) => atualizarInventario("adicionar", item)} aoAtualizarItem={(item) => atualizarInventario("atualizar", item)} aoRemoverItem={(item) => atualizarInventario("remover", item)} />;
+    }
+
+    if (menuAtivo === "rituais") {
+      return (
+        <>
+          <div className={fichaAtiva.editLocked ? "pagina-jogador__permissao pagina-jogador__permissao--bloqueada" : "pagina-jogador__permissao"}>
+            {fichaAtiva.editLocked
+              ? "Edição bloqueada pelo mestre. Você pode consultar os rituais, mas não salvar alterações."
+              : "Você pode adicionar e remover os rituais da sua própria ficha. O catálogo respeita classe, habilidades, NEX e círculo máximo."}
+          </div>
+
+          <PainelRituais
+            ficha={fichaAtiva}
+            rituais={fichaAtiva.rituais || []}
+            aoAlterarRituais={atualizarRituais}
+            modoCompleto
+          />
+        </>
+      );
     }
 
     if (["anotacoes", "missoes", "arquivos"].includes(menuAtivo)) {
