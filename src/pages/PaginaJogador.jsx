@@ -104,6 +104,9 @@ function PaginaJogador() {
         });
     },
     aoRolagem: (rolagem) => {
+      dadosRef.current?.mostrarResultado(
+        rolagem,
+      );
       setResultado(
         `${rolagem.nome || "Mesa"}: ${rolagem.total ?? rolagem.resultado}`,
       );

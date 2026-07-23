@@ -32,6 +32,11 @@ const Dados3D = forwardRef(
     const [dadosVisiveis, setDadosVisiveis] =
       useState(false);
 
+    const [
+      resultadoVisual,
+      setResultadoVisual,
+    ] = useState(null);
+
     useEffect(() => {
       aoFinalizarRef.current = aoFinalizar;
     }, [aoFinalizar]);
@@ -89,6 +94,7 @@ const Dados3D = forwardRef(
                     caixaDadosRef.current === caixaDados
                   ) {
                     caixaDados.clear();
+                    setResultadoVisual(null);
                     setDadosVisiveis(false);
                   }
                 }, 2500);
@@ -164,6 +170,8 @@ const Dados3D = forwardRef(
             temporizadorLimpezaRef.current,
           );
 
+          setResultadoVisual(null);
+
           let notacao =
             `${quantidade}d${lados}`;
 
@@ -189,6 +197,81 @@ const Dados3D = forwardRef(
           }
         },
 
+        mostrarResultado(rolagem = {}) {
+          const valores = Array.isArray(
+            rolagem.valores,
+          )
+            ? rolagem.valores
+                .map(Number)
+                .filter(Number.isFinite)
+            : [];
+
+          const valorUnico = Number(
+            rolagem.valor,
+          );
+
+          const valoresExibidos =
+            valores.length > 0
+              ? valores
+              : Number.isFinite(valorUnico)
+                ? [valorUnico]
+                : [];
+
+          const lados = Number(
+            rolagem.lados ||
+              String(
+                rolagem.dado ||
+                  rolagem.tipo ||
+                  "",
+              ).replace(/\D/g, ""),
+          );
+
+          const modificador =
+            Number(rolagem.modificador) ||
+            0;
+
+          const total = Number(
+            rolagem.total ??
+              rolagem.resultado,
+          );
+
+          window.clearTimeout(
+            temporizadorLimpezaRef.current,
+          );
+
+          ignorarFinalizacaoRef.current = false;
+
+          if (caixaDadosRef.current) {
+            caixaDadosRef.current.clear();
+          }
+
+          setResultadoVisual({
+            valores: valoresExibidos,
+            lados:
+              Number.isFinite(lados) &&
+              lados > 0
+                ? lados
+                : null,
+            modificador,
+            total:
+              Number.isFinite(total)
+                ? total
+                : valoresExibidos.reduce(
+                    (soma, valor) =>
+                      soma + valor,
+                    0,
+                  ) + modificador,
+          });
+
+          setDadosVisiveis(true);
+
+          temporizadorLimpezaRef.current =
+            window.setTimeout(() => {
+              setResultadoVisual(null);
+              setDadosVisiveis(false);
+            }, 3000);
+        },
+
         limpar() {
           window.clearTimeout(
             temporizadorLimpezaRef.current,
@@ -198,6 +281,7 @@ const Dados3D = forwardRef(
             caixaDadosRef.current.clear();
           }
 
+          setResultadoVisual(null);
           setDadosVisiveis(false);
         },
       }),
@@ -214,6 +298,49 @@ const Dados3D = forwardRef(
           className="dados-3d__area"
           ref={areaDadosRef}
         />
+
+        {resultadoVisual && (
+          <div
+            className="dados-3d__resultado-oficial"
+            role="status"
+            aria-live="polite"
+          >
+            <span className="dados-3d__resultado-legenda">
+              Resultado da mesa
+            </span>
+
+            <div className="dados-3d__faces">
+              {resultadoVisual.valores.map(
+                (valor, indice) => (
+                  <span
+                    className="dados-3d__face"
+                    key={`${valor}-${indice}`}
+                  >
+                    <small>
+                      {resultadoVisual.lados
+                        ? `d${resultadoVisual.lados}`
+                        : "dado"}
+                    </small>
+
+                    <strong>{valor}</strong>
+                  </span>
+                ),
+              )}
+            </div>
+
+            {(resultadoVisual.valores.length >
+              1 ||
+              resultadoVisual.modificador !==
+                0) && (
+              <strong className="dados-3d__total">
+                {resultadoVisual.modificador ===
+                0
+                  ? `Total: ${resultadoVisual.total}`
+                  : `Total com modificador: ${resultadoVisual.total}`}
+              </strong>
+            )}
+          </div>
+        )}
 
         {mensagem && (
           <span className="dados-3d__mensagem">

@@ -102,7 +102,10 @@ export default function useRealtimeMesaOrbe({
       const historicoAtual = Array.isArray(sessaoAtual.historicoRolagens)
         ? sessaoAtual.historicoRolagens
         : [];
-      if (historicoAtual.some((item) => item?.id === rolagem.id)) return;
+      if (historicoAtual.some((item) => item?.id === rolagem.id)) {
+        callbacksRef.current.aoRolagem?.(rolagem);
+        return;
+      }
 
       const sessao = aplicarSessaoArquivosRemota(mesaId, {
         ...sessaoAtual,

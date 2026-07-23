@@ -30,6 +30,113 @@
   pointer-events: none;
 }
 
+.dados-3d__resultado-oficial {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  min-width: 180px;
+  padding: 14px 18px 16px;
+  border: 1px solid rgba(183, 132, 255, 0.82);
+  background:
+    radial-gradient(
+      circle at 50% 0,
+      rgba(155, 92, 255, 0.42),
+      transparent 65%
+    ),
+    rgba(18, 10, 29, 0.94);
+  color: #f8edff;
+  transform: translate(-50%, -50%);
+  box-shadow:
+    0 0 28px rgba(155, 92, 255, 0.56),
+    0 18px 60px rgba(0, 0, 0, 0.72);
+  animation:
+    dados-3d-resultado-entrada 260ms ease-out;
+}
+
+.dados-3d__resultado-legenda {
+  color: #d9baff;
+  font-family: "Courier New", monospace;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.dados-3d__faces {
+  display: flex;
+  justify-content: center;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+
+.dados-3d__face {
+  display: grid;
+  place-items: center;
+  width: 66px;
+  min-height: 72px;
+  padding: 7px;
+  border: 2px solid #b784ff;
+  background:
+    linear-gradient(
+      145deg,
+      #b784ff,
+      #6f31d2 52%,
+      #311355
+    );
+  color: #fff;
+  clip-path: polygon(
+    50% 0,
+    92% 24%,
+    100% 70%,
+    50% 100%,
+    0 70%,
+    8% 24%
+  );
+  filter:
+    drop-shadow(
+      0 0 10px rgba(183, 132, 255, 0.72)
+    );
+}
+
+.dados-3d__face small {
+  align-self: end;
+  font-family: "Courier New", monospace;
+  font-size: 0.52rem;
+  text-transform: uppercase;
+}
+
+.dados-3d__face strong {
+  align-self: start;
+  font-family: Georgia, serif;
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.dados-3d__total {
+  font-family: "Courier New", monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+}
+
+@keyframes dados-3d-resultado-entrada {
+  from {
+    opacity: 0;
+    transform:
+      translate(-50%, -45%)
+      scale(0.82);
+  }
+
+  to {
+    opacity: 1;
+    transform:
+      translate(-50%, -50%)
+      scale(1);
+  }
+}
+
 .dados-3d__mensagem {
   position: absolute;
   top: 24px;

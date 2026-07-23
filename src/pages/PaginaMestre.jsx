@@ -201,6 +201,9 @@ function PaginaMestre() {
         });
     },
     aoRolagem: (rolagem) => {
+      dados3DRef.current?.mostrarResultado(
+        rolagem,
+      );
       setResultadoRolagem(
         `${rolagem.nome || "Jogador"}: ${rolagem.total ?? rolagem.resultado}`,
       );
