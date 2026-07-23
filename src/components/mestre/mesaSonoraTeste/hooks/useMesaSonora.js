@@ -46,14 +46,12 @@ export default function useMesaSonora() {
       atualizarSom(id, { estado: ESTADOS_SOM.ERRO, erro: "ARQUIVO PRECISA SER SELECIONADO NOVAMENTE" });
       return;
     }
-    if (som.origem !== ORIGENS_SOM.LOCAL) {
-      atualizarSom(id, {
-        estado: ESTADOS_SOM.ERRO,
-        erro: "Esta fonte externa não é capturada pelo LiveKit. Use compartilhamento de aba ou um player oficial sincronizado.",
-      });
+    if (som.pararOutros || !som.tocarJunto) pararTodos();
+    if (som.origem === ORIGENS_SOM.SPOTIFY) {
+      setSpotifyAtivoId(id);
+      atualizarSom(id, { estado: ESTADOS_SOM.TOCANDO, erro: "" });
       return;
     }
-    if (som.pararOutros || !som.tocarJunto) pararTodos();
     const player = players.current.get(id);
     if (!player) {
       atualizarSom(id, { estado: ESTADOS_SOM.CARREGANDO, erro: "" });

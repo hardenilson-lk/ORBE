@@ -1,5 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link, useParams } from "react-router";
+import {
+  Link,
+  useLocation,
+  useParams,
+} from "react-router";
 
 import Dados3D from "../components/Dados3D.jsx";
 import { ComunicacaoMesa } from "../comunicacao/index.js";
@@ -51,6 +55,7 @@ function porcentagem(atual, maximo) {
 
 function PaginaJogador() {
   const { mesaId = "local" } = useParams();
+  const localizacao = useLocation();
   const dadosRef = useRef(null);
   const [sessao, setSessao] = useState(() => carregarSessaoArquivos(mesaId));
   const [fichas, setFichas] = useState(() => listarFichasArquivos(mesaId));
@@ -63,7 +68,10 @@ function PaginaJogador() {
   const [quantidade, setQuantidade] = useState(1);
   const [modificador, setModificador] = useState(0);
   const [resultado, setResultado] = useState("Pronto para rolar.");
-  const [mensagemSistema, setMensagemSistema] = useState("Conectado ao arquivo da campanha.");
+  const [mensagemSistema, setMensagemSistema] = useState(
+    localizacao.state?.aviso ||
+      "Conectado ao arquivo da campanha.",
+  );
   const [menuRecolhido, setMenuRecolhido] = useState(() => localStorage.getItem("orbe:jogador:menu-recolhido") === "true");
 
   const mesa = lerMesasSalvas().find((item) => String(item.id) === String(mesaId));

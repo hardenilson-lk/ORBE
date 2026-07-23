@@ -15,9 +15,13 @@ export default function useTransmissaoMesaSonora({ room, conectado, volumeSala, 
   const roomPublicadaRef = useRef(null);
   const canaisRef = useRef(new Map());
   const buffersRef = useRef(new Map());
+  const capturaExternaRef = useRef(null);
   const estadoAtualRef = useRef({ somAtual: "", cenaAtual: "", tocando: false, pausado: false });
   const [estadoTransmissao, setEstadoTransmissao] = useState(ESTADOS_TRANSMISSAO.DESCONECTADO);
   const [erroTransmissao, setErroTransmissao] = useState("");
+  const [capturandoAudioExterno, setCapturandoAudioExterno] = useState(false);
+  const [iniciandoAudioExterno, setIniciandoAudioExterno] = useState(false);
+  const [erroAudioExterno, setErroAudioExterno] = useState("");
 
   const podeTransmitir = Boolean(room && conectado && participanteEhMestre(room.localParticipant));
 
@@ -66,6 +70,113 @@ export default function useTransmissaoMesaSonora({ room, conectado, volumeSala, 
     await room.localParticipant.publishData(new TextEncoder().encode(JSON.stringify(pacote)), { reliable: true, topic: TOPICO_ESTADO_MESA_SONORA });
     return true;
   }, [podeTransmitir, room, volumeSala]);
+
+  const pararCapturaExternaAtual = useCallback((pararTracks = true) => {
+    const captura = capturaExternaRef.current;
+    capturaExternaRef.current = null;
+
+    if (captura?.fonte) {
+      try {
+        captura.fonte.disconnect();
+      } catch {
+        // A fonte já pode ter sido encerrada pelo navegador.
+      }
+    }
+
+    if (captura?.stream) {
+      captura.stream.getTracks().forEach((track) => {
+        track.onended = null;
+        if (pararTracks) track.stop();
+      });
+    }
+
+    setCapturandoAudioExterno(false);
+    setIniciandoAudioExterno(false);
+  }, []);
+
+  const encerrarCapturaAudioExterno = useCallback(async () => {
+    pararCapturaExternaAtual(true);
+    setErroAudioExterno("");
+    try {
+      await publicarEstado({ somAtual: "", tocando: false, pausado: false });
+    } catch {
+      // A sala pode ter sido desconectada ao mesmo tempo.
+    }
+  }, [pararCapturaExternaAtual, publicarEstado]);
+
+  const iniciarCapturaAudioExterno = useCallback(async () => {
+    if (!podeTransmitir) {
+      setErroAudioExterno("Entre na voz como mestre antes de transmitir áudio externo.");
+      return false;
+    }
+    if (!navigator.mediaDevices?.getDisplayMedia) {
+      setErroAudioExterno("Este navegador não permite capturar o áudio de uma aba.");
+      return false;
+    }
+    if (capturaExternaRef.current) return true;
+
+    setIniciandoAudioExterno(true);
+    setErroAudioExterno("");
+    let stream;
+
+    try {
+      stream = await navigator.mediaDevices.getDisplayMedia({
+        video: true,
+        audio: true,
+        preferCurrentTab: true,
+        selfBrowserSurface: "include",
+        systemAudio: "include",
+        surfaceSwitching: "include",
+      });
+
+      const faixaAudio = stream.getAudioTracks()[0];
+      if (!faixaAudio) {
+        stream.getTracks().forEach((track) => track.stop());
+        throw new Error("Nenhum áudio foi compartilhado. Escolha uma aba e marque “Compartilhar áudio”.");
+      }
+
+      const mixer = obterMixer();
+      await mixer.contexto.resume();
+      await publicarFaixa();
+
+      const streamAudio = new MediaStream([faixaAudio]);
+      const fonte = mixer.contexto.createMediaStreamSource(streamAudio);
+
+      // Envia a aba somente para a sala. O mestre já ouve o áudio na aba original.
+      fonte.connect(mixer.ganhoSala);
+      capturaExternaRef.current = { stream, fonte };
+
+      const finalizarPeloNavegador = () => {
+        pararCapturaExternaAtual(true);
+        publicarEstado({ somAtual: "", tocando: false, pausado: false }).catch(() => {});
+      };
+      stream.getTracks().forEach((track) => {
+        track.onended = finalizarPeloNavegador;
+      });
+
+      setCapturandoAudioExterno(true);
+      setIniciandoAudioExterno(false);
+      await publicarEstado({
+        somAtual: "Áudio externo da aba",
+        tocando: true,
+        pausado: false,
+        iniciadoEm: Date.now(),
+      });
+      return true;
+    } catch (erro) {
+      pararCapturaExternaAtual(true);
+      if (stream) stream.getTracks().forEach((track) => track.stop());
+      const cancelado = erro?.name === "NotAllowedError" || erro?.name === "AbortError";
+      setErroAudioExterno(
+        cancelado
+          ? "O compartilhamento foi cancelado. Tente novamente e selecione uma aba com áudio."
+          : erro?.message || "Não foi possível transmitir o áudio da aba.",
+      );
+      setIniciandoAudioExterno(false);
+      setCapturandoAudioExterno(false);
+      return false;
+    }
+  }, [obterMixer, pararCapturaExternaAtual, podeTransmitir, publicarEstado, publicarFaixa]);
 
   useEffect(() => {
     if (!room || !podeTransmitir) return undefined;
@@ -156,6 +267,7 @@ export default function useTransmissaoMesaSonora({ room, conectado, volumeSala, 
   }), [iniciarCanal, publicarEstado]);
 
   const encerrarFaixa = useCallback(async () => {
+    pararCapturaExternaAtual(true);
     canaisRef.current.forEach((canal) => { canal.encerramentoManual = true; try { canal.source.stop(); } catch { /* encerrada */ } });
     canaisRef.current.clear();
     const publicacao = publicacaoRef.current;
@@ -164,7 +276,7 @@ export default function useTransmissaoMesaSonora({ room, conectado, volumeSala, 
     if (room && publicacao?.track) await room.localParticipant.unpublishTrack(publicacao.track, false);
     setEstadoTransmissao(podeTransmitir ? ESTADOS_TRANSMISSAO.PRONTO : ESTADOS_TRANSMISSAO.DESCONECTADO);
     await publicarEstado({ somAtual: "", cenaAtual: "", tocando: false, pausado: false });
-  }, [podeTransmitir, publicarEstado, room]);
+  }, [pararCapturaExternaAtual, podeTransmitir, publicarEstado, room]);
 
   useEffect(() => {
     const mixer = mixerRef.current;
@@ -178,9 +290,31 @@ export default function useTransmissaoMesaSonora({ room, conectado, volumeSala, 
   }, [meuVolumeEfetivo]);
 
   useEffect(() => {
-    if (!conectado) { publicacaoRef.current = null; roomPublicadaRef.current = null; setEstadoTransmissao(ESTADOS_TRANSMISSAO.DESCONECTADO); }
+    if (!conectado) {
+      pararCapturaExternaAtual(true);
+      publicacaoRef.current = null;
+      roomPublicadaRef.current = null;
+      setEstadoTransmissao(ESTADOS_TRANSMISSAO.DESCONECTADO);
+    }
     else if (podeTransmitir) setEstadoTransmissao((atual) => atual === ESTADOS_TRANSMISSAO.TRANSMITINDO ? atual : ESTADOS_TRANSMISSAO.PRONTO);
-  }, [conectado, podeTransmitir, room]);
+  }, [conectado, pararCapturaExternaAtual, podeTransmitir, room]);
 
-  return { podeTransmitir, estadoTransmissao, erroTransmissao, criarControleArquivo, publicarFaixa, encerrarFaixa, publicarEstado };
+  useEffect(() => () => {
+    pararCapturaExternaAtual(true);
+  }, [pararCapturaExternaAtual]);
+
+  return {
+    podeTransmitir,
+    estadoTransmissao,
+    erroTransmissao,
+    capturandoAudioExterno,
+    iniciandoAudioExterno,
+    erroAudioExterno,
+    criarControleArquivo,
+    publicarFaixa,
+    encerrarFaixa,
+    publicarEstado,
+    iniciarCapturaAudioExterno,
+    encerrarCapturaAudioExterno,
+  };
 }

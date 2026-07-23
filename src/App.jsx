@@ -4,6 +4,7 @@ import {
 } from "react-router";
 
 import ProvedorAutenticacaoOrbe from "./autenticacao/ProvedorAutenticacaoOrbe.jsx";
+import RotaMestreMesa from "./components/RotaMestreMesa.jsx";
 import RotaProtegida from "./components/RotaProtegida.jsx";
 import PaginaArquivos from "./pages/PaginaArquivos.jsx";
 import PaginaInicial from "./pages/PaginaInicial.jsx";
@@ -52,9 +53,13 @@ function App() {
           />
 
           <Route
-            path="/arquivos/mesa/:mesaId"
-            element={<PaginaMestre />}
-          />
+            element={<RotaMestreMesa />}
+          >
+            <Route
+              path="/arquivos/mesa/:mesaId"
+              element={<PaginaMestre />}
+            />
+          </Route>
 
           <Route
             path="/arquivos/jogador/:mesaId"

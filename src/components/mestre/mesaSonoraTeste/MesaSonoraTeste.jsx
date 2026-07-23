@@ -1,6 +1,7 @@
 import { useState } from "react";
 import AvisoSincronizacao from "./components/AvisoSincronizacao.jsx";
 import CabecalhoMesaSonora from "./components/CabecalhoMesaSonora.jsx";
+import ControleAudioExterno from "./components/ControleAudioExterno.jsx";
 import ControlesGeraisSom from "./components/ControlesGeraisSom.jsx";
 import FormularioSom from "./components/FormularioSom.jsx";
 import ListaBotoesSom from "./components/ListaBotoesSom.jsx";
@@ -26,6 +27,15 @@ export default function MesaSonoraTeste({ aoVoltar }) {
     <section className="mesa-sonora">
       <CabecalhoMesaSonora quantidade={mesaSonora.mesa.sons.length} ativos={mesaSonora.ativos.length} aoVoltar={aoVoltar} aoLimpar={confirmarLimpeza} />
       <AvisoSincronizacao conectado={livekit.conectado} podeTransmitir={livekit.podeTransmitir} estado={livekit.estadoTransmissao} erro={livekit.erroTransmissao} />
+      <ControleAudioExterno
+        conectado={livekit.conectado}
+        podeTransmitir={livekit.podeTransmitir}
+        transmitindo={livekit.capturandoAudioExterno}
+        iniciando={livekit.iniciandoAudioExterno}
+        erro={livekit.erroAudioExterno}
+        aoIniciar={() => { void livekit.iniciarCapturaAudioExterno(); }}
+        aoEncerrar={() => { void livekit.encerrarCapturaAudioExterno(); }}
+      />
       <ControlesGeraisSom
         mesa={mesaSonora.mesa}
         busca={mesaSonora.busca} setBusca={mesaSonora.setBusca}

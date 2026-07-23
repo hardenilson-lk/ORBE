@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router";
 
 import Cabecalho from "../components/Cabecalho.jsx";
 import { criarMesaRemota, orbeOnlineHabilitado } from "../services/supabaseOrbe.js";
+import { lerUsuarioAtual } from "../utils/contasOrbe.js";
 
 import {
   aplicarMesaRemota,
@@ -35,6 +36,12 @@ function PaginaNovaMesa() {
 
     const novaMesa = {
       id: idMesa,
+      ownerId:
+        lerUsuarioAtual()?.id ||
+        "",
+      criadaPorId:
+        lerUsuarioAtual()?.id ||
+        "",
       nomeCampanha: nomeFinal,
       descricao: descricao.trim(),
       arquivoInicial: "ARQUIVO 0001",

@@ -34,6 +34,13 @@
 .botao-console--perigo { border-color: #a04c43; background: #4b1715; }
 .mesa-sonora__aviso { display: flex; justify-content: space-between; gap: 15px; padding: 10px 14px; border-left: 4px solid #a87c30; background: rgba(223,190,119,.09); font-size: .7rem; }
 .mesa-sonora__aviso span { color: #bfae8d; }
+.mesa-sonora__audio-externo { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px; border: 1px solid #77572f; border-left: 5px solid #a87c30; background: linear-gradient(100deg, rgba(183,132,255,.12), rgba(19,12,9,.92) 56%); }
+.mesa-sonora__audio-externo--ativo { border-color: #4f996b; border-left-color: #62c483; box-shadow: inset 0 0 22px rgba(98,196,131,.08); }
+.mesa-sonora__audio-externo > div { display: grid; gap: 4px; }
+.mesa-sonora__audio-externo span { color: #b784ff; font-size: .58rem; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+.mesa-sonora__audio-externo strong { color: #f5deb0; font-size: .9rem; }
+.mesa-sonora__audio-externo p { margin: 0; color: #bfae8d; font-size: .68rem; }
+.mesa-sonora__audio-externo small { color: #ed766b; font-size: .64rem; }
 .mesa-sonora__controles { display: grid; grid-template-columns: minmax(220px,.7fr) auto minmax(340px,1fr); gap: 12px; padding: 14px; border: 1px solid #78562e; background: #160e0b; }
 .mesa-sonora__controle-master { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 9px; }
 .mesa-sonora label { display: grid; gap: 5px; color: #d5bd8e; font-size: .62rem; font-weight: 900; text-transform: uppercase; }
@@ -90,4 +97,4 @@
 .mesa-sonora__player-spotify { grid-column: 1 / -1; }
 .mesa-sonora__vazio { padding: 18px; border: 1px dashed #6e5234; color: #ac9b7a; font-size: .7rem; text-align: center; }
 @media (max-width: 1450px) { .mesa-sonora__cabecalho { flex-direction: column; } .mesa-sonora__cabecalho-acoes { justify-content: flex-start; } .mesa-sonora__controles { grid-template-columns: 1fr; } .mesa-sonora__filtros { grid-column: auto; } .mesa-sonora__corpo { grid-template-columns: 1fr; } }
-@media (max-width: 700px) { .mesa-sonora { padding: 10px; } .mesa-sonora__cabecalho { flex-direction: column; } .mesa-sonora__cabecalho-acoes { justify-content: flex-start; } .mesa-sonora__controles, .mesa-sonora__filtros, .mesa-sonora__grade-formulario { grid-template-columns: 1fr; } .mesa-sonora__campo-amplo, .mesa-sonora__filtros { grid-column: auto; } .botao-som__acoes { grid-template-columns: repeat(3,1fr); } }
+@media (max-width: 700px) { .mesa-sonora { padding: 10px; } .mesa-sonora__cabecalho, .mesa-sonora__audio-externo { flex-direction: column; align-items: stretch; } .mesa-sonora__cabecalho-acoes { justify-content: flex-start; } .mesa-sonora__audio-externo .botao-console { width: 100%; } .mesa-sonora__controles, .mesa-sonora__filtros, .mesa-sonora__grade-formulario { grid-template-columns: 1fr; } .mesa-sonora__campo-amplo, .mesa-sonora__filtros { grid-column: auto; } .botao-som__acoes { grid-template-columns: repeat(3,1fr); } }

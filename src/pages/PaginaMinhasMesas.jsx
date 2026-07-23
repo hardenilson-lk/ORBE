@@ -1,14 +1,23 @@
 import { Link } from "react-router";
 
+import useAutenticacaoOrbe from "../autenticacao/useAutenticacaoOrbe.js";
 import Cabecalho from "../components/Cabecalho.jsx";
 import useMesasOrbe from "../hooks/useMesasOrbe.js";
+import { lerUsuarioAtual } from "../utils/contasOrbe.js";
 
 import {
   formatarData,
+  usuarioPodeAdministrarMesa,
 } from "../utils/mesas.js";
 
 function PaginaMinhasMesas() {
   const [mesas] = useMesasOrbe();
+  const { usuario } =
+    useAutenticacaoOrbe();
+  const usuarioId =
+    usuario?.id ||
+    lerUsuarioAtual()?.id ||
+    "";
 
   return (
     <div className="pagina">
@@ -86,12 +95,17 @@ function PaginaMinhasMesas() {
                     "Nenhuma descrição foi adicionada."}
                 </p>
 
-                <Link
-                  className="mesa-salva__abrir"
-                  to={`/arquivos/mesa/${mesa.id}`}
-                >
-                  Abrir mesa
-                </Link>
+                {usuarioPodeAdministrarMesa(
+                  mesa,
+                  usuarioId,
+                ) ? (
+                  <Link
+                    className="mesa-salva__abrir"
+                    to={`/arquivos/mesa/${mesa.id}`}
+                  >
+                    Abrir como mestre
+                  </Link>
+                ) : null}
 
                 <Link
                   className="mesa-salva__jogador"

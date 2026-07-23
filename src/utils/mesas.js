@@ -57,6 +57,24 @@ export function aplicarMesaRemota(mesa) {
   return atualizadas;
 }
 
+export function usuarioPodeAdministrarMesa(
+  mesa,
+  usuarioId,
+) {
+  const proprietarioId = String(
+    mesa?.ownerId ||
+      mesa?.criadaPorId ||
+      "",
+  );
+
+  return Boolean(
+    proprietarioId &&
+      usuarioId &&
+      proprietarioId ===
+        String(usuarioId),
+  );
+}
+
 export function gerarIdMesa() {
   if (
     typeof crypto !== "undefined" &&
