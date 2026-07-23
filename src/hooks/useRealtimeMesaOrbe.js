@@ -43,14 +43,31 @@ export default function useRealtimeMesaOrbe({
   aoSessao,
   aoFichas,
   aoMesa,
+  aoInicioRolagem,
   aoRolagem,
   aoStatus,
   aoErro,
 }) {
   const online = orbeOnlineHabilitado() && Boolean(mesaId) && mesaId !== "local";
   const [pronto, setPronto] = useState(!online);
-  const callbacksRef = useRef({ aoSessao, aoFichas, aoMesa, aoRolagem, aoStatus, aoErro });
-  callbacksRef.current = { aoSessao, aoFichas, aoMesa, aoRolagem, aoStatus, aoErro };
+  const callbacksRef = useRef({
+    aoSessao,
+    aoFichas,
+    aoMesa,
+    aoInicioRolagem,
+    aoRolagem,
+    aoStatus,
+    aoErro,
+  });
+  callbacksRef.current = {
+    aoSessao,
+    aoFichas,
+    aoMesa,
+    aoInicioRolagem,
+    aoRolagem,
+    aoStatus,
+    aoErro,
+  };
 
   useEffect(() => {
     if (!online) {
@@ -121,6 +138,10 @@ export default function useRealtimeMesaOrbe({
       },
       aoFichasAlteradas: recarregarFichas,
       aoSessao: aplicarSessao,
+      aoInicioRolagem: (configuracao) => {
+        if (!ativo || !configuracao?.id) return;
+        callbacksRef.current.aoInicioRolagem?.(configuracao);
+      },
       aoRolagem: aplicarRolagem,
       aoMembrosAlterados: recarregarMembros,
       ...(mestre ? {

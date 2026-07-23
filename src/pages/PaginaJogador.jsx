@@ -24,7 +24,10 @@ import {
   salvarSessaoArquivos,
 } from "../utils/sessoesArquivos.js";
 import useRealtimeMesaOrbe from "../hooks/useRealtimeMesaOrbe.js";
-import { publicarRolagemMesaRealtime } from "../services/supabaseOrbe.js";
+import {
+  publicarInicioRolagemMesaRealtime,
+  publicarRolagemMesaRealtime,
+} from "../services/supabaseOrbe.js";
 
 import "./PaginaJogador.css";
 
@@ -85,6 +88,21 @@ function PaginaJogador() {
     mesaId,
     aoSessao: setSessao,
     aoFichas: setFichas,
+    aoInicioRolagem: (configuracao) => {
+      setResultado(`${configuracao.nome || "Jogador"} está rolando...`);
+      void dadosRef.current
+        ?.rolar(
+          {
+            qty: configuracao.quantidade,
+            sides: configuracao.lados,
+            modifier: configuracao.modificador,
+          },
+          { notificarResultado: false },
+        )
+        .catch(() => {
+          setResultado("A animação remota não pôde ser exibida.");
+        });
+    },
     aoRolagem: (rolagem) => {
       setResultado(
         `${rolagem.nome || "Mesa"}: ${rolagem.total ?? rolagem.resultado}`,
@@ -266,13 +284,23 @@ function PaginaJogador() {
 
   async function rolarDado() {
     if (!dadosRef.current?.rolar) return;
+    const configuracao = {
+      qty: Math.max(1, Math.min(10, Number(quantidade) || 1)),
+      sides: Number(tipoDado.replace("d", "")),
+      modifier: Number(modificador) || 0,
+    };
     setResultado("Rolando...");
     try {
-      await dadosRef.current.rolar({
-        qty: Math.max(1, Math.min(10, Number(quantidade) || 1)),
-        sides: Number(tipoDado.replace("d", "")),
-        modifier: Number(modificador) || 0,
+      void publicarInicioRolagemMesaRealtime(mesaId, {
+        id: `inicio-rolagem-${Date.now()}-${Math.random()}`,
+        nome: fichaAtiva?.nome || "Jogador",
+        quantidade: configuracao.qty,
+        lados: configuracao.sides,
+        modificador: configuracao.modifier,
+      }).catch((erro) => {
+        console.warn("Não foi possível transmitir a animação dos dados.", erro);
       });
+      await dadosRef.current.rolar(configuracao);
     } catch {
       setResultado("Não foi possível realizar a rolagem.");
     }

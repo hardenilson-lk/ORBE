@@ -1066,6 +1066,8 @@
 }
 
 .catalogo-equipamentos__item {
+  --item-cor: #806d55;
+  --item-cor-clara: rgba(128, 109, 85, 0.14);
   display: grid;
   grid-template-columns:
     46px minmax(0, 1fr) auto;
@@ -1075,8 +1077,14 @@
   min-height: 54px;
   padding: 6px 9px;
   border: 1px solid rgba(74, 52, 32, 0.48);
+  border-left: 6px solid var(--item-cor);
   border-radius: 0;
   background:
+    linear-gradient(
+      90deg,
+      var(--item-cor-clara),
+      transparent 42%
+    ),
     rgba(255, 249, 233, 0.34);
   color: #281b12;
   text-align: left;
@@ -1085,11 +1093,11 @@
 
 .catalogo-equipamentos__item:hover,
 .catalogo-equipamentos__item--ativo {
-  border-color: var(--ficha-vermelho);
+  border-color: var(--item-cor);
   background:
     linear-gradient(
       90deg,
-      rgba(146, 44, 39, 0.14),
+      var(--item-cor-clara),
       transparent 45%
     ),
     rgba(255, 249, 233, 0.44);
@@ -1100,7 +1108,7 @@
   place-items: center;
   width: 42px;
   height: 42px;
-  border: 1px solid #3b291d;
+  border: 2px solid var(--item-cor);
   background:
     linear-gradient(
       145deg,
@@ -1123,7 +1131,7 @@
 }
 
 .catalogo-equipamentos__item small {
-  color: var(--ficha-vermelho);
+  color: var(--item-cor);
   font-family:
     "Courier Prime",
     "Courier New",
@@ -1131,6 +1139,69 @@
   font-size: 0.55rem;
   font-weight: 900;
   text-transform: uppercase;
+}
+
+.catalogo-equipamentos__item.item-cor--fogo,
+.catalogo-equipamentos__categoria.item-cor--fogo {
+  --item-cor: #a72f35;
+  --item-cor-clara: rgba(167, 47, 53, 0.16);
+}
+
+.catalogo-equipamentos__item.item-cor--corte,
+.catalogo-equipamentos__categoria.item-cor--corte {
+  --item-cor: #d16a25;
+  --item-cor-clara: rgba(209, 106, 37, 0.17);
+}
+
+.catalogo-equipamentos__item.item-cor--impacto,
+.catalogo-equipamentos__categoria.item-cor--impacto {
+  --item-cor: #8a5a34;
+  --item-cor-clara: rgba(138, 90, 52, 0.17);
+}
+
+.catalogo-equipamentos__item.item-cor--perfuracao,
+.catalogo-equipamentos__categoria.item-cor--perfuracao {
+  --item-cor: #b08b24;
+  --item-cor-clara: rgba(176, 139, 36, 0.17);
+}
+
+.catalogo-equipamentos__item.item-cor--protecao,
+.catalogo-equipamentos__categoria.item-cor--protecao {
+  --item-cor: #3975a6;
+  --item-cor-clara: rgba(57, 117, 166, 0.17);
+}
+
+.catalogo-equipamentos__item.item-cor--explosivo,
+.catalogo-equipamentos__categoria.item-cor--explosivo {
+  --item-cor: #8f2635;
+  --item-cor-clara: rgba(143, 38, 53, 0.18);
+}
+
+.catalogo-equipamentos__item.item-cor--consumivel,
+.catalogo-equipamentos__categoria.item-cor--consumivel {
+  --item-cor: #3f7f58;
+  --item-cor-clara: rgba(63, 127, 88, 0.17);
+}
+
+.catalogo-equipamentos__item.item-cor--ferramenta,
+.catalogo-equipamentos__categoria.item-cor--ferramenta {
+  --item-cor: #6951a1;
+  --item-cor-clara: rgba(105, 81, 161, 0.17);
+}
+
+.catalogo-equipamentos__item.item-cor--geral,
+.catalogo-equipamentos__categoria.item-cor--geral {
+  --item-cor: #806d55;
+  --item-cor-clara: rgba(128, 109, 85, 0.14);
+}
+
+.catalogo-equipamentos__categoria {
+  display: inline-flex;
+  width: fit-content;
+  padding: 4px 8px;
+  border: 1px solid var(--item-cor);
+  background: var(--item-cor-clara);
+  color: var(--item-cor) !important;
 }
 
 .catalogo-equipamentos__detalhes {

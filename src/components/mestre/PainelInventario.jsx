@@ -10,6 +10,10 @@ import {
   criarItemArquivos,
 } from "../../data/itensArquivos.js";
 
+import {
+  obterClasseVisualItem,
+} from "../../utils/categoriasItens.js";
+
 import "./PaineisDossie.css";
 
 const ITEM_VAZIO = {
@@ -123,19 +127,6 @@ function obterIconeItem(tipo) {
   }
 
   return "▣";
-}
-
-function obterClasseVisualItem(item = {}) {
-  const texto = normalizarTexto([item.tipo, item.categoria, item.grupo, item.tipoDano, item.nome].join(" "));
-  if (texto.includes("arma de fogo") || texto.includes("disparo") || texto.includes("balistico")) return "item-cor--fogo";
-  if (texto.includes("corte") || /faca|katana|machete|lamina|espada/.test(texto)) return "item-cor--corte";
-  if (texto.includes("impacto") || /bastao|martelo|marreta/.test(texto)) return "item-cor--impacto";
-  if (texto.includes("perfuracao") || /punhal|lanca/.test(texto)) return "item-cor--perfuracao";
-  if (texto.includes("protecao") || texto.includes("escudo")) return "item-cor--protecao";
-  if (texto.includes("explosivo") || texto.includes("granada")) return "item-cor--explosivo";
-  if (texto.includes("medico") || texto.includes("consumivel")) return "item-cor--consumivel";
-  if (texto.includes("tecnologia") || texto.includes("ferramenta")) return "item-cor--ferramenta";
-  return "item-cor--geral";
 }
 
 function obterImagemItem(item) {
@@ -907,6 +898,51 @@ function PainelInventario({
             margin-top: 16px;
           }
 
+          .painel-inventario-atualizado .item-cor--fogo {
+            --item-cor: #a72f35;
+            --item-cor-clara: rgba(167, 47, 53, 0.16);
+          }
+
+          .painel-inventario-atualizado .item-cor--corte {
+            --item-cor: #d16a25;
+            --item-cor-clara: rgba(209, 106, 37, 0.17);
+          }
+
+          .painel-inventario-atualizado .item-cor--impacto {
+            --item-cor: #8a5a34;
+            --item-cor-clara: rgba(138, 90, 52, 0.17);
+          }
+
+          .painel-inventario-atualizado .item-cor--perfuracao {
+            --item-cor: #b08b24;
+            --item-cor-clara: rgba(176, 139, 36, 0.17);
+          }
+
+          .painel-inventario-atualizado .item-cor--protecao {
+            --item-cor: #3975a6;
+            --item-cor-clara: rgba(57, 117, 166, 0.17);
+          }
+
+          .painel-inventario-atualizado .item-cor--explosivo {
+            --item-cor: #8f2635;
+            --item-cor-clara: rgba(143, 38, 53, 0.18);
+          }
+
+          .painel-inventario-atualizado .item-cor--consumivel {
+            --item-cor: #3f7f58;
+            --item-cor-clara: rgba(63, 127, 88, 0.17);
+          }
+
+          .painel-inventario-atualizado .item-cor--ferramenta {
+            --item-cor: #6951a1;
+            --item-cor-clara: rgba(105, 81, 161, 0.17);
+          }
+
+          .painel-inventario-atualizado .item-cor--geral {
+            --item-cor: #806d55;
+            --item-cor-clara: rgba(128, 109, 85, 0.14);
+          }
+
           .painel-inventario-atualizado
           .inventario-catalogo__filtros {
             display: grid;
@@ -962,6 +998,11 @@ function PainelInventario({
             border: 1px solid rgba(67, 45, 25, 0.42);
             border-left: 7px solid var(--item-cor, #8b6b3e);
             background:
+              linear-gradient(
+                115deg,
+                var(--item-cor-clara, rgba(128, 109, 85, 0.14)),
+                transparent 38%
+              ),
               linear-gradient(
                 180deg,
                 rgba(255, 247, 225, 0.96),
@@ -1098,6 +1139,11 @@ function PainelInventario({
             border: 1px solid rgba(66, 45, 26, 0.35);
             border-left: 7px solid var(--item-cor, #8b6b3e);
             background:
+              linear-gradient(
+                115deg,
+                var(--item-cor-clara, rgba(128, 109, 85, 0.14)),
+                transparent 34%
+              ),
               linear-gradient(
                 180deg,
                 rgba(255, 248, 233, 0.95),

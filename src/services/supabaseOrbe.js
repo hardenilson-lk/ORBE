@@ -393,6 +393,23 @@ export async function publicarRolagemMesaRealtime(mesaId, rolagem) {
   return resultado === "ok";
 }
 
+export async function publicarInicioRolagemMesaRealtime(mesaId, configuracao) {
+  if (!supabaseOrbe || !mesaId || mesaId === "local" || !configuracao?.id) {
+    return false;
+  }
+
+  const canal = canaisMesaRealtime.get(String(mesaId));
+  if (!canal) return false;
+
+  const resultado = await canal.send({
+    type: "broadcast",
+    event: "inicio_rolagem_dados",
+    payload: configuracao,
+  });
+
+  return resultado === "ok";
+}
+
 export function assinarMesaOrbeRealtime(mesaId, callbacks = {}) {
   if (!supabaseOrbe || !mesaId || mesaId === "local") return () => {};
 
@@ -404,6 +421,9 @@ export function assinarMesaOrbeRealtime(mesaId, callbacks = {}) {
     })
     .on("broadcast", { event: "rolagem_dados" }, (evento) => {
       callbacks.aoRolagem?.(evento.payload);
+    })
+    .on("broadcast", { event: "inicio_rolagem_dados" }, (evento) => {
+      callbacks.aoInicioRolagem?.(evento.payload);
     })
     .on("postgres_changes", { event: "*", schema: "public", table: "mesas_orbe", filter: `id=eq.${mesaId}` }, (evento) => {
       callbacks.aoMesa?.(evento.eventType === "DELETE" ? null : normalizarMesaRemota(evento.new));

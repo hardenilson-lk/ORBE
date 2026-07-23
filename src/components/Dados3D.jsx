@@ -23,6 +23,7 @@ const Dados3D = forwardRef(
     const caixaDadosRef = useRef(null);
     const aoFinalizarRef = useRef(aoFinalizar);
     const temporizadorLimpezaRef = useRef(null);
+    const ignorarFinalizacaoRef = useRef(false);
 
     const [mensagem, setMensagem] = useState(
       "Carregando dados 3D...",
@@ -64,9 +65,13 @@ const Dados3D = forwardRef(
             offscreen: false,
 
             onRollComplete: (resultados) => {
+              const deveNotificar = !ignorarFinalizacaoRef.current;
+              ignorarFinalizacaoRef.current = false;
+
               if (
                 !componenteFechado &&
-                aoFinalizarRef.current
+                aoFinalizarRef.current &&
+                deveNotificar
               ) {
                 aoFinalizarRef.current(
                   resultados,
@@ -137,7 +142,7 @@ const Dados3D = forwardRef(
     useImperativeHandle(
       referencia,
       () => ({
-        async rolar(configuracao) {
+        async rolar(configuracao, opcoes = {}) {
           if (!caixaDadosRef.current) {
             throw new Error(
               "Os dados 3D ainda estão carregando.",
@@ -152,6 +157,8 @@ const Dados3D = forwardRef(
 
           const modificador =
             Number(configuracao?.modifier) || 0;
+          ignorarFinalizacaoRef.current =
+            opcoes.notificarResultado === false;
 
           window.clearTimeout(
             temporizadorLimpezaRef.current,
@@ -176,6 +183,7 @@ const Dados3D = forwardRef(
               notacao,
             );
           } catch (erro) {
+            ignorarFinalizacaoRef.current = false;
             setDadosVisiveis(false);
             throw erro;
           }

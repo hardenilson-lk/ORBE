@@ -46,6 +46,7 @@ import {
   salvarSessaoArquivos,
 } from "../utils/sessoesArquivos.js";
 import {
+  publicarInicioRolagemMesaRealtime,
   publicarRolagemMesaRealtime,
   salvarSegredosMestreRemotos,
 } from "../services/supabaseOrbe.js";
@@ -182,6 +183,23 @@ function PaginaMestre() {
     mestre: true,
     aoSessao: setSessao,
     aoFichas: setFichas,
+    aoInicioRolagem: (configuracao) => {
+      setResultadoRolagem(
+        `${configuracao.nome || "Jogador"} está rolando...`,
+      );
+      void dados3DRef.current
+        ?.rolar(
+          {
+            qty: configuracao.quantidade,
+            sides: configuracao.lados,
+            modifier: configuracao.modificador,
+          },
+          { notificarResultado: false },
+        )
+        .catch(() => {
+          setResultadoRolagem("A animação remota não pôde ser exibida.");
+        });
+    },
     aoRolagem: (rolagem) => {
       setResultadoRolagem(
         `${rolagem.nome || "Jogador"}: ${rolagem.total ?? rolagem.resultado}`,
@@ -533,6 +551,15 @@ function PaginaMestre() {
     );
 
     try {
+      void publicarInicioRolagemMesaRealtime(mesaId, {
+        id: `inicio-rolagem-${Date.now()}-${Math.random()}`,
+        nome: "Mestre",
+        quantidade,
+        lados: quantidadeLados,
+        modificador: valorModificador,
+      }).catch((erro) => {
+        console.warn("Não foi possível transmitir a animação dos dados.", erro);
+      });
       await dados3DRef.current.rolar({
         qty: quantidade,
         sides:

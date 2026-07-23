@@ -32,6 +32,11 @@ import {
   recalcularFichaArquivos,
 } from "../../utils/fichasArquivos.js";
 
+import {
+  obterClasseVisualItem,
+  obterRotuloCategoriaItem,
+} from "../../utils/categoriasItens.js";
+
 import PainelDanoCura from "./PainelDanoCura.jsx";
 
 import PainelHabilidades, {
@@ -46,7 +51,7 @@ import PainelRituais, {
   normalizarRituaisFicha,
 } from "./PainelRituais.jsx";
 
-import TabelaAtaques, {
+import {
   normalizarAtaquesFicha,
 } from "./TabelaAtaques.jsx";
 
@@ -363,21 +368,6 @@ function PainelFichas({
           fichaAtualizada,
         );
       },
-    );
-  }
-
-  function atualizarAtaques(
-    novosAtaques,
-  ) {
-    setFicha(
-      (fichaAnterior) => ({
-        ...fichaAnterior,
-
-        ataques:
-          normalizarAtaquesFicha(
-            novosAtaques,
-          ),
-      }),
     );
   }
 
@@ -1225,13 +1215,6 @@ function PainelFichas({
           }
         />
 
-        <TabelaAtaques
-          ataques={ficha.ataques}
-          aoAlterarAtaques={
-            atualizarAtaques
-          }
-        />
-
         <div className="ficha-arquivos__habilidades-equipamentos">
           <PainelHabilidades
             ficha={ficha}
@@ -1483,12 +1466,12 @@ function PainelFichas({
                   itensCatalogoFiltrados.map(
                     (item) => (
                       <button
-                        className={
+                        className={`catalogo-equipamentos__item ${obterClasseVisualItem(item)} ${
                           equipamentoSelecionadoId ===
                           item.id
-                            ? "catalogo-equipamentos__item catalogo-equipamentos__item--ativo"
-                            : "catalogo-equipamentos__item"
-                        }
+                            ? "catalogo-equipamentos__item--ativo"
+                            : ""
+                        }`}
                         type="button"
                         key={item.id}
                         onClick={() =>
@@ -1518,7 +1501,9 @@ function PainelFichas({
                         </strong>
 
                         <small>
-                          {item.tipo}
+                          {obterRotuloCategoriaItem(
+                            item,
+                          )}
                         </small>
                       </button>
                     ),
@@ -1542,9 +1527,15 @@ function PainelFichas({
                   </>
                 ) : (
                   <>
-                    <span>
+                    <span
+                      className={`catalogo-equipamentos__categoria ${obterClasseVisualItem(
+                        equipamentoSelecionado,
+                      )}`}
+                    >
                       {
-                        equipamentoSelecionado.tipo
+                        obterRotuloCategoriaItem(
+                          equipamentoSelecionado,
+                        )
                       }
                     </span>
 
