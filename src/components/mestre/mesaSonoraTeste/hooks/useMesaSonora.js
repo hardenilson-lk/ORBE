@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ESTADOS_SOM, ORIGENS_SOM } from "../constants/mesaSonoraConstants.js";
 import { revogarUrlObjeto } from "../utils/audioUtils.js";
+import {
+  removerArquivoAudioLocal,
+  salvarArquivoAudioLocal,
+} from "../utils/armazenamentoAudioLocal.js";
 import { criarIdMesa } from "../utils/mesaSonoraUtils.js";
 import useAtalhosMesaSonora from "./useAtalhosMesaSonora.js";
 import usePersistenciaMesaSonora from "./usePersistenciaMesaSonora.js";
@@ -16,6 +20,10 @@ export default function useMesaSonora() {
   const [filaExecucao, setFilaExecucao] = useState([]);
 
   useEffect(() => { sonsRef.current = mesa.sons; }, [mesa.sons]);
+
+  useEffect(() => () => {
+    sonsRef.current.forEach((som) => revogarUrlObjeto(som.urlObjeto));
+  }, []);
 
   const atualizarSom = useCallback((id, alteracoes) => {
     setMesa((anterior) => ({ ...anterior, sons: anterior.sons.map((som) => som.id === id ? { ...som, ...alteracoes } : som) }));
@@ -76,15 +84,32 @@ export default function useMesaSonora() {
 
   useAtalhosMesaSonora(mesa.sons, tocarSom);
 
-  function salvarSom(dados, arquivo, idEdicao = "") {
+  async function salvarSom(dados, arquivo, idEdicao = "") {
     const categoria = dados.categoria === "Personalizada" ? dados.categoriaPersonalizada.trim() : dados.categoria;
-    const urlObjeto = arquivo ? URL.createObjectURL(arquivo) : "";
+    const id = idEdicao || criarIdMesa("som");
+    const existenteAtual = sonsRef.current.find((som) => som.id === idEdicao);
+    const ehArquivoLocal = dados.origem === ORIGENS_SOM.LOCAL;
+
+    if (ehArquivoLocal && arquivo) {
+      try {
+        await salvarArquivoAudioLocal(id, arquivo);
+      } catch (erro) {
+        throw new Error(
+          erro?.message ||
+            "Não foi possível salvar o arquivo no navegador. Verifique o espaço disponível.",
+        );
+      }
+    } else if (!ehArquivoLocal && existenteAtual?.origem === ORIGENS_SOM.LOCAL) {
+      await removerArquivoAudioLocal(id).catch(() => {});
+    }
+
+    const urlObjeto = ehArquivoLocal && arquivo ? URL.createObjectURL(arquivo) : "";
     setMesa((anterior) => {
       const existente = anterior.sons.find((som) => som.id === idEdicao);
       if (existente?.urlObjeto && (urlObjeto || dados.origem !== ORIGENS_SOM.LOCAL)) revogarUrlObjeto(existente.urlObjeto);
       const urlObjetoFinal = dados.origem === ORIGENS_SOM.LOCAL ? urlObjeto || existente?.urlObjeto || "" : "";
       const som = {
-        ...(existente || {}), ...dados, categoria, id: idEdicao || criarIdMesa("som"),
+        ...(existente || {}), ...dados, categoria, id,
         atalho: dados.origem === ORIGENS_SOM.LOCAL ? dados.atalho : "",
         url: dados.origem === ORIGENS_SOM.LOCAL ? "" : dados.url,
         urlObjeto: urlObjetoFinal,
@@ -100,6 +125,7 @@ export default function useMesaSonora() {
     const som = mesa.sons.find((item) => item.id === id);
     players.current.get(id)?.destruir?.();
     revogarUrlObjeto(som?.urlObjeto);
+    void removerArquivoAudioLocal(id).catch(() => {});
     setMesa((anterior) => ({
       ...anterior,
       sons: anterior.sons.filter((item) => item.id !== id),

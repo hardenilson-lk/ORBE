@@ -58,7 +58,7 @@ export default function MesaSonoraTeste({ aoVoltar }) {
           <PlayersExternos sons={mesaSonora.mesa.sons} spotifyAtivoId={mesaSonora.spotifyAtivoId} registrar={mesaSonora.registrarPlayer} atualizar={mesaSonora.atualizarSom} />
         </main>
         <aside>
-          <FormularioSom categorias={mesaSonora.mesa.categorias} sons={mesaSonora.mesa.sons} somEditado={somEditado} aoCancelar={() => setSomEditado(null)} aoSalvar={(...args) => { mesaSonora.salvarSom(...args); setSomEditado(null); }} />
+          <FormularioSom categorias={mesaSonora.mesa.categorias} sons={mesaSonora.mesa.sons} somEditado={somEditado} aoCancelar={() => setSomEditado(null)} aoSalvar={async (...args) => { await mesaSonora.salvarSom(...args); setSomEditado(null); }} />
           <ListaCenasSonoras cenas={mesaSonora.mesa.cenas} sons={mesaSonora.mesa.sons} aoSalvar={mesaSonora.salvarCena} aoRemover={mesaSonora.removerCena} aoAtivar={(cena) => { mesaSonora.ativarCena(cena); void livekit.publicarEstado({ cenaAtual: cena.nome, cenaId: cena.id }); }} aoParar={(cena) => { mesaSonora.pararCena(cena); void livekit.publicarEstado({ cenaAtual: "", cenaId: "" }); }} />
         </aside>
       </div>

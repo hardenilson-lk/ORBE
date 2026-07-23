@@ -6,16 +6,26 @@ export default function FormularioSom({ categorias, sons, somEditado, aoSalvar, 
   const [dados, setDados] = useState(() => formularioDoSom(somEditado));
   const [arquivo, setArquivo] = useState(null);
   const [erro, setErro] = useState("");
+  const [salvando, setSalvando] = useState(false);
 
   useEffect(() => { setDados(formularioDoSom(somEditado)); setArquivo(null); setErro(""); }, [somEditado]);
   const campo = (nome, valor) => setDados((anterior) => ({ ...anterior, [nome]: valor }));
 
-  function enviar(evento) {
+  async function enviar(evento) {
     evento.preventDefault();
     const mensagem = validarSom(dados, arquivo, sons, somEditado?.id);
     if (mensagem) { setErro(mensagem); return; }
-    aoSalvar(dados, arquivo, somEditado?.id);
-    setDados(formularioDoSom()); setArquivo(null); setErro("");
+    setSalvando(true);
+    setErro("");
+    try {
+      await aoSalvar(dados, arquivo, somEditado?.id);
+      setDados(formularioDoSom());
+      setArquivo(null);
+    } catch (falha) {
+      setErro(falha?.message || "Não foi possível salvar o arquivo de áudio.");
+    } finally {
+      setSalvando(false);
+    }
   }
 
   function capturarAtalho(evento) {
@@ -49,7 +59,7 @@ export default function FormularioSom({ categorias, sons, somEditado, aoSalvar, 
         <label><input type="checkbox" checked={dados.pararOutros} onChange={(e) => campo("pararOutros", e.target.checked)} /> Parar outros ao iniciar</label>
       </div>
       {erro && <p className="mesa-sonora__erro" role="alert">{erro}</p>}
-      <button className="botao-console botao-console--primario" type="submit">{somEditado ? "Salvar alterações" : "Criar botão de som"}</button>
+      <button className="botao-console botao-console--primario" type="submit" disabled={salvando}>{salvando ? "Salvando áudio..." : somEditado ? "Salvar alterações" : "Criar botão de som"}</button>
     </form>
   );
 }
