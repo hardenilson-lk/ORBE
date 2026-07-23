@@ -184,6 +184,14 @@ export default function PaginaLogin() {
       setRetorno({ tipo: "processando", texto: "Localizando a campanha..." });
       try {
         const mesaRemota = await entrarMesaRemota(normalizado);
+        if (mesaRemota.statusEntrada === "pendente") {
+          setRetorno({
+            tipo: "sucesso",
+            texto: "Solicitação enviada. Aguarde o mestre aprovar sua entrada.",
+          });
+          setCodigo("");
+          return;
+        }
         aplicarMesaRemota(mesaRemota);
         navegar(`/arquivos/jogador/${mesaRemota.id}`);
       } catch (falha) {

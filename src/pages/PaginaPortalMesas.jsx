@@ -22,6 +22,11 @@ export default function PaginaPortalMesas() {
       setCarregandoConvite(true);
       try {
         const mesa = await entrarMesaRemota(valor);
+        if (mesa.statusEntrada === "pendente") {
+          setErro("Solicitação enviada. Aguarde o mestre aprovar sua entrada.");
+          setCodigo("");
+          return;
+        }
         setMesas(aplicarMesaRemota(mesa));
         navegar(`/arquivos/jogador/${mesa.id}`);
         return;

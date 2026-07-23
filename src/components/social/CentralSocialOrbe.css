@@ -1,0 +1,307 @@
+.social-orbe {
+  margin-top: 20px;
+  border: 1px solid rgba(216, 173, 95, .48);
+  color: #eee0c3;
+  background:
+    radial-gradient(circle at 88% 0, rgba(135, 54, 181, .2), transparent 34%),
+    linear-gradient(145deg, rgba(28, 21, 18, .97), rgba(12, 9, 14, .97));
+  box-shadow: 0 24px 80px rgba(0, 0, 0, .45);
+}
+
+.social-orbe__cabecalho {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 22px;
+  border-bottom: 1px solid rgba(216, 173, 95, .26);
+}
+
+.social-orbe__cabecalho > div > span,
+.social-orbe__conversa > header span,
+.social-orbe--offline > span {
+  color: #d8ad5f;
+  font: 700 .62rem "Courier New", monospace;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.social-orbe h2 {
+  margin: 6px 0;
+  color: #f7e2b0;
+}
+
+.social-orbe__cabecalho p,
+.social-orbe--offline p {
+  margin: 0;
+  color: #aa9d86;
+}
+
+.social-orbe__cabecalho nav {
+  display: flex;
+}
+
+.social-orbe button {
+  border: 1px solid rgba(216, 173, 95, .38);
+  color: #dccba8;
+  background: rgba(22, 14, 12, .9);
+  min-height: 38px;
+  padding: 8px 13px;
+  font: 700 .66rem "Courier New", monospace;
+  cursor: pointer;
+}
+
+.social-orbe button.ativo,
+.social-orbe button:hover {
+  border-color: #b66bec;
+  color: #fff0c7;
+  background: #392044;
+}
+
+.social-orbe__canal,
+.social-orbe__conversa {
+  display: grid;
+  min-height: 440px;
+  grid-template-rows: 1fr auto;
+}
+
+.social-orbe__mensagens {
+  max-height: 520px;
+  padding: 18px;
+  overflow: auto;
+}
+
+.social-orbe__mensagens article {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 9px;
+  margin-bottom: 12px;
+}
+
+.social-orbe__mensagens article > span,
+.social-orbe__amigo > span {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid #9b6d34;
+  border-radius: 50%;
+  color: #f3d58e;
+  background: #28150d;
+  font: 700 .62rem "Courier New", monospace;
+}
+
+.social-orbe__mensagens article > div {
+  max-width: min(760px, 82%);
+  border: 1px solid rgba(216, 173, 95, .22);
+  border-radius: 0 9px 9px;
+  padding: 9px 11px;
+  background: rgba(247, 222, 176, .055);
+}
+
+.social-orbe__mensagens article.propria {
+  grid-template-columns: minmax(0, 1fr) 34px;
+}
+
+.social-orbe__mensagens article.propria > span {
+  grid-column: 2;
+}
+
+.social-orbe__mensagens article.propria > div {
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: end;
+  border-color: rgba(173, 91, 222, .34);
+  border-radius: 9px 0 9px 9px;
+  background: rgba(111, 49, 145, .18);
+}
+
+.social-orbe__mensagens header {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.social-orbe__mensagens strong {
+  color: #dfb96b;
+  font-size: .75rem;
+}
+
+.social-orbe__mensagens time {
+  color: #837867;
+  font: .58rem "Courier New", monospace;
+}
+
+.social-orbe__mensagens p {
+  margin: 5px 0 0;
+  color: #d8ccb4;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.social-orbe__envio {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 9px;
+  border-top: 1px solid rgba(216, 173, 95, .22);
+  padding: 14px;
+}
+
+.social-orbe input {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid rgba(216, 173, 95, .34);
+  padding: 9px 12px;
+  color: #f5e7c6;
+  background: rgba(4, 3, 5, .78);
+  outline: none;
+}
+
+.social-orbe input:focus {
+  border-color: #b44ff0;
+  box-shadow: 0 0 0 2px rgba(166, 65, 226, .13);
+}
+
+.social-orbe__area-amigos {
+  display: grid;
+  min-height: 520px;
+  grid-template-columns: minmax(250px, 340px) 1fr;
+}
+
+.social-orbe__area-amigos > aside {
+  padding: 14px;
+  border-right: 1px solid rgba(216, 173, 95, .24);
+  overflow: auto;
+}
+
+.social-orbe__area-amigos h3 {
+  margin: 18px 0 8px;
+  color: #d4ae67;
+  font-size: .75rem;
+  text-transform: uppercase;
+}
+
+.social-orbe__pesquisa {
+  display: grid;
+  gap: 7px;
+}
+
+.social-orbe__pesquisa label {
+  display: grid;
+  gap: 6px;
+  color: #b9a98b;
+  font: 700 .62rem "Courier New", monospace;
+  text-transform: uppercase;
+}
+
+.social-orbe__pessoa {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-bottom: 1px solid rgba(216, 173, 95, .14);
+  padding: 9px 0;
+}
+
+.social-orbe__pessoa div {
+  min-width: 0;
+  flex: 1;
+}
+
+.social-orbe__pessoa strong,
+.social-orbe__pessoa small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.social-orbe__pessoa small,
+.social-orbe__amigo small,
+.social-orbe__sem-amigos {
+  color: #918570;
+  font-size: .62rem;
+}
+
+.social-orbe__pessoa button {
+  min-height: 30px;
+  padding: 5px 7px;
+  font-size: .55rem;
+}
+
+.social-orbe__amigo {
+  display: grid;
+  width: 100%;
+  grid-template-columns: 34px 1fr;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 5px;
+  text-align: left;
+}
+
+.social-orbe__amigo div {
+  min-width: 0;
+}
+
+.social-orbe__amigo strong,
+.social-orbe__amigo small {
+  display: block;
+}
+
+.social-orbe__conversa > header {
+  display: grid;
+  padding: 13px 18px;
+  border-bottom: 1px solid rgba(216, 173, 95, .22);
+}
+
+.social-orbe__vazio {
+  display: grid;
+  min-height: 260px;
+  place-content: center;
+  padding: 30px;
+  color: #8f836f;
+  text-align: center;
+}
+
+.social-orbe__vazio > span {
+  color: #ae63da;
+  font-size: 1.7rem;
+}
+
+.social-orbe__vazio strong {
+  margin-top: 8px;
+  color: #d6c39e;
+}
+
+.social-orbe__retorno {
+  display: block;
+  border-top: 1px solid rgba(216, 173, 95, .2);
+  padding: 9px 14px;
+  color: #e0bb72;
+  font: .65rem "Courier New", monospace;
+}
+
+.social-orbe--offline {
+  padding: 24px;
+}
+
+@media (max-width: 800px) {
+  .social-orbe__cabecalho {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .social-orbe__cabecalho nav button {
+    flex: 1;
+  }
+
+  .social-orbe__area-amigos {
+    grid-template-columns: 1fr;
+  }
+
+  .social-orbe__area-amigos > aside {
+    max-height: 390px;
+    border-right: 0;
+    border-bottom: 1px solid rgba(216, 173, 95, .24);
+  }
+}

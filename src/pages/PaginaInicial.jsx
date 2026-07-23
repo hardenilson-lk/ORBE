@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 
 import PortalLayout from "../components/portal/PortalLayout.jsx";
+import CentralSocialOrbe from "../components/social/CentralSocialOrbe.jsx";
 import useMesasOrbe from "../hooks/useMesasOrbe.js";
 import { listarFichasArquivos } from "../utils/fichasArquivos.js";
 
@@ -24,6 +25,7 @@ export default function PaginaInicial() {
         <article className="portal-card"><span className="portal-etiqueta">02 · agentes</span><h2>Fichas</h2><p>Consulte todos os agentes vinculados às suas campanhas do Arquivos.</p><Link className="portal-botao" to="/fichas">Ver fichas</Link></article>
         <article className="portal-card"><span className="portal-etiqueta">03 · referência</span><h2>Biblioteca</h2><p>Conheça a estrutura do ORBE e as regras usadas pelo sistema atual.</p><Link className="portal-botao" to="/biblioteca">Abrir biblioteca</Link></article>
       </section>
+      <CentralSocialOrbe />
     </PortalLayout>
   );
 }

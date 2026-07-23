@@ -1,0 +1,120 @@
+.solicitacoes-entrada {
+  border: 1px solid #7b5528;
+  padding: 14px;
+  color: #ead9b7;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 25px, rgba(216, 173, 95, .035) 25px 26px),
+    linear-gradient(145deg, #25160f, #130d0a);
+}
+
+.solicitacoes-entrada header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.solicitacoes-entrada header span {
+  color: #c99542;
+  font: 700 .58rem "Courier New", monospace;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.solicitacoes-entrada h3 {
+  margin: 4px 0 0;
+  font-size: 1rem;
+}
+
+.solicitacoes-entrada button {
+  min-height: 32px;
+  border: 1px solid #89612c;
+  padding: 5px 9px;
+  color: #f4dfb2;
+  background: #422512;
+  font: 700 .58rem "Courier New", monospace;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.solicitacoes-entrada header button.ativo {
+  border-color: #5b9a62;
+  color: #b9edbb;
+  background: #17321d;
+}
+
+.solicitacoes-entrada > p {
+  margin: 10px 0;
+  color: #bba98a;
+  font-size: .68rem;
+  line-height: 1.45;
+}
+
+.solicitacoes-entrada__lista {
+  display: grid;
+  gap: 7px;
+}
+
+.solicitacoes-entrada__lista article {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid rgba(216, 173, 95, .2);
+  padding: 7px;
+  background: rgba(255, 242, 205, .04);
+}
+
+.solicitacoes-entrada__lista article > span {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border: 1px solid #b7853f;
+  border-radius: 50%;
+  color: #f4d695;
+  background: #24130c;
+  font-size: .62rem;
+}
+
+.solicitacoes-entrada__lista article div {
+  min-width: 0;
+}
+
+.solicitacoes-entrada__lista strong,
+.solicitacoes-entrada__lista small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.solicitacoes-entrada__lista small,
+.solicitacoes-entrada__vazio {
+  color: #a79578;
+  font-size: .58rem;
+}
+
+.solicitacoes-entrada button.recusar {
+  border-color: #854339;
+  color: #efb5ac;
+  background: #421b17;
+}
+
+.solicitacoes-entrada output {
+  display: block;
+  margin-top: 9px;
+  color: #dfbd78;
+  font-size: .62rem;
+}
+
+@media (max-width: 520px) {
+  .solicitacoes-entrada header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .solicitacoes-entrada__lista article {
+    grid-template-columns: 32px minmax(0, 1fr);
+  }
+}

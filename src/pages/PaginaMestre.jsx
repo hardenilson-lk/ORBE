@@ -16,6 +16,7 @@ import { ComunicacaoMesa } from "../comunicacao/index.js";
 import EscudoMestre from "../components/mestre/EscudoMestre.jsx";
 import HistoricoRolagens from "../components/mestre/HistoricoRolagens.jsx";
 import MenuMestre from "../components/mestre/MenuMestre.jsx";
+import SolicitacoesEntradaMesa from "../components/mestre/SolicitacoesEntradaMesa.jsx";
 import PainelAnotacoes from "../components/mestre/PainelAnotacoes.jsx";
 import PainelArquivos from "../components/mestre/PainelArquivos.jsx";
 import PainelFichas from "../components/mestre/PainelFichas.jsx";
@@ -44,7 +45,10 @@ import {
   carregarSessaoArquivos,
   salvarSessaoArquivos,
 } from "../utils/sessoesArquivos.js";
-import { salvarSegredosMestreRemotos } from "../services/supabaseOrbe.js";
+import {
+  publicarRolagemMesaRealtime,
+  salvarSegredosMestreRemotos,
+} from "../services/supabaseOrbe.js";
 import useRealtimeMesaOrbe from "../hooks/useRealtimeMesaOrbe.js";
 
 import "./PaginaMestre.css";
@@ -178,6 +182,11 @@ function PaginaMestre() {
     mestre: true,
     aoSessao: setSessao,
     aoFichas: setFichas,
+    aoRolagem: (rolagem) => {
+      setResultadoRolagem(
+        `${rolagem.nome || "Jogador"}: ${rolagem.total ?? rolagem.resultado}`,
+      );
+    },
     aoStatus: setMensagemSistema,
     aoErro: (erro) => {
       console.warn("Sincronização em tempo real da mesa indisponível.", erro);
@@ -672,6 +681,10 @@ function PaginaMestre() {
         ].slice(0, 50),
       }),
     );
+
+    void publicarRolagemMesaRealtime(mesaId, novaRolagem).catch((erro) => {
+      console.warn("Não foi possível transmitir a rolagem para a mesa.", erro);
+    });
   }
 
   async function recarregarCampanha() {
@@ -1397,6 +1410,11 @@ function PaginaMestre() {
               jogadores={sessao.jogadores || []}
               nomeLocal="Mestre"
               papelLocal="Mestre"
+            />
+
+            <SolicitacoesEntradaMesa
+              mesaId={mesaId}
+              exigirAprovacaoInicial={mesa?.exigeAprovacaoConvite}
             />
 
             <BarraLateralMesa

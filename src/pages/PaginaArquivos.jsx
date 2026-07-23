@@ -20,6 +20,13 @@ export default function PaginaArquivos() {
       setCarregandoConvite(true);
       try {
         const mesaRemota = await entrarMesaRemota(normalizado);
+        if (mesaRemota.statusEntrada === "pendente") {
+          setErroConvite(
+            "Solicitação enviada. Aguarde o mestre aprovar sua entrada.",
+          );
+          setCodigo("");
+          return;
+        }
         aplicarMesaRemota(mesaRemota);
         navegar(`/arquivos/jogador/${mesaRemota.id}`);
         return;

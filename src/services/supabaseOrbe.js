@@ -183,6 +183,10 @@ export function normalizarMesaRemota(registro = {}) {
     nome: registro.nome,
     nomeCampanha: registro.dados?.nomeCampanha || registro.nome,
     codigoConvite: registro.codigo_convite,
+    exigeAprovacaoConvite:
+      registro.exigir_aprovacao_convite !== false,
+    statusEntrada:
+      registro.status_entrada || "ativo",
     sistema: registro.sistema || "arquivos",
     atualizadoEm: registro.updated_at,
     remoto: true,
@@ -268,6 +272,85 @@ export async function listarMembrosMesaRemotos(mesaId) {
   });
 }
 
+export async function listarSolicitacoesEntradaRemotas(mesaId) {
+  const cliente = exigirCliente();
+  const { data: solicitacoes, error } = await cliente
+    .from("mesa_membros_orbe")
+    .select("mesa_id,user_id,papel,status,created_at")
+    .eq("mesa_id", String(mesaId))
+    .eq("status", "pendente")
+    .order("created_at", { ascending: true });
+  if (error) throw error;
+
+  const ids = (solicitacoes || []).map((item) => item.user_id);
+  if (!ids.length) return [];
+
+  const { data: perfis, error: erroPerfis } = await cliente
+    .from("perfis_orbe")
+    .select("id,nome,usuario")
+    .in("id", ids);
+  if (erroPerfis) throw erroPerfis;
+
+  const perfisPorId = new Map((perfis || []).map((perfil) => [perfil.id, perfil]));
+  return (solicitacoes || []).map((solicitacao) => ({
+    ...solicitacao,
+    perfil: perfisPorId.get(solicitacao.user_id) || null,
+  }));
+}
+
+export async function responderSolicitacaoEntradaRemota(
+  mesaId,
+  usuarioId,
+  aprovar,
+) {
+  const cliente = exigirCliente();
+  const { data, error } = await cliente
+    .from("mesa_membros_orbe")
+    .update({ status: aprovar ? "ativo" : "recusado" })
+    .eq("mesa_id", String(mesaId))
+    .eq("user_id", String(usuarioId))
+    .eq("status", "pendente")
+    .select("mesa_id,user_id,status")
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function configurarAprovacaoConvitesRemota(mesaId, exigir) {
+  const cliente = exigirCliente();
+  const { data, error } = await cliente
+    .from("mesas_orbe")
+    .update({ exigir_aprovacao_convite: Boolean(exigir) })
+    .eq("id", String(mesaId))
+    .select()
+    .single();
+  if (error) throw error;
+  return normalizarMesaRemota(data);
+}
+
+export function assinarSolicitacoesEntradaRealtime(mesaId, aoAlterar, aoErro) {
+  if (!supabaseOrbe || !mesaId || mesaId === "local") return () => {};
+  const canal = supabaseOrbe
+    .channel(nomeCanal("orbe-solicitacoes", mesaId))
+    .on(
+      "postgres_changes",
+      {
+        event: "*",
+        schema: "public",
+        table: "mesa_membros_orbe",
+        filter: `mesa_id=eq.${mesaId}`,
+      },
+      () => aoAlterar?.(),
+    )
+    .subscribe((_status, erro) => {
+      if (erro) aoErro?.(erro);
+    });
+
+  return () => {
+    void supabaseOrbe.removeChannel(canal);
+  };
+}
+
 export async function carregarEstadoMesaRemoto(mesaId, { incluirSegredos = false } = {}) {
   if (!supabaseOrbe) return null;
   const [mesa, fichas, sessao, membros, segredos] = await Promise.all([
@@ -287,11 +370,41 @@ function nomeCanal(prefixo, identificador) {
   return `${prefixo}:${identificador}:${sufixo}`;
 }
 
+const canaisMesaRealtime = new Map();
+
+function topicoMesaRealtime(mesaId) {
+  return `orbe-mesa:${String(mesaId)}`;
+}
+
+export async function publicarRolagemMesaRealtime(mesaId, rolagem) {
+  if (!supabaseOrbe || !mesaId || mesaId === "local" || !rolagem?.id) {
+    return false;
+  }
+
+  const canal = canaisMesaRealtime.get(String(mesaId));
+  if (!canal) return false;
+
+  const resultado = await canal.send({
+    type: "broadcast",
+    event: "rolagem_dados",
+    payload: rolagem,
+  });
+
+  return resultado === "ok";
+}
+
 export function assinarMesaOrbeRealtime(mesaId, callbacks = {}) {
   if (!supabaseOrbe || !mesaId || mesaId === "local") return () => {};
 
   let construtorCanal = supabaseOrbe
-    .channel(nomeCanal("orbe-mesa", mesaId))
+    .channel(topicoMesaRealtime(mesaId), {
+      config: {
+        broadcast: { self: false },
+      },
+    })
+    .on("broadcast", { event: "rolagem_dados" }, (evento) => {
+      callbacks.aoRolagem?.(evento.payload);
+    })
     .on("postgres_changes", { event: "*", schema: "public", table: "mesas_orbe", filter: `id=eq.${mesaId}` }, (evento) => {
       callbacks.aoMesa?.(evento.eventType === "DELETE" ? null : normalizarMesaRemota(evento.new));
     })
@@ -318,8 +431,12 @@ export function assinarMesaOrbeRealtime(mesaId, callbacks = {}) {
       callbacks.aoStatus?.(status);
       if (erro) callbacks.aoErro?.(erro);
     });
+  canaisMesaRealtime.set(String(mesaId), canal);
 
   return () => {
+    if (canaisMesaRealtime.get(String(mesaId)) === canal) {
+      canaisMesaRealtime.delete(String(mesaId));
+    }
     void supabaseOrbe.removeChannel(canal);
   };
 }

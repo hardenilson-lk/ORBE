@@ -24,6 +24,7 @@ import {
   salvarSessaoArquivos,
 } from "../utils/sessoesArquivos.js";
 import useRealtimeMesaOrbe from "../hooks/useRealtimeMesaOrbe.js";
+import { publicarRolagemMesaRealtime } from "../services/supabaseOrbe.js";
 
 import "./PaginaJogador.css";
 
@@ -84,6 +85,11 @@ function PaginaJogador() {
     mesaId,
     aoSessao: setSessao,
     aoFichas: setFichas,
+    aoRolagem: (rolagem) => {
+      setResultado(
+        `${rolagem.nome || "Mesa"}: ${rolagem.total ?? rolagem.resultado}`,
+      );
+    },
     aoStatus: setMensagemSistema,
     aoErro: (erro) => {
       console.warn("Sincronização em tempo real do jogador indisponível.", erro);
@@ -235,20 +241,27 @@ function PaginaJogador() {
     const total = Number.isFinite(Number(grupo?.value)) ? Number(grupo.value) : soma + bonus;
     const expressao = `${valores.length > 1 ? valores.join(" + ") : soma}${bonus > 0 ? ` + ${bonus}` : bonus < 0 ? ` - ${Math.abs(bonus)}` : ""}`;
     setResultado(`${expressao} = ${total}`);
+    const novaRolagem = {
+      id: `rolagem-${Date.now()}-${Math.random()}`,
+      nome: fichaAtiva?.nome || "Jogador",
+      tipo: tipoDado,
+      quantidade: Number(quantidade) || 1,
+      valores: valores.length ? valores : [soma],
+      modificador: bonus,
+      total,
+      resultado: total,
+      criadoEm: new Date().toISOString(),
+    };
     persistirSessao((anterior) => ({
       ...anterior,
-      historicoRolagens: [{
-        id: `rolagem-${Date.now()}-${Math.random()}`,
-        nome: fichaAtiva?.nome || "Jogador",
-        tipo: tipoDado,
-        quantidade: Number(quantidade) || 1,
-        valores: valores.length ? valores : [soma],
-        modificador: bonus,
-        total,
-        resultado: total,
-        criadoEm: new Date().toISOString(),
-      }, ...listaSegura(anterior.historicoRolagens)].slice(0, 50),
+      historicoRolagens: [
+        novaRolagem,
+        ...listaSegura(anterior.historicoRolagens),
+      ].slice(0, 50),
     }));
+    void publicarRolagemMesaRealtime(mesaId, novaRolagem).catch((erro) => {
+      console.warn("Não foi possível transmitir a rolagem para a mesa.", erro);
+    });
   }
 
   async function rolarDado() {

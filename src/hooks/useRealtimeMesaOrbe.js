@@ -43,13 +43,14 @@ export default function useRealtimeMesaOrbe({
   aoSessao,
   aoFichas,
   aoMesa,
+  aoRolagem,
   aoStatus,
   aoErro,
 }) {
   const online = orbeOnlineHabilitado() && Boolean(mesaId) && mesaId !== "local";
   const [pronto, setPronto] = useState(!online);
-  const callbacksRef = useRef({ aoSessao, aoFichas, aoMesa, aoStatus, aoErro });
-  callbacksRef.current = { aoSessao, aoFichas, aoMesa, aoStatus, aoErro };
+  const callbacksRef = useRef({ aoSessao, aoFichas, aoMesa, aoRolagem, aoStatus, aoErro });
+  callbacksRef.current = { aoSessao, aoFichas, aoMesa, aoRolagem, aoStatus, aoErro };
 
   useEffect(() => {
     if (!online) {
@@ -78,6 +79,22 @@ export default function useRealtimeMesaOrbe({
       callbacksRef.current.aoSessao?.(sessao);
     };
 
+    const aplicarRolagem = (rolagem) => {
+      if (!ativo || !rolagem?.id) return;
+      const sessaoAtual = carregarSessaoArquivos(mesaId);
+      const historicoAtual = Array.isArray(sessaoAtual.historicoRolagens)
+        ? sessaoAtual.historicoRolagens
+        : [];
+      if (historicoAtual.some((item) => item?.id === rolagem.id)) return;
+
+      const sessao = aplicarSessaoArquivosRemota(mesaId, {
+        ...sessaoAtual,
+        historicoRolagens: [rolagem, ...historicoAtual].slice(0, 50),
+      });
+      callbacksRef.current.aoSessao?.(sessao);
+      callbacksRef.current.aoRolagem?.(rolagem);
+    };
+
     async function recarregarFichas() {
       try {
         aplicarFichas(await listarFichasRemotas(mesaId));
@@ -104,6 +121,7 @@ export default function useRealtimeMesaOrbe({
       },
       aoFichasAlteradas: recarregarFichas,
       aoSessao: aplicarSessao,
+      aoRolagem: aplicarRolagem,
       aoMembrosAlterados: recarregarMembros,
       ...(mestre ? {
         aoSegredos: (segredos) => {
