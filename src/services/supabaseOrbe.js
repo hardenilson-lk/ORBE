@@ -158,7 +158,8 @@ export async function entrarContaRemota(email, senha) {
     password: String(senha || ""),
   });
   if (error) throw error;
-  return carregarOuCriarPerfil(cliente, data.user);
+  if (!data.session?.user) throw new Error("O servidor não iniciou uma sessão válida. Tente entrar novamente.");
+  return carregarOuCriarPerfil(cliente, data.session.user);
 }
 
 export async function sairContaRemota() {
@@ -364,22 +365,32 @@ export async function salvarMesaRemota(mesa) {
 export async function criarMesaRemota(mesa) {
   const cliente = exigirCliente();
   const {
+    data: { session },
+    error: erroSessao,
+  } = await cliente.auth.getSession();
+  const {
     data: { user },
     error: erroUsuario,
   } = await cliente.auth.getUser();
 
-  if (erroUsuario || !user) {
+  const possuiSessao = !erroSessao && Boolean(session?.access_token);
+  const userId = user?.id || null;
+
+  if (!possuiSessao || erroUsuario || !userId) {
     throw new Error("Sua sessão expirou. Entre novamente para criar a mesa.");
   }
 
-  const payload = {
+  const dadosPermitidosDaMesa = {
     id: mesa.id,
-    owner_id: user.id,
     nome: mesa.nomeCampanha || mesa.nome || "Campanha",
     codigo_convite: mesa.codigoConvite || `ORBE-${String(mesa.id).slice(-6).toUpperCase()}`,
     sistema: "arquivos",
     dados: mesa,
     updated_at: new Date().toISOString(),
+  };
+  const payload = {
+    ...dadosPermitidosDaMesa,
+    owner_id: user.id,
   };
 
   const { data, error } = await cliente

@@ -3,6 +3,7 @@ import {
   Routes,
 } from "react-router";
 
+import ProvedorAutenticacaoOrbe from "./autenticacao/ProvedorAutenticacaoOrbe.jsx";
 import RotaProtegida from "./components/RotaProtegida.jsx";
 import PaginaArquivos from "./pages/PaginaArquivos.jsx";
 import PaginaInicial from "./pages/PaginaInicial.jsx";
@@ -21,7 +22,7 @@ import "./App.css";
 
 function App() {
   return (
-    <>
+    <ProvedorAutenticacaoOrbe>
       <Routes>
         <Route
           path="/"
@@ -63,7 +64,7 @@ function App() {
       </Routes>
 
       <Orbinho />
-    </>
+    </ProvedorAutenticacaoOrbe>
   );
 }
 

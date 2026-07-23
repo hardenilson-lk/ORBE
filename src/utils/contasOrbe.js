@@ -40,6 +40,16 @@ export function lerUsuarioAtual() {
   return listarContasOrbe().find((conta) => conta.id === sessao.id) || null;
 }
 
+export function limparSessaoLocalOrbe() {
+  window.localStorage.removeItem(CHAVE_SESSAO);
+}
+
+function limparAutenticacaoOnlineLocalOrbe() {
+  limparSessaoLocalOrbe();
+  const contasLocais = listarContasOrbe().filter((conta) => !conta.remoto);
+  window.localStorage.setItem(CHAVE_CONTAS, JSON.stringify(contasLocais));
+}
+
 export function criarContaOrbe({ nome, usuario, senha }) {
   const nomeFinal = String(nome || usuario || "").trim();
   const usuarioFinal = String(usuario || "").trim();
@@ -76,9 +86,14 @@ export function entrarContaOrbe(usuario, senha) {
   return conta;
 }
 
-export function sairContaOrbe() {
-  window.localStorage.removeItem(CHAVE_SESSAO);
-  void sairContaRemota().catch(() => {});
+export async function sairContaOrbe() {
+  const online = orbeOnlineHabilitado();
+  try {
+    if (online) await sairContaRemota();
+  } finally {
+    if (online) limparAutenticacaoOnlineLocalOrbe();
+    else limparSessaoLocalOrbe();
+  }
 }
 
 function armazenarEspelhoConta(conta) {

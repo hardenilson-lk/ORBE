@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router";
+import { Link, Navigate, useLocation, useNavigate } from "react-router";
 
 import logoOrbe from "../assets/logo.png";
+import useAutenticacaoOrbe from "../autenticacao/useAutenticacaoOrbe.js";
 import { CONFIRMACAO_EMAIL_ATIVA } from "../config/recursosOrbe.js";
 import {
   criarContaOrbeConectada,
@@ -36,6 +37,7 @@ function mensagemAmigavel(falha) {
 export default function PaginaLogin() {
   const navegar = useNavigate();
   const localizacao = useLocation();
+  const { online, carregando: restaurandoSessao, sessao } = useAutenticacaoOrbe();
   const [modo, setModo] = useState("entrar");
   const [nome, setNome] = useState("");
   const [usuario, setUsuario] = useState("");
@@ -113,7 +115,10 @@ export default function PaginaLogin() {
 
       if (conta?.confirmacaoPendente) {
         if (!CONFIRMACAO_EMAIL_ATIVA) {
-          setRetorno({ tipo: "sucesso", texto: "Conta criada com sucesso." });
+          setRetorno({
+            tipo: "aviso",
+            texto: "Conta criada, mas o servidor não iniciou uma sessão. Entre para continuar.",
+          });
           setUsuario(String(email || "").trim());
           setModo("entrar");
           return;
@@ -165,7 +170,8 @@ export default function PaginaLogin() {
 
   async function entrarComConvite(evento) {
     evento.preventDefault();
-    if (!lerUsuarioAtual()) {
+    const possuiAcesso = online ? Boolean(sessao?.user) : Boolean(lerUsuarioAtual());
+    if (!possuiAcesso) {
       setRetorno({ tipo: "aviso", texto: "Entre na sua conta antes de usar um convite de campanha." });
       setModo("entrar");
       return;
@@ -199,7 +205,19 @@ export default function PaginaLogin() {
     navegar(`/arquivos/jogador/${mesa.id}`);
   }
 
-  const usuarioAtual = lerUsuarioAtual();
+  const perfilLocal = lerUsuarioAtual();
+  const usuarioAtual = online ? (sessao?.user ? perfilLocal : null) : perfilLocal;
+  const possuiRetornoAutenticacao = typeof window !== "undefined"
+    && /(?:^|[?#&])(access_token|refresh_token|code|error|error_description)=/i
+      .test(`${window.location.search}${window.location.hash}`);
+
+  if (online && restaurandoSessao) {
+    return <main role="status" aria-live="polite">Restaurando sua sessão...</main>;
+  }
+
+  if (online && sessao?.user && !carregando && !possuiRetornoAutenticacao) {
+    return <Navigate to={localizacao.state?.origem || "/inicio"} replace />;
+  }
 
   return (
     <main className="login-orbe">

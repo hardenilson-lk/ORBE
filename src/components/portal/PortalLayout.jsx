@@ -17,9 +17,12 @@ export default function PortalLayout({ titulo, subtitulo, children }) {
   const navegar = useNavigate();
   const usuario = lerUsuarioAtual();
 
-  function sair() {
-    sairContaOrbe();
-    navegar("/");
+  async function sair() {
+    try {
+      await sairContaOrbe();
+    } finally {
+      navegar("/", { replace: true });
+    }
   }
 
   return (
