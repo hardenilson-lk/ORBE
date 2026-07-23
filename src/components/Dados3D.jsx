@@ -10,6 +10,8 @@ import DiceBox from "@3d-dice/dice-box";
 
 import "./Dados3D.css";
 
+const CAMINHO_ASSETS_DADOS = `${import.meta.env.BASE_URL}assets/dice-box/`;
+
 const Dados3D = forwardRef(
   function Dados3D(
     {
@@ -44,7 +46,7 @@ const Dados3D = forwardRef(
 
             container: "#dados-3d-area",
 
-            assetPath: "/assets/dice-box/",
+            assetPath: CAMINHO_ASSETS_DADOS,
 
             theme: "default",
             themeColor: "#9B5CFF",
