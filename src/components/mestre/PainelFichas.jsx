@@ -18,6 +18,7 @@ import {
 
 import {
   criarValoresPericiasArquivos,
+  substituirPericiasOrigemArquivos,
 } from "../../data/periciasArquivos.js";
 
 import {
@@ -62,6 +63,7 @@ import "./PainelFichas.css";
 const CAMPOS_QUE_RECALCULAM =
   new Set([
     "classe",
+    "origem",
     "nex",
     "agilidade",
     "forca",
@@ -108,13 +110,33 @@ function prepararFichaParaTela(
       ? fichaBase.pericias
       : {};
 
+  const origemSelecionada =
+    ORIGENS_ARQUIVOS.find(
+      (origem) =>
+        normalizarBusca(
+          origem.nome,
+        ) ===
+        normalizarBusca(
+          fichaBase.origem,
+        ),
+    ) || null;
+
+  const periciasNormalizadas =
+    criarValoresPericiasArquivos(
+      periciasAnteriores,
+    );
+
+  const periciasComOrigem =
+    substituirPericiasOrigemArquivos(
+      periciasNormalizadas,
+      origemSelecionada?.pericias || [],
+    );
+
   return recalcularFichaArquivos({
     ...fichaBase,
 
     pericias:
-      criarValoresPericiasArquivos(
-        periciasAnteriores,
-      ),
+      periciasComOrigem,
 
     ataques:
       normalizarAtaquesFicha(
@@ -255,6 +277,49 @@ function PainelFichas({
         }
 
         return fichaAtualizada;
+      },
+    );
+  }
+
+  function atualizarOrigem(
+    novaOrigem,
+  ) {
+    setFicha(
+      (fichaAnterior) => {
+        const origemSelecionada =
+          ORIGENS_ARQUIVOS.find(
+            (origem) =>
+              normalizarBusca(
+                origem.nome,
+              ) ===
+              normalizarBusca(
+                novaOrigem,
+              ),
+          ) || null;
+
+        const periciasComOrigem =
+          substituirPericiasOrigemArquivos(
+            fichaAnterior.pericias,
+            origemSelecionada?.pericias || [],
+          );
+
+        setMensagemDistribuicao(
+          origemSelecionada
+            ? `Origem ${origemSelecionada.nome}: perícias ${origemSelecionada.pericias.join(
+                " e ",
+              )} adicionadas automaticamente.`
+            : "Origem removida. As perícias concedidas por ela foram retiradas.",
+        );
+
+        return recalcularFichaArquivos({
+          ...fichaAnterior,
+
+          origem:
+            novaOrigem,
+
+          pericias:
+            periciasComOrigem,
+        });
       },
     );
   }
@@ -717,8 +782,7 @@ function PainelFichas({
                   <select
                     value={ficha.origem}
                     onChange={(evento) =>
-                      atualizarCampo(
-                        "origem",
+                      atualizarOrigem(
                         evento.target
                           .value,
                       )

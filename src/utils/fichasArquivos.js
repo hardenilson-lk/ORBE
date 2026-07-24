@@ -6,7 +6,7 @@ import {
 } from "../services/supabaseOrbe.js";
 
 import {
-  calcularCapacidadeCargaBase,
+  calcularResumoInventario,
 } from "./regrasInventarioArquivos.js";
 
 const PREFIXO_STORAGE =
@@ -98,6 +98,14 @@ function normalizarTexto(valor) {
       /[\u0300-\u036f]/g,
       "",
     )
+    .replace(
+      /[_-]+/g,
+      " ",
+    )
+    .replace(
+      /\s+/g,
+      " ",
+    )
     .toLowerCase()
     .trim();
 }
@@ -108,9 +116,27 @@ function lerValorNex(valor) {
       /\d+/,
     );
 
-  return numeroPositivo(
-    encontrado?.[0],
-    5,
+  const nex =
+    numeroPositivo(
+      encontrado?.[0],
+      5,
+    );
+
+  return nex >= 99
+    ? 99
+    : Math.max(5, nex);
+}
+
+function obterNiveisExposicao(
+  nex,
+) {
+  if (nex >= 99) {
+    return 20;
+  }
+
+  return Math.max(
+    1,
+    Math.floor(nex / 5),
   );
 }
 
@@ -125,10 +151,13 @@ function obterBaseClasse(classe) {
     return {
       pvInicial: 20,
       pvPorEtapa: 4,
+
       peInicial: 2,
-      pePorEtapa: 1,
+      pePorEtapa: 2,
+
       sanInicial: 12,
       sanPorEtapa: 3,
+
       deslocamento: 9,
     };
   }
@@ -140,10 +169,13 @@ function obterBaseClasse(classe) {
     return {
       pvInicial: 12,
       pvPorEtapa: 2,
-      peInicial: 3,
-      pePorEtapa: 1,
+
+      peInicial: 4,
+      pePorEtapa: 4,
+
       sanInicial: 20,
       sanPorEtapa: 5,
+
       deslocamento: 9,
     };
   }
@@ -151,30 +183,92 @@ function obterBaseClasse(classe) {
   return {
     pvInicial: 16,
     pvPorEtapa: 3,
-    peInicial: 2,
-    pePorEtapa: 1,
+
+    peInicial: 3,
+    pePorEtapa: 3,
+
     sanInicial: 16,
     sanPorEtapa: 4,
+
     deslocamento: 9,
   };
 }
 
-function obterBonusReflexos(
+function obterValorPericia(
   pericias,
+  nomePericia,
 ) {
+  const nomeNormalizado =
+    normalizarTexto(
+      nomePericia,
+    );
+
   if (
     pericias &&
     typeof pericias === "object" &&
     !Array.isArray(pericias)
   ) {
-    const valorReflexos =
-      pericias.Reflexos ??
-      pericias.reflexos;
+    const chave =
+      Object.keys(
+        pericias,
+      ).find(
+        (nome) =>
+          normalizarTexto(
+            nome,
+          ) ===
+          nomeNormalizado,
+      );
 
-    return numeroSeguro(
-      valorReflexos,
-      0,
-    );
+    const valor =
+      chave
+        ? pericias[chave]
+        : undefined;
+
+    if (
+      typeof valor === "number" ||
+      typeof valor === "string"
+    ) {
+      return numeroSeguro(
+        valor,
+        0,
+      );
+    }
+
+    if (
+      valor &&
+      typeof valor === "object"
+    ) {
+      const totalInformado =
+        Number(
+          valor.total ??
+            valor.valorTotal,
+        );
+
+      if (
+        Number.isFinite(
+          totalInformado,
+        )
+      ) {
+        return totalInformado;
+      }
+
+      return (
+        numeroSeguro(
+          valor.treino,
+          0,
+        ) +
+        numeroSeguro(
+          valor.outros,
+          0,
+        ) +
+        numeroSeguro(
+          valor.bonus,
+          0,
+        )
+      );
+    }
+
+    return 0;
   }
 
   const partes =
@@ -187,21 +281,21 @@ function obterBonusReflexos(
       )
       .filter(Boolean);
 
-  const linhaReflexos =
+  const linha =
     partes.find((parte) =>
       normalizarTexto(
         parte,
       ).includes(
-        "reflexos",
+        nomeNormalizado,
       ),
     );
 
-  if (!linhaReflexos) {
+  if (!linha) {
     return 0;
   }
 
   const numeroEncontrado =
-    linhaReflexos.match(
+    linha.match(
       /[+-]?\d+/,
     );
 
@@ -211,7 +305,111 @@ function obterBonusReflexos(
   );
 }
 
-function calcularBonusInventario(
+function obterBonusOrigem({
+  origem,
+  nex,
+  niveisExposicao,
+  intelecto,
+}) {
+  const origemNormalizada =
+    normalizarTexto(origem);
+
+  const bonus = {
+    pvMaximo: 0,
+    peMaximo: 0,
+    sanMaximo: 0,
+
+    defesa: 0,
+    limitePePorTurno: 0,
+
+    resistenciaMental: 0,
+
+    bonusDanoCorpoACorpo: 0,
+    bonusDanoArmaFogo: 0,
+
+    cultistaArrependido: false,
+    escolhaPoderParanormal: false,
+  };
+
+  if (
+    origemNormalizada ===
+    "desgarrado"
+  ) {
+    bonus.pvMaximo =
+      niveisExposicao;
+  }
+
+  if (
+    origemNormalizada ===
+    "universitario"
+  ) {
+    bonus.peMaximo =
+      1 +
+      Math.floor(
+        Math.max(
+          0,
+          nex - 5,
+        ) / 10,
+      );
+
+    bonus.limitePePorTurno =
+      1;
+  }
+
+  if (
+    origemNormalizada ===
+    "vitima"
+  ) {
+    bonus.sanMaximo =
+      niveisExposicao;
+  }
+
+  if (
+    origemNormalizada ===
+    "policial"
+  ) {
+    bonus.defesa = 2;
+  }
+
+  if (
+    origemNormalizada ===
+    "teorico da conspiracao"
+  ) {
+    bonus.resistenciaMental =
+      intelecto;
+  }
+
+  if (
+    origemNormalizada ===
+    "lutador"
+  ) {
+    bonus.bonusDanoCorpoACorpo =
+      2;
+  }
+
+  if (
+    origemNormalizada ===
+    "militar"
+  ) {
+    bonus.bonusDanoArmaFogo =
+      2;
+  }
+
+  if (
+    origemNormalizada ===
+    "cultista arrependido"
+  ) {
+    bonus.cultistaArrependido =
+      true;
+
+    bonus.escolhaPoderParanormal =
+      true;
+  }
+
+  return bonus;
+}
+
+function calcularBonusEquipamentos(
   inventario,
 ) {
   const itens =
@@ -219,121 +417,140 @@ function calcularBonusInventario(
       ? inventario
       : [];
 
-  return itens.reduce(
-    (resultado, item) => {
-      if (!item) {
-        return resultado;
-      }
+  const resultado = {
+    defesaProtecao: 0,
+    defesaEscudo: 0,
+    defesaOutros: 0,
 
-      const quantidade =
-        numeroPositivo(
-          item.quantidade,
-          1,
-        );
+    resistenciaDanoFisico: 0,
+    tiposResistidos: [],
 
-      const volume =
+    penalidadePericiasProtecao: 0,
+  };
+
+  itens.forEach((item) => {
+    if (
+      !item ||
+      item.ativo === false
+    ) {
+      return;
+    }
+
+    const nome =
+      normalizarTexto(
+        item.nome,
+      );
+
+    const id =
+      normalizarTexto(
+        item.id,
+      );
+
+    const tipo =
+      normalizarTexto(
+        item.tipo,
+      );
+
+    const categoria =
+      normalizarTexto(
+        item.categoria,
+      );
+
+    const defesa =
+      numeroPositivo(
+        item.defesa,
+        0,
+      );
+
+    const resistencia =
+      Math.max(
         numeroPositivo(
-          item.volume,
+          item.resistenciaDano,
           0,
-        );
-
-      const defesa =
-        numeroPositivo(
-          item.defesa,
-          0,
-        );
-
-      const protecaoInformada =
+        ),
         numeroPositivo(
           item.protecao,
           0,
+        ),
+      );
+
+    const ehEscudo =
+      id === "escudo" ||
+      nome === "escudo" ||
+      categoria === "escudo";
+
+    const ehProtecao =
+      ehEscudo ||
+      tipo.includes(
+        "protecao",
+      ) ||
+      categoria.includes(
+        "protecao",
+      );
+
+    if (ehEscudo) {
+      resultado.defesaEscudo =
+        Math.max(
+          resultado.defesaEscudo,
+          defesa,
+        );
+    } else if (ehProtecao) {
+      resultado.defesaProtecao =
+        Math.max(
+          resultado.defesaProtecao,
+          defesa,
         );
 
-      const nomeNormalizado =
-        normalizarTexto(
-          item.nome,
+      resultado.resistenciaDanoFisico =
+        Math.max(
+          resultado.resistenciaDanoFisico,
+          resistencia,
         );
 
-      const descricaoNormalizada =
-        normalizarTexto(
-          item.descricao,
+      const penalidade =
+        Math.min(
+          0,
+          numeroSeguro(
+            item.penalidadeCarga,
+            0,
+          ),
         );
 
-      resultado.cargaAtual +=
-        volume * quantidade;
+      resultado.penalidadePericiasProtecao =
+        Math.min(
+          resultado.penalidadePericiasProtecao,
+          penalidade,
+        );
 
-      if (item.ativo === false) {
-        return resultado;
+      if (
+        resistencia >
+        0 &&
+        Array.isArray(
+          item.tiposResistidos,
+        )
+      ) {
+        resultado.tiposResistidos =
+          Array.from(
+            new Set([
+              ...resultado.tiposResistidos,
+              ...item.tiposResistidos,
+            ]),
+          );
       }
-
-      resultado.defesa +=
+    } else {
+      resultado.defesaOutros +=
         defesa;
+    }
+  });
 
-      if (
-        protecaoInformada > 0
-      ) {
-        resultado.bloqueio +=
-          protecaoInformada;
-      } else if (defesa > 0) {
-        resultado.bloqueio +=
-          nomeNormalizado.includes(
-            "pesada",
-          )
-            ? 5
-            : 2;
-      }
+  return {
+    ...resultado,
 
-      let penalidadeMovimento =
-        numeroPositivo(
-          item.penalidadeMovimento,
-          0,
-        );
-
-      if (
-        penalidadeMovimento === 0 &&
-        nomeNormalizado.includes(
-          "protecao pesada",
-        )
-      ) {
-        penalidadeMovimento = 1;
-      }
-
-      resultado.penalidadeMovimento +=
-        penalidadeMovimento;
-
-      let bonusCarga =
-        numeroPositivo(
-          item.bonusCarga,
-          0,
-        );
-
-      if (
-        bonusCarga === 0 &&
-        (
-          nomeNormalizado.includes(
-            "mochila militar",
-          ) ||
-          descricaoNormalizada.includes(
-            "aumenta carga",
-          )
-        )
-      ) {
-        bonusCarga = 5;
-      }
-
-      resultado.bonusCarga +=
-        bonusCarga;
-
-      return resultado;
-    },
-    {
-      defesa: 0,
-      bloqueio: 0,
-      bonusCarga: 0,
-      cargaAtual: 0,
-      penalidadeMovimento: 0,
-    },
-  );
+    defesaTotal:
+      resultado.defesaProtecao +
+      resultado.defesaEscudo +
+      resultado.defesaOutros,
+  };
 }
 
 function preservarValorAtual(
@@ -361,7 +578,10 @@ function preservarValorAtual(
     return novoMaximo;
   }
 
-  return Math.max(0, atual);
+  return Math.max(
+    0,
+    atual,
+  );
 }
 
 export function recalcularFichaArquivos(
@@ -369,12 +589,14 @@ export function recalcularFichaArquivos(
 ) {
   const ficha = {
     ...fichaRecebida,
+
     inventario:
       Array.isArray(
         fichaRecebida.inventario,
       )
         ? fichaRecebida.inventario
         : [],
+
     rituais:
       Array.isArray(
         fichaRecebida.rituais,
@@ -393,10 +615,15 @@ export function recalcularFichaArquivos(
       ficha.nex,
     );
 
+  const niveisExposicao =
+    obterNiveisExposicao(
+      nex,
+    );
+
   const etapasNex =
     Math.max(
       0,
-      Math.floor(nex / 5) - 1,
+      niveisExposicao - 1,
     );
 
   const agilidade =
@@ -408,6 +635,12 @@ export function recalcularFichaArquivos(
   const forca =
     numeroPositivo(
       ficha.forca,
+      1,
+    );
+
+  const intelecto =
+    numeroPositivo(
+      ficha.intelecto,
       1,
     );
 
@@ -423,14 +656,38 @@ export function recalcularFichaArquivos(
       1,
     );
 
-  const bonusInventario =
-    calcularBonusInventario(
+  const bonusOrigem =
+    obterBonusOrigem({
+      origem: ficha.origem,
+      nex,
+      niveisExposicao,
+      intelecto,
+    });
+
+  const bonusEquipamentos =
+    calcularBonusEquipamentos(
+      ficha.inventario,
+    );
+
+  const resumoInventario =
+    calcularResumoInventario(
+      {
+        ...ficha,
+        forca,
+      },
       ficha.inventario,
     );
 
   const reflexos =
-    obterBonusReflexos(
+    obterValorPericia(
       ficha.pericias,
+      "Reflexos",
+    );
+
+  const fortitude =
+    obterValorPericia(
+      ficha.pericias,
+      "Fortitude",
     );
 
   const pvMaximo =
@@ -442,7 +699,8 @@ export function recalcularFichaArquivos(
           (
             baseClasse.pvPorEtapa +
             vigor
-          ),
+          ) +
+        bonusOrigem.pvMaximo,
     );
 
   const peMaximo =
@@ -451,23 +709,47 @@ export function recalcularFichaArquivos(
       baseClasse.peInicial +
         presenca +
         etapasNex *
-          baseClasse.pePorEtapa,
+          (
+            baseClasse.pePorEtapa +
+            presenca
+          ) +
+        bonusOrigem.peMaximo,
     );
+
+  const sanInicial =
+    bonusOrigem
+      .cultistaArrependido
+      ? Math.floor(
+          baseClasse.sanInicial /
+            2,
+        )
+      : baseClasse.sanInicial;
 
   const sanMaximo =
     Math.max(
       1,
-      baseClasse.sanInicial +
+      sanInicial +
         etapasNex *
-          baseClasse.sanPorEtapa,
+          baseClasse.sanPorEtapa +
+        bonusOrigem.sanMaximo,
+    );
+
+  const defesaSemPenalidade =
+    Math.max(
+      0,
+      10 +
+        agilidade +
+        bonusEquipamentos
+          .defesaTotal +
+        bonusOrigem.defesa,
     );
 
   const defesa =
     Math.max(
       0,
-      10 +
-        agilidade +
-        bonusInventario.defesa,
+      defesaSemPenalidade +
+        resumoInventario
+          .penalidadeDefesa,
     );
 
   const esquiva =
@@ -476,67 +758,170 @@ export function recalcularFichaArquivos(
       defesa + reflexos,
     );
 
+  const bloqueio =
+    Math.max(
+      0,
+      fortitude,
+    );
+
   const deslocamento =
     Math.max(
-      3,
-      baseClasse.deslocamento -
-        bonusInventario
+      0,
+      baseClasse.deslocamento +
+        resumoInventario
           .penalidadeMovimento,
     );
 
   const peRodada =
     Math.max(
       1,
-      1 +
-        Math.floor(
-          nex / 20,
-        ),
+      niveisExposicao +
+        bonusOrigem
+          .limitePePorTurno,
     );
 
-  const cargaMaxima =
-    calcularCapacidadeCargaBase(
-      forca,
-    ) +
-    bonusInventario.bonusCarga;
+  const penalidadePericiasCarga =
+    Math.min(
+      0,
+      resumoInventario
+        .penalidadePericias,
+    );
+
+  const penalidadePericiasProtecao =
+    Math.min(
+      0,
+      bonusEquipamentos
+        .penalidadePericiasProtecao,
+    );
+
+  const penalidadePericiasAfetadas =
+    Math.min(
+      penalidadePericiasCarga,
+      penalidadePericiasProtecao,
+    );
 
   return {
     ...ficha,
+
+    nex:
+      nex === 99
+        ? "99%"
+        : `${nex}%`,
+
+    niveisExposicao,
+
     agilidade,
     forca,
+    intelecto,
     presenca,
     vigor,
+
     pvAtual:
       preservarValorAtual(
         ficha.pvAtual,
         ficha.pvMaximo,
         pvMaximo,
       ),
+
     pvMaximo,
+
     peAtual:
       preservarValorAtual(
         ficha.peAtual,
         ficha.peMaximo,
         peMaximo,
       ),
+
     peMaximo,
+
     sanAtual:
       preservarValorAtual(
         ficha.sanAtual,
         ficha.sanMaximo,
         sanMaximo,
       ),
+
     sanMaximo,
+
+    defesaBase:
+      10 + agilidade,
+
+    defesaSemPenalidade,
+
     defesa,
-    bloqueio:
-      bonusInventario.bloqueio,
+
+    bloqueio,
+
     protecao:
-      bonusInventario.bloqueio,
+      bonusEquipamentos
+        .resistenciaDanoFisico,
+
+    resistenciaDano:
+      bonusEquipamentos
+        .resistenciaDanoFisico,
+
+    tiposResistidos:
+      bonusEquipamentos
+        .tiposResistidos,
+
     esquiva,
+
     deslocamento,
+
     peRodada,
+
     cargaAtual:
-      bonusInventario.cargaAtual,
-    cargaMaxima,
+      resumoInventario
+        .cargaAtual,
+
+    cargaMaxima:
+      resumoInventario
+        .cargaMaxima,
+
+    limiteCargaAbsoluto:
+      resumoInventario
+        .limiteAbsoluto,
+
+    situacaoCarga:
+      resumoInventario
+        .situacaoCarga,
+
+    sobrecarregado:
+      resumoInventario
+        .sobrecarregado,
+
+    cargaExcedida:
+      resumoInventario
+        .cargaExcedida,
+
+    penalidadeDefesaCarga:
+      resumoInventario
+        .penalidadeDefesa,
+
+    penalidadePericiasCarga,
+
+    penalidadePericiasProtecao,
+
+    penalidadePericiasAfetadas,
+
+    resistenciaMental:
+      bonusOrigem
+        .resistenciaMental,
+
+    bonusDanoCorpoACorpo:
+      bonusOrigem
+        .bonusDanoCorpoACorpo,
+
+    bonusDanoArmaFogo:
+      bonusOrigem
+        .bonusDanoArmaFogo,
+
+    escolhaPoderParanormalOrigem:
+      bonusOrigem
+        .escolhaPoderParanormal,
+
+    bonusOrigemAplicado:
+      bonusOrigem,
   };
 }
 
@@ -548,42 +933,64 @@ export function criarFichaArquivosVazia(
     nome: "",
     jogador: "",
     foto: "",
+
     origem: "",
     classe: "Combatente",
     trilha: "",
     nex: "5%",
     patente: "Recruta",
+
     deslocamento: 9,
     peRodada: 1,
+
     agilidade: 1,
     forca: 1,
     intelecto: 1,
     presenca: 1,
     vigor: 1,
-    pvAtual: 16,
-    pvMaximo: 16,
-    peAtual: 2,
-    peMaximo: 2,
+
+    pvAtual: 21,
+    pvMaximo: 21,
+
+    peAtual: 3,
+    peMaximo: 3,
+
     sanAtual: 12,
     sanMaximo: 12,
-    defesa: 10,
+
+    defesa: 11,
     bloqueio: 0,
     protecao: 0,
-    esquiva: 0,
+    resistenciaDano: 0,
+    esquiva: 11,
+
     cargaAtual: 0,
     cargaMaxima: 5,
+    limiteCargaAbsoluto: 10,
+    situacaoCarga: "normal",
+    sobrecarregado: false,
+    cargaExcedida: false,
+
+    resistenciaMental: 0,
+    bonusDanoCorpoACorpo: 0,
+    bonusDanoArmaFogo: 0,
+
     pericias: "",
     ataques: "",
     habilidades: "",
+
     anotacoes: "",
     aparencia: "",
     personalidade: "",
     historico: "",
     objetivo: "",
+
     inventario: [],
     rituais: [],
+
     criadoEm: "",
     atualizadoEm: "",
+
     ...valoresIniciais,
   };
 
@@ -666,12 +1073,15 @@ export function salvarFichaArquivos(
   const fichaNormalizada =
     criarFichaArquivosVazia({
       ...fichaRecebida,
+
       id:
         fichaRecebida?.id ||
         `ficha-${Date.now()}`,
+
       criadoEm:
         fichaRecebida?.criadoEm ||
         agora,
+
       atualizadoEm: agora,
     });
 
@@ -713,31 +1123,62 @@ export async function salvarFichaArquivosConectada(
   fichaRecebida,
   opcoes = {},
 ) {
-  const agora = new Date().toISOString();
-  const fichaNormalizada = criarFichaArquivosVazia({
-    ...fichaRecebida,
-    id: fichaRecebida?.id || `ficha-${Date.now()}`,
-    criadoEm: fichaRecebida?.criadoEm || agora,
-    atualizadoEm: agora,
-  });
+  const agora =
+    new Date().toISOString();
+
+  const fichaNormalizada =
+    criarFichaArquivosVazia({
+      ...fichaRecebida,
+
+      id:
+        fichaRecebida?.id ||
+        `ficha-${Date.now()}`,
+
+      criadoEm:
+        fichaRecebida?.criadoEm ||
+        agora,
+
+      atualizadoEm: agora,
+    });
 
   if (!orbeOnlineHabilitado()) {
-    return salvarFichaArquivos(mesaId, fichaNormalizada);
+    return salvarFichaArquivos(
+      mesaId,
+      fichaNormalizada,
+    );
   }
 
-  const fichaConfirmada = await salvarFichaRemota(
-    mesaId,
-    fichaNormalizada,
-    opcoes,
-  );
+  const fichaConfirmada =
+    await salvarFichaRemota(
+      mesaId,
+      fichaNormalizada,
+      opcoes,
+    );
 
-  return salvarFichaArquivos(mesaId, fichaConfirmada);
+  return salvarFichaArquivos(
+    mesaId,
+    fichaConfirmada,
+  );
 }
 
-export async function carregarFichasArquivosConectadas(mesaId) {
-  if (!orbeOnlineHabilitado()) return listarFichasArquivos(mesaId);
-  const fichasRemotas = await listarFichasRemotas(mesaId);
-  return salvarListaFichasArquivos(mesaId, fichasRemotas);
+export async function carregarFichasArquivosConectadas(
+  mesaId,
+) {
+  if (!orbeOnlineHabilitado()) {
+    return listarFichasArquivos(
+      mesaId,
+    );
+  }
+
+  const fichasRemotas =
+    await listarFichasRemotas(
+      mesaId,
+    );
+
+  return salvarListaFichasArquivos(
+    mesaId,
+    fichasRemotas,
+  );
 }
 
 export function removerFichaArquivos(
@@ -760,8 +1201,13 @@ export function removerFichaArquivos(
     listaAtualizada,
   );
 
-  void removerFichaRemota(fichaId).catch((falha) =>
-    console.warn("Ficha removida localmente, mas não sincronizada.", falha),
+  void removerFichaRemota(
+    fichaId,
+  ).catch((falha) =>
+    console.warn(
+      "Ficha removida localmente, mas não sincronizada.",
+      falha,
+    ),
   );
 
   return listaAtualizada;
@@ -791,18 +1237,25 @@ export function limparFichasArquivos(
 const fichasArquivos = {
   criarFichaVazia:
     criarFichaArquivosVazia,
+
   recalcular:
     recalcularFichaArquivos,
+
   listar:
     listarFichasArquivos,
+
   buscar:
     buscarFichaArquivos,
+
   salvarLista:
     salvarListaFichasArquivos,
+
   salvar:
     salvarFichaArquivos,
+
   remover:
     removerFichaArquivos,
+
   limpar:
     limparFichasArquivos,
 };

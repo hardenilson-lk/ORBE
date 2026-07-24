@@ -43,47 +43,6 @@ function criarId(texto) {
 
 export const HABILIDADES_CATALOGO_ARQUIVOS = [
   {
-    id: "olhos-abertos",
-    nome: "Olhos Abertos",
-    tipo: "Talento de origem",
-    origem: "Batedor",
-    descricao:
-      "Ajuda a notar emboscadas, rastros e sinais de perigo.",
-  },
-  {
-    id: "saber-e-poder",
-    nome: "Saber e Poder",
-    tipo: "Talento de origem",
-    origem: "Acadêmico",
-    descricao:
-      "Usa estudo e pesquisa para preparar respostas melhores.",
-  },
-  {
-    id: "faro-para-pistas",
-    nome: "Faro para Pistas",
-    tipo: "Talento de origem",
-    origem: "Investigador",
-    descricao:
-      "Facilita encontrar pistas relevantes em cenas complicadas.",
-  },
-  {
-    id: "para-bellum",
-    nome: "Para Bellum",
-    tipo: "Talento de origem",
-    origem: "Militar",
-    descricao:
-      "A experiência de combate ajuda em situações armadas.",
-  },
-  {
-    id: "ferramentas-de-trabalho",
-    nome: "Ferramentas de Trabalho",
-    tipo: "Talento de origem",
-    origem: "Operário",
-    descricao:
-      "Permite aproveitar ferramentas comuns de forma eficiente.",
-  },
-
-  {
     id: "ataque-especial",
     nome: "Ataque Especial",
     tipo: "Habilidade de classe",
@@ -522,22 +481,6 @@ function buscarTrilha(nomeTrilha) {
   );
 }
 
-function buscarHabilidadePorNome(
-  nomeHabilidade,
-) {
-  return (
-    HABILIDADES_CATALOGO_ARQUIVOS.find(
-      (habilidade) =>
-        normalizarTexto(
-          habilidade.nome,
-        ) ===
-        normalizarTexto(
-          nomeHabilidade,
-        ),
-    ) || null
-  );
-}
-
 export function obterHabilidadesAutomaticasArquivos(
   ficha = {},
 ) {
@@ -562,6 +505,13 @@ export function obterHabilidadesAutomaticasArquivos(
   const automaticas = [];
 
   if (origem) {
+    const periciasOrigem =
+      Array.isArray(
+        origem.pericias,
+      )
+        ? origem.pericias
+        : [];
+
     automaticas.push({
       id:
         `origem-${origem.id}`,
@@ -570,42 +520,42 @@ export function obterHabilidadesAutomaticasArquivos(
       descricao:
         origem.descricao,
       detalhes:
-        `Perícias: ${origem.pericias.join(
-          " e ",
-        )}.`,
+        periciasOrigem.length > 0
+          ? `Perícias: ${periciasOrigem.join(
+              " e ",
+            )}.`
+          : origem.periciasEspeciais
+              ?.descricao ||
+            "Perícias definidas conforme a origem.",
       automatica: true,
+      fixa: true,
     });
 
-    if (origem.talento) {
-      const talentoCatalogado =
-        buscarHabilidadePorNome(
-          origem.talento,
-        );
-
-      automaticas.push(
-        talentoCatalogado
-          ? {
-              ...talentoCatalogado,
-              automatica: true,
-            }
-          : {
-              id:
-                `talento-${origem.id}`,
-              nome:
-                origem.talento,
-              tipo:
-                "Talento de origem",
-              origem:
-                origem.nome,
-              descricao:
-                `Talento concedido pela origem ${origem.nome}.`,
-              detalhes:
-                `Perícias da origem: ${origem.pericias.join(
-                  " e ",
-                )}.`,
-              automatica: true,
-            },
-      );
+    if (origem.poder?.nome) {
+      automaticas.push({
+        id:
+          `poder-origem-${origem.id}`,
+        nome:
+          origem.poder.nome,
+        tipo:
+          "Poder de origem",
+        origem:
+          origem.nome,
+        descricao:
+          origem.poder.descricao ||
+          "Poder concedido pela origem.",
+        custoPe:
+          Number(
+            origem.poder.custoPe,
+          ) || 0,
+        tipoAtivacao:
+          origem.poder.tipo ||
+          "automatico",
+        efeitos:
+          origem.poder.efeitos || {},
+        automatica: true,
+        fixa: true,
+      });
     }
   }
 

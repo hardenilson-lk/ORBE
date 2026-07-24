@@ -14,14 +14,6 @@ const CATEGORIAS_POR_NUMERO = {
   4: "IV",
 };
 
-const NUMEROS_POR_CATEGORIA = {
-  "0": 0,
-  I: 1,
-  II: 2,
-  III: 3,
-  IV: 4,
-};
-
 const LIMITES_POR_PATENTE = {
   Recruta: {
     I: 2,
@@ -59,8 +51,9 @@ const LIMITES_POR_PATENTE = {
   },
 };
 
-export const CATEGORIAS_ITENS_ARQUIVOS =
-  [...CATEGORIAS_VALIDAS];
+export const CATEGORIAS_ITENS_ARQUIVOS = [
+  ...CATEGORIAS_VALIDAS,
+];
 
 export const PATENTES_INVENTARIO_ARQUIVOS =
   Object.keys(
@@ -651,7 +644,9 @@ export function contarItensPorCategoria(
     criarContagemCategorias();
 
   const itensSemCategoria = [];
-  const itensAcimaCategoriaIV = [];
+
+  const itensAcimaCategoriaIV =
+    [];
 
   criarListaSegura(
     itens,
@@ -675,10 +670,13 @@ export function contarItensPorCategoria(
         categoriaNumerica === null
       ) {
         itensSemCategoria.push({
-          id: item?.id || "",
+          id:
+            item?.id || "",
+
           nome:
             item?.nome ||
             "Item sem nome",
+
           quantidade,
         });
 
@@ -689,11 +687,15 @@ export function contarItensPorCategoria(
         categoriaNumerica > 4
       ) {
         itensAcimaCategoriaIV.push({
-          id: item?.id || "",
+          id:
+            item?.id || "",
+
           nome:
             item?.nome ||
             "Item sem nome",
+
           quantidade,
+
           categoriaNumerica,
         });
 
@@ -707,10 +709,13 @@ export function contarItensPorCategoria(
 
       if (!categoria) {
         itensSemCategoria.push({
-          id: item?.id || "",
+          id:
+            item?.id || "",
+
           nome:
             item?.nome ||
             "Item sem nome",
+
           quantidade,
         });
 
@@ -918,13 +923,15 @@ export function validarAlteracaoInventario({
   const resumoAtual =
     calcularResumoInventario({
       ficha,
-      itens: itensAtuais,
+      itens:
+        itensAtuais,
     });
 
   const resumoProposto =
     calcularResumoInventario({
       ficha,
-      itens: itensPropostos,
+      itens:
+        itensPropostos,
     });
 
   const motivos = [];
