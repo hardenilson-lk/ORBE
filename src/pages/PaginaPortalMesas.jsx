@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router";
 
 import useAutenticacaoOrbe from "../autenticacao/useAutenticacaoOrbe.js";
 import PortalLayout from "../components/portal/PortalLayout.jsx";
@@ -14,6 +14,7 @@ import {
 
 export default function PaginaPortalMesas() {
   const navegar = useNavigate();
+  const localizacao = useLocation();
   const { usuario } =
     useAutenticacaoOrbe();
   const usuarioId =
@@ -21,9 +22,29 @@ export default function PaginaPortalMesas() {
     lerUsuarioAtual()?.id ||
     "";
   const [codigo, setCodigo] = useState("");
-  const [erro, setErro] = useState("");
+  const [erro, setErro] = useState(localizacao.state?.aviso || "");
   const [carregandoConvite, setCarregandoConvite] = useState(false);
+  const [mesaAguardandoId, setMesaAguardandoId] = useState("");
   const [mesas, setMesas] = useMesasOrbe();
+
+  useEffect(() => {
+    if (!mesaAguardandoId) return;
+
+    const mesaAprovada = mesas.find(
+      (mesa) =>
+        String(mesa.id) === String(mesaAguardandoId) &&
+        mesa.statusEntrada !== "pendente",
+    );
+
+    if (!mesaAprovada) return;
+
+    setMesaAguardandoId("");
+    navegar(`/arquivos/jogador/${mesaAprovada.id}`, {
+      state: {
+        aviso: "Entrada aprovada pelo mestre.",
+      },
+    });
+  }, [mesaAguardandoId, mesas, navegar]);
 
   async function entrar(evento) {
     evento.preventDefault();
@@ -34,6 +55,7 @@ export default function PaginaPortalMesas() {
       try {
         const mesa = await entrarMesaRemota(valor);
         if (mesa.statusEntrada === "pendente") {
+          setMesaAguardandoId(String(mesa.id));
           setErro("Solicitação enviada. Aguarde o mestre aprovar sua entrada.");
           setCodigo("");
           return;

@@ -14,6 +14,7 @@ import PainelNeblinaMapa from "./mapa/PainelNeblinaMapa.jsx";
 import CamadaIluminacaoMapa from "./mapa/CamadaIluminacaoMapa.jsx";
 import PainelIluminacaoMapa from "./mapa/PainelIluminacaoMapa.jsx";
 import PainelPermissoesMapa from "./mapa/PainelPermissoesMapa.jsx";
+import MiniMapaNavegacao from "./mapa/MiniMapaNavegacao.jsx";
 import { podeControlarTokenMapa } from "./mapa/permissoesTokensMapa.js";
 import "./PainelMapa.css";
 const GRID_PADRAO = {
@@ -465,6 +466,14 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
     const recolherJanelaTimeoutRef = useRef(null);
     const mapaRef = useRef(normalizarMapa(mapa));
     const [mapaLocal, setMapaLocal,] = useState(() => normalizarMapa(mapa));
+    const [posicaoCameraVisual, setPosicaoCameraVisual] = useState(() => ({
+        x: Number(mapaRef.current.camera.x) || 0,
+        y: Number(mapaRef.current.camera.y) || 0,
+        larguraRolagem: 0,
+        alturaRolagem: 0,
+        larguraCliente: 0,
+        alturaCliente: 0,
+    }));
     const [tamanhoViewport, setTamanhoViewport,] = useState({
         largura: 0,
         altura: 0,
@@ -541,6 +550,14 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
             setTamanhoViewport({
                 largura: viewport.clientWidth,
                 altura: viewport.clientHeight,
+            });
+            setPosicaoCameraVisual({
+                x: viewport.scrollLeft,
+                y: viewport.scrollTop,
+                larguraRolagem: viewport.scrollWidth,
+                alturaRolagem: viewport.scrollHeight,
+                larguraCliente: viewport.clientWidth,
+                alturaCliente: viewport.clientHeight,
             });
         }
         atualizarTamanho();
@@ -1443,6 +1460,23 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
                 viewport.clientHeight) / 2);
         salvarPosicaoCamera("Mapa centralizado.");
     }
+    function navegarPeloMiniMapa(xMundo, yMundo) {
+        const viewport = viewportRef.current;
+        if (!viewport) return;
+        viewport.scrollLeft = Math.max(0, xMundo * camera.zoom +
+            margemHorizontal - viewport.clientWidth / 2);
+        viewport.scrollTop = Math.max(0, yMundo * camera.zoom +
+            margemVertical - viewport.clientHeight / 2);
+        setPosicaoCameraVisual({
+            x: viewport.scrollLeft,
+            y: viewport.scrollTop,
+            larguraRolagem: viewport.scrollWidth,
+            alturaRolagem: viewport.scrollHeight,
+            larguraCliente: viewport.clientWidth,
+            alturaCliente: viewport.clientHeight,
+        });
+        salvarPosicaoCamera("Câmera reposicionada pelo minimapa.");
+    }
     function alterarZoom(valor, pontoTela = null) {
         const viewport = viewportRef.current;
         const zoomAnterior = mapaRef.current
@@ -1773,6 +1807,17 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
         alterarZoom(mapaRef.current.camera.zoom + (evento.deltaY < 0 ? 0.1 : -0.1), { x: evento.clientX, y: evento.clientY });
     }
     function controlarScroll() {
+        const viewport = viewportRef.current;
+        if (viewport) {
+            setPosicaoCameraVisual({
+                x: viewport.scrollLeft,
+                y: viewport.scrollTop,
+                larguraRolagem: viewport.scrollWidth,
+                alturaRolagem: viewport.scrollHeight,
+                larguraCliente: viewport.clientWidth,
+                alturaCliente: viewport.clientHeight,
+            });
+        }
         if (arrastandoMapa ||
             arrastandoFundo ||
             redimensionandoFundo ||
@@ -4331,6 +4376,45 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
             </div>
           </div>
         </div>
+
+        <MiniMapaNavegacao
+          larguraMundo={larguraMundo}
+          alturaMundo={alturaMundo}
+          larguraViewport={tamanhoViewport.largura}
+          alturaViewport={tamanhoViewport.altura}
+          margemHorizontal={margemHorizontal}
+          margemVertical={margemVertical}
+          tamanhoCelula={grid.tamanhoCelula}
+          grid={grid}
+          camera={{
+            ...camera,
+            x: posicaoCameraVisual.x,
+            y: posicaoCameraVisual.y,
+          }}
+          limitesCamera={posicaoCameraVisual}
+          fundos={mapaLocal.camadas.mapa.visivel ? mapas : []}
+          tokens={mapaLocal.camadas.tokens.visivel ? tokensVisiveis.map((token) => ({
+            ...token,
+            opacidadeMiniMapa: papelEfetivo === "jogador" && token.modoVisibilidade === "proximidade"
+              ? opacidadeProximidadePorToken.get(token.id)
+              : 1,
+          })) : []}
+          paredes={papelEfetivo === "mestre" && mapaLocal.camadas.paredes.visivel ? mapaLocal.paredes : []}
+          portas={mapaLocal.camadas.paredes.visivel
+            ? mapaLocal.portas.filter((estrutura) => papelEfetivo === "mestre" || !estrutura.oculta)
+            : []}
+          luzes={mapaLocal.camadas.efeitos.visivel ? mapaLocal.luzes : []}
+          neblina={mapaLocal.camadas.neblina.visivel && mapaLocal.neblina.ativa
+            ? {
+                ...mapaLocal.neblina,
+                opacidade: papelEfetivo === "mestre" && !mapaLocal.neblina.previsualizarJogador
+                  ? Math.min(0.48, mapaLocal.neblina.opacidade)
+                  : mapaLocal.neblina.opacidade,
+              }
+            : null}
+          aoNavegar={navegarPeloMiniMapa}
+          aoAlterarZoom={alterarZoom}
+        />
 
         <div className="painel-mapa__informacao">
           <strong>

@@ -5,6 +5,7 @@ import {
 
 import ProvedorAutenticacaoOrbe from "./autenticacao/ProvedorAutenticacaoOrbe.jsx";
 import RotaMestreMesa from "./components/RotaMestreMesa.jsx";
+import RotaJogadorMesa from "./components/RotaJogadorMesa.jsx";
 import RotaProtegida from "./components/RotaProtegida.jsx";
 import PaginaArquivos from "./pages/PaginaArquivos.jsx";
 import PaginaInicial from "./pages/PaginaInicial.jsx";
@@ -61,10 +62,12 @@ function App() {
             />
           </Route>
 
-          <Route
-            path="/arquivos/jogador/:mesaId"
-            element={<PaginaJogador />}
-          />
+          <Route element={<RotaJogadorMesa />}>
+            <Route
+              path="/arquivos/jogador/:mesaId"
+              element={<PaginaJogador />}
+            />
+          </Route>
         </Route>
       </Routes>
 

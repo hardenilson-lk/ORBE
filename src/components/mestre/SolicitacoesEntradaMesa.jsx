@@ -13,6 +13,7 @@ import "./SolicitacoesEntradaMesa.css";
 export default function SolicitacoesEntradaMesa({
   mesaId,
   exigirAprovacaoInicial = true,
+  aoMesaAtualizada,
 }) {
   const [solicitacoes, setSolicitacoes] = useState([]);
   const [exigirAprovacao, setExigirAprovacao] = useState(
@@ -56,8 +57,10 @@ export default function SolicitacoesEntradaMesa({
     setProcessando("configuracao");
     setMensagem("");
     try {
-      await configurarAprovacaoConvitesRemota(mesaId, proximo);
+      const mesaAtualizada =
+        await configurarAprovacaoConvitesRemota(mesaId, proximo);
       setExigirAprovacao(proximo);
+      aoMesaAtualizada?.(mesaAtualizada);
       setMensagem(
         proximo
           ? "O mestre precisa aprovar novos participantes."

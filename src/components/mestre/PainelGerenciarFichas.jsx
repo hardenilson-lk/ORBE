@@ -5,12 +5,14 @@ import "./PainelFichas.css";
 function PainelGerenciarFichas({
   fichas = [],
   jogadores = [],
+  solicitacoes = [],
   jogadorInicialId = "",
   fichaSelecionada = null,
   aoCriarFicha,
   aoAbrirFicha,
   aoAlternarPermissao,
   aoRemoverFicha,
+  aoRevisarSolicitacao,
 }) {
   const [nome, setNome] = useState("");
   const [tipo, setTipo] = useState("Personagem da sessão");
@@ -58,6 +60,28 @@ function PainelGerenciarFichas({
           const vinculadas = fichas.filter((ficha) => ficha.jogadorId === jogador.id || ficha.id === jogador.fichaId);
           return <article key={jogador.id}><div><strong>{jogador.nome || "Jogador"}</strong><span>{jogador.online === false ? "Offline" : "Conectado"}</span><small>{vinculadas.length ? `${vinculadas.length} ficha(s) vinculada(s)` : "Sem ficha vinculada"}</small></div><button type="submit" form="form-criar-ficha-sessao" name="jogadorDireto" value={jogador.id}>Criar ficha</button></article>;
         })}</div> : <p className="painel-fichas__vazio">Nenhum jogador entrou nesta mesa. Assim que alguém entrar pelo convite, aparecerá aqui.</p>}
+      </section>
+
+      <section className="painel-fichas__mesa">
+        <header className="painel-gerenciar-fichas__subtitulo">
+          <div><span>Arquivo pessoal</span><h3>Solicitações dos jogadores</h3></div>
+          <small>{solicitacoes.length} pendente(s)</small>
+        </header>
+        {solicitacoes.length ? (
+          <div className="painel-gerenciar-fichas__jogadores">
+            {solicitacoes.map((ficha) => (
+              <article key={ficha.id}>
+                <div>
+                  <strong>{ficha.nome || "Agente sem nome"}</strong>
+                  <span>{ficha.jogador || "Jogador da mesa"}</span>
+                  <small>{ficha.classe || "Classe não definida"} · NEX {ficha.nex || "5%"}</small>
+                </div>
+                <button type="button" onClick={() => aoRevisarSolicitacao?.(ficha, true)}>Autorizar ficha</button>
+                <button className="painel-fichas__remover" type="button" onClick={() => aoRevisarSolicitacao?.(ficha, false)}>Recusar</button>
+              </article>
+            ))}
+          </div>
+        ) : <p className="painel-fichas__vazio">Nenhuma ficha pessoal aguardando autorização.</p>}
       </section>
 
       <section className="painel-fichas__mesa">

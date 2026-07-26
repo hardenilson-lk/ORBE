@@ -6,6 +6,7 @@ import {
 } from "react-router";
 
 import Dados3D from "../components/Dados3D.jsx";
+import useAutenticacaoOrbe from "../autenticacao/useAutenticacaoOrbe.js";
 import { ComunicacaoMesa } from "../comunicacao/index.js";
 import PainelFichas from "../components/mestre/PainelFichas.jsx";
 import PainelInventario from "../components/mestre/PainelInventario.jsx";
@@ -17,7 +18,6 @@ import MesaSonoraJogador from "../components/jogador/MesaSonoraJogador.jsx";
 import { MesaSonoraLiveKitProvider } from "../components/mestre/mesaSonora/livekit/MesaSonoraLiveKitContext.jsx";
 
 import {
-  criarFichaArquivosVazia,
   carregarFichasArquivosConectadas,
   listarFichasArquivos,
   salvarFichaArquivosConectada,
@@ -25,13 +25,16 @@ import {
 import { lerUsuarioAtual } from "../utils/contasOrbe.js";
 import { lerMesasSalvas } from "../utils/mesas.js";
 import {
+  aplicarSessaoArquivosRemota,
   carregarSessaoArquivos,
   salvarSessaoArquivos,
 } from "../utils/sessoesArquivos.js";
 import useRealtimeMesaOrbe from "../hooks/useRealtimeMesaOrbe.js";
 import {
+  carregarEstadoMesaRemoto,
   publicarInicioRolagemMesaRealtime,
   publicarRolagemMesaRealtime,
+  publicarTokensMesaRealtime,
 } from "../services/supabaseOrbe.js";
 
 import "./PaginaJogador.css";
@@ -59,12 +62,11 @@ function PaginaJogador() {
   const { mesaId = "local" } = useParams();
   const localizacao = useLocation();
   const dadosRef = useRef(null);
+  const { usuario } = useAutenticacaoOrbe();
   const [sessao, setSessao] = useState(() => carregarSessaoArquivos(mesaId));
   const [fichas, setFichas] = useState(() => listarFichasArquivos(mesaId));
   const [menuAtivo, setMenuAtivo] = useState("mapa");
   const [selecaoAberta, setSelecaoAberta] = useState(true);
-  const [nomeJogador, setNomeJogador] = useState("");
-  const [nomePersonagem, setNomePersonagem] = useState("");
   const [fichaId, setFichaId] = useState(() => localStorage.getItem(`orbe:jogador:ficha:${mesaId}`) || "");
   const [tipoDado, setTipoDado] = useState("d20");
   const [quantidade, setQuantidade] = useState(1);
@@ -76,17 +78,23 @@ function PaginaJogador() {
   );
   const [menuRecolhido, setMenuRecolhido] = useState(() => localStorage.getItem("orbe:jogador:menu-recolhido") === "true");
 
-  const mesa = lerMesasSalvas().find((item) => String(item.id) === String(mesaId));
+  const [mesaAtual, setMesaAtual] = useState(() =>
+    lerMesasSalvas().find((item) => String(item.id) === String(mesaId)) || null,
+  );
+  const mesa =
+    mesaAtual ||
+    lerMesasSalvas().find((item) => String(item.id) === String(mesaId));
   const usuarioPortal = lerUsuarioAtual();
-  const usuarioPortalId = usuarioPortal?.id || "";
+  const usuarioPortalId = usuario?.id || usuarioPortal?.id || "";
   const usuarioPortalNome = usuarioPortal?.nome || usuarioPortal?.usuario || "";
   const nomeCampanha = mesa?.nomeCampanha || mesa?.nome || "Campanha";
   const arquivoAtual = sessao.arquivoAtual || mesa?.arquivoInicial || "ARQUIVO 0001";
   const fichasDisponiveis = useMemo(() => usuarioPortalId
     ? fichas.filter((ficha) =>
         ficha.jogadorId === usuarioPortalId ||
-        String(ficha.jogador || "").trim().toLocaleLowerCase("pt-BR") === usuarioPortalNome.trim().toLocaleLowerCase("pt-BR") ||
-        (!ficha.jogadorId && !ficha.jogador && fichas.length === 1),
+        (Boolean(usuarioPortalNome) &&
+          String(ficha.jogador || "").trim().toLocaleLowerCase("pt-BR") ===
+            usuarioPortalNome.trim().toLocaleLowerCase("pt-BR")),
       )
     : fichas, [fichas, usuarioPortalId, usuarioPortalNome]);
   const fichaAtiva = fichasDisponiveis.find((ficha) => ficha.id === fichaId) || null;
@@ -96,6 +104,10 @@ function PaginaJogador() {
 
   const { online: realtimeOnline, pronto: realtimePronto } = useRealtimeMesaOrbe({
     mesaId,
+    usuarioId: usuarioPortalId,
+    nomePresenca: usuarioPortalNome || fichaAtivaNome || "Jogador",
+    fichaId: fichaAtivaId || "",
+    aoMesa: setMesaAtual,
     aoSessao: setSessao,
     aoFichas: setFichas,
     aoInicioRolagem: (configuracao) => {
@@ -132,24 +144,12 @@ function PaginaJogador() {
   });
 
   useEffect(() => {
-    if (realtimeOnline && !realtimePronto) return;
-    if (!usuarioPortalId) return;
-    setSessao((anterior) => {
-      const jogadores = listaSegura(anterior.jogadores);
-      const existente = jogadores.find((jogador) => jogador.id === usuarioPortalId);
-      const registro = {
-        ...(existente || {}),
-        id: usuarioPortalId,
-        nome: usuarioPortalNome || "Jogador",
-        online: true,
-        atualizadoEm: new Date().toISOString(),
-      };
-      return salvarSessaoArquivos(mesaId, {
-        ...anterior,
-        jogadores: [...jogadores.filter((jogador) => jogador.id !== usuarioPortalId), registro],
-      });
-    });
-  }, [mesaId, realtimeOnline, realtimePronto, usuarioPortalId, usuarioPortalNome]);
+    setMesaAtual(
+      lerMesasSalvas().find(
+        (item) => String(item.id) === String(mesaId),
+      ) || null,
+    );
+  }, [mesaId]);
 
   useEffect(() => {
     if (!fichaId && fichasDisponiveis.length === 1) {
@@ -191,7 +191,6 @@ function PaginaJogador() {
         fichaId: fichaAtivaId,
         nome: usuarioPortalNome || fichaAtivaJogador || fichaAtivaNome || "Jogador",
         personagem: fichaAtivaNome || "Agente",
-        online: true,
         atualizadoEm: new Date().toISOString(),
       };
       const atualizados = [
@@ -205,6 +204,11 @@ function PaginaJogador() {
   function persistirSessao(alteracoes) {
     setSessao((anterior) => {
       const proxima = typeof alteracoes === "function" ? alteracoes(anterior) : { ...anterior, ...alteracoes };
+      if (proxima.mapa !== anterior.mapa) {
+        void publicarTokensMesaRealtime(mesaId, proxima.mapa?.tokens).catch((erro) => {
+          console.warn("NÃ£o foi possÃ­vel transmitir o movimento dos tokens.", erro);
+        });
+      }
       return salvarSessaoArquivos(mesaId, proxima);
     });
   }
@@ -234,27 +238,6 @@ function PaginaJogador() {
     localStorage.setItem(`orbe:jogador:ficha:${mesaId}`, ficha.id);
     setSelecaoAberta(false);
     setMensagemSistema(`Agente ${ficha.nome || "selecionado"} vinculado.`);
-  }
-
-  async function criarFicha(evento) {
-    evento.preventDefault();
-    if (!nomePersonagem.trim()) return;
-    let ficha;
-    try {
-      ficha = await salvarFichaArquivosConectada(mesaId, criarFichaArquivosVazia({
-        nome: nomePersonagem.trim(),
-        jogador: usuarioPortalNome || nomeJogador.trim() || nomePersonagem.trim(),
-        jogadorId: usuarioPortalId,
-        origemFicha: "pessoal",
-      }), { usarUsuarioAutenticadoComoResponsavel: true });
-    } catch (erro) {
-      setMensagemSistema(erro?.message || "Não foi possível criar sua ficha online.");
-      return;
-    }
-    setFichas(listarFichasArquivos(mesaId));
-    escolherFicha(ficha);
-    setNomeJogador("");
-    setNomePersonagem("");
   }
 
   function atualizarInventario(operacao, item) {
@@ -332,8 +315,24 @@ function PaginaJogador() {
   }
 
   async function recarregar() {
-    setSessao(carregarSessaoArquivos(mesaId));
     try {
+      const estadoRemoto =
+        await carregarEstadoMesaRemoto(
+          mesaId,
+        );
+      if (estadoRemoto?.mesa) {
+        setMesaAtual(
+          estadoRemoto.mesa,
+        );
+      }
+      if (estadoRemoto?.sessao) {
+        setSessao(
+          aplicarSessaoArquivosRemota(
+            mesaId,
+            estadoRemoto.sessao,
+          ),
+        );
+      }
       setFichas(await carregarFichasArquivosConectadas(mesaId));
       setMensagemSistema("Campanha atualizada.");
     } catch (erro) {
@@ -468,8 +467,7 @@ function PaginaJogador() {
         <div className="selecao-agente" role="dialog" aria-modal="true" aria-labelledby="selecao-agente-titulo">
           <section>
             <header><span>Identificação obrigatória</span><h2 id="selecao-agente-titulo">Quem entra no arquivo?</h2><p>Escolha a ficha que representa você nesta campanha.</p></header>
-            {fichasDisponiveis.length ? <div className="selecao-agente__lista">{fichasDisponiveis.map((ficha) => <button type="button" key={ficha.id} onClick={() => escolherFicha(ficha)}><span>{String(ficha.nome || "AG").slice(0, 2).toUpperCase()}</span><div><strong>{ficha.nome || "Agente sem nome"}</strong><small>{ficha.jogador || "Jogador não informado"} · {ficha.classe} · NEX {ficha.nex}</small></div><i>Entrar</i></button>)}</div> : <p className="selecao-agente__sem-ficha">O mestre ainda não atribuiu uma ficha à sua conta. Você também pode criar uma ficha pessoal abaixo.</p>}
-            <form onSubmit={criarFicha}><h3>Criar ficha de jogador</h3><label>Seu nome<input maxLength="40" value={nomeJogador} onChange={(e) => setNomeJogador(e.target.value)} placeholder="Nome do jogador" /></label><label>Nome do agente<input required maxLength="40" value={nomePersonagem} onChange={(e) => setNomePersonagem(e.target.value)} placeholder="Nome do personagem" /></label><button type="submit">Criar e entrar</button></form>
+            {fichasDisponiveis.length ? <div className="selecao-agente__lista">{fichasDisponiveis.map((ficha) => <button type="button" key={ficha.id} onClick={() => escolherFicha(ficha)}><span>{String(ficha.nome || "AG").slice(0, 2).toUpperCase()}</span><div><strong>{ficha.nome || "Agente sem nome"}</strong><small>{ficha.jogador || "Jogador não informado"} · {ficha.classe} · NEX {ficha.nex}</small></div><i>Entrar</i></button>)}</div> : <div className="selecao-agente__sem-ficha"><p>O mestre ainda não atribuiu uma ficha à sua conta.</p><p>Ele pode criar sua ficha diretamente. Se você já possui uma ficha pessoal, abra a aba Fichas do portal e solicite “Migrar ficha”; ela só aparecerá aqui depois da autorização.</p></div>}
             {fichaAtiva ? <button className="selecao-agente__fechar" type="button" onClick={() => setSelecaoAberta(false)}>Continuar com {fichaAtiva.nome}</button> : null}
             <Link to="/mesas">Voltar ao portal</Link>
           </section>

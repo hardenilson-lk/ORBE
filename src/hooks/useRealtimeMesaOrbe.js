@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import {
+  assinarPresencaMesaOrbe,
   assinarMesaOrbeRealtime,
   carregarEstadoMesaRemoto,
   listarFichasRemotas,
@@ -14,11 +15,18 @@ import {
   carregarSessaoArquivos,
 } from "../utils/sessoesArquivos.js";
 
-function mesclarMembrosNaSessao(mesaId, membros = []) {
-  const sessaoAtual = carregarSessaoArquivos(mesaId);
+function mesclarMembrosNaSessao(
+  mesaId,
+  membros = [],
+  presencas = [],
+  sessaoBase,
+) {
+  const sessaoAtual = sessaoBase || carregarSessaoArquivos(mesaId);
   const jogadoresAtuais = Array.isArray(sessaoAtual.jogadores) ? sessaoAtual.jogadores : [];
   const membrosJogadores = membros.filter((membro) => membro.papel !== "mestre");
-  const idsMembros = new Set(membrosJogadores.map((membro) => membro.id));
+  const idsOnline = new Set(
+    presencas.map((presenca) => String(presenca.user_id || "")),
+  );
   const jogadores = [
     ...membrosJogadores.map((membro) => {
       const atual = jogadoresAtuais.find((jogador) => jogador.id === membro.id) || {};
@@ -29,10 +37,9 @@ function mesclarMembrosNaSessao(mesaId, membros = []) {
         nome: atual.nome || membro.nome,
         usuario: membro.usuario,
         papel: membro.papel,
-        online: atual.online ?? false,
+        online: idsOnline.has(String(membro.id)),
       };
     }),
-    ...jogadoresAtuais.filter((jogador) => jogador.id && !idsMembros.has(jogador.id)),
   ];
   return aplicarSessaoArquivosRemota(mesaId, { ...sessaoAtual, jogadores });
 }
@@ -45,17 +52,38 @@ export default function useRealtimeMesaOrbe({
   aoMesa,
   aoInicioRolagem,
   aoRolagem,
+  aoTokens,
+  aoSolicitacoesFichasAlteradas,
   aoStatus,
   aoErro,
+  usuarioId,
+  nomePresenca,
+  fichaId,
 }) {
   const online = orbeOnlineHabilitado() && Boolean(mesaId) && mesaId !== "local";
   const [pronto, setPronto] = useState(!online);
+  const [presencas, setPresencas] = useState([]);
+  const membrosRef = useRef([]);
+  const presencasRef = useRef([]);
+  const controlePresencaRef = useRef(null);
+  const dadosPresencaRef = useRef({
+    nome: nomePresenca,
+    fichaId,
+    papel: mestre ? "mestre" : "jogador",
+  });
+  dadosPresencaRef.current = {
+    nome: nomePresenca,
+    fichaId,
+    papel: mestre ? "mestre" : "jogador",
+  };
   const callbacksRef = useRef({
     aoSessao,
     aoFichas,
     aoMesa,
     aoInicioRolagem,
     aoRolagem,
+    aoTokens,
+    aoSolicitacoesFichasAlteradas,
     aoStatus,
     aoErro,
   });
@@ -65,6 +93,8 @@ export default function useRealtimeMesaOrbe({
     aoMesa,
     aoInicioRolagem,
     aoRolagem,
+    aoTokens,
+    aoSolicitacoesFichasAlteradas,
     aoStatus,
     aoErro,
   };
@@ -75,12 +105,19 @@ export default function useRealtimeMesaOrbe({
       return undefined;
     }
     setPronto(false);
+    membrosRef.current = [];
     let ativo = true;
     let cancelarCanal = () => {};
 
     const aplicarSessao = (dados) => {
       if (!ativo || !dados) return;
-      const sessao = aplicarSessaoArquivosRemota(mesaId, dados);
+      const sessaoRemota = aplicarSessaoArquivosRemota(mesaId, dados);
+      const sessao = mesclarMembrosNaSessao(
+        mesaId,
+        membrosRef.current,
+        presencasRef.current,
+        sessaoRemota,
+      );
       callbacksRef.current.aoSessao?.(sessao);
     };
 
@@ -92,7 +129,12 @@ export default function useRealtimeMesaOrbe({
 
     const aplicarMembros = (membros) => {
       if (!ativo) return;
-      const sessao = mesclarMembrosNaSessao(mesaId, membros);
+      membrosRef.current = membros || [];
+      const sessao = mesclarMembrosNaSessao(
+        mesaId,
+        membrosRef.current,
+        presencasRef.current,
+      );
       callbacksRef.current.aoSessao?.(sessao);
     };
 
@@ -146,6 +188,23 @@ export default function useRealtimeMesaOrbe({
         callbacksRef.current.aoInicioRolagem?.(configuracao);
       },
       aoRolagem: aplicarRolagem,
+      aoTokens: (evento) => {
+        if (!ativo || !Array.isArray(evento?.tokens)) return;
+        const sessaoAtual = carregarSessaoArquivos(mesaId);
+        const sessao = aplicarSessaoArquivosRemota(mesaId, {
+          ...sessaoAtual,
+          mapa: {
+            ...(sessaoAtual.mapa || {}),
+            tokens: evento.tokens,
+          },
+          atualizadoEm: evento.atualizadoEm || new Date().toISOString(),
+        });
+        callbacksRef.current.aoSessao?.(sessao);
+        callbacksRef.current.aoTokens?.(evento.tokens);
+      },
+      aoSolicitacoesFichasAlteradas: () => {
+        callbacksRef.current.aoSolicitacoesFichasAlteradas?.();
+      },
       aoMembrosAlterados: recarregarMembros,
       ...(mestre ? {
         aoSegredos: (segredos) => {
@@ -194,5 +253,68 @@ export default function useRealtimeMesaOrbe({
     };
   }, [mesaId, mestre, online]);
 
-  return { online, pronto };
+  useEffect(() => {
+    if (!online || !usuarioId) {
+      setPresencas([]);
+      presencasRef.current = [];
+      return undefined;
+    }
+
+    let ativo = true;
+    let remover = () => {};
+
+    void assinarPresencaMesaOrbe(
+      mesaId,
+      dadosPresencaRef.current,
+      {
+        aoAlterar: (lista) => {
+          if (!ativo) return;
+          presencasRef.current = lista;
+          setPresencas(lista);
+          const sessao = mesclarMembrosNaSessao(
+            mesaId,
+            membrosRef.current,
+            lista,
+          );
+          callbacksRef.current.aoSessao?.(sessao);
+        },
+        aoErro: (erro) => callbacksRef.current.aoErro?.(erro),
+      },
+    )
+      .then((controle) => {
+        if (!ativo) {
+          controle.remover();
+          return;
+        }
+        controlePresencaRef.current = controle;
+        remover = controle.remover;
+        void controle
+          .atualizar(dadosPresencaRef.current)
+          .catch((erro) => callbacksRef.current.aoErro?.(erro));
+      })
+      .catch((erro) => callbacksRef.current.aoErro?.(erro));
+
+    return () => {
+      ativo = false;
+      controlePresencaRef.current = null;
+      remover();
+    };
+  }, [mesaId, mestre, online, usuarioId]);
+
+  useEffect(() => {
+    if (!controlePresencaRef.current) return;
+    void controlePresencaRef.current
+      .atualizar({
+        nome: nomePresenca,
+        fichaId,
+        papel: mestre ? "mestre" : "jogador",
+      })
+      .catch((erro) => callbacksRef.current.aoErro?.(erro));
+  }, [fichaId, mestre, nomePresenca]);
+
+  const mestreOnline = presencas.some(
+    (presenca) => String(presenca.papel || "").toLowerCase() === "mestre",
+  );
+
+  return { online, pronto, presencas, mestreOnline };
 }

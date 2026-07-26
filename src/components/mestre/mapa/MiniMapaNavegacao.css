@@ -1,0 +1,182 @@
+.mini-mapa-navegacao {
+  position: absolute;
+  z-index: 46;
+  top: 16px;
+  left: 16px;
+  width: clamp(220px, 22vw, 290px);
+  overflow: hidden;
+  border: 1px solid #c89a43;
+  background: rgba(24, 15, 11, 0.94);
+  color: #f4dfaa;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.58);
+  font-family: "Courier Prime", "Courier New", monospace;
+  backdrop-filter: blur(5px);
+}
+
+.mini-mapa-navegacao header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 7px 8px;
+  border-bottom: 1px solid rgba(200, 154, 67, 0.42);
+  background: linear-gradient(90deg, rgba(126, 38, 31, 0.55), transparent);
+}
+
+.mini-mapa-navegacao header > div:first-child {
+  display: grid;
+  min-width: 0;
+}
+
+.mini-mapa-navegacao header span {
+  color: #d4a950;
+  font-size: 0.48rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.mini-mapa-navegacao header strong {
+  font-family: "Special Elite", "Courier New", monospace;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+}
+
+.mini-mapa-navegacao__zoom {
+  display: flex;
+  flex: 0 0 auto;
+}
+
+.mini-mapa-navegacao__zoom button {
+  min-width: 24px;
+  height: 24px;
+  padding: 0 5px;
+  border: 1px solid rgba(212, 169, 80, 0.5);
+  background: #2b1a12;
+  color: #f8dda0;
+  font: 800 0.58rem/1 "Courier Prime", monospace;
+  cursor: pointer;
+}
+
+.mini-mapa-navegacao__zoom button:hover,
+.mini-mapa-navegacao__zoom button:focus-visible {
+  z-index: 1;
+  border-color: #f0bd4e;
+  background: #70271f;
+  outline: none;
+}
+
+.mini-mapa-navegacao svg {
+  display: block;
+  width: 100%;
+  height: 150px;
+  overflow: hidden;
+  background: #111713;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.mini-mapa-navegacao__base {
+  fill: #26322b;
+}
+
+.mini-mapa-navegacao__linha-grid {
+  fill: none;
+  stroke: rgba(232, 202, 126, 0.52);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.mini-mapa-navegacao__linha-grid-principal {
+  fill: none;
+  stroke: rgba(245, 204, 105, 0.8);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.mini-mapa-navegacao__luz {
+  fill: currentColor;
+  fill-opacity: 0.12;
+  stroke: currentColor;
+  stroke-opacity: 0.35;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.mini-mapa-navegacao__parede {
+  stroke: #f4ead2;
+  stroke-width: 5;
+  vector-effect: non-scaling-stroke;
+}
+
+.mini-mapa-navegacao__abertura {
+  stroke: #d89242;
+  stroke-width: 6;
+  vector-effect: non-scaling-stroke;
+}
+
+.mini-mapa-navegacao__abertura--janela {
+  stroke: #6ec9e8;
+}
+
+.mini-mapa-navegacao__abertura--aberta {
+  stroke-dasharray: 7 5;
+  opacity: 0.68;
+}
+
+.mini-mapa-navegacao__neblina {
+  fill: #070909;
+}
+
+.mini-mapa-navegacao__token {
+  fill: #e7bc53;
+  stroke: #21130d;
+  stroke-width: 6;
+  vector-effect: non-scaling-stroke;
+}
+
+.mini-mapa-navegacao__token--npc {
+  fill: #b13a32;
+}
+
+.mini-mapa-navegacao__visao {
+  fill: rgba(246, 221, 153, 0.2);
+  stroke: #fff0b6;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.mini-mapa-navegacao__mira {
+  stroke: rgba(255, 240, 182, 0.5);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.mini-mapa-navegacao small {
+  display: block;
+  padding: 5px 8px 6px;
+  color: #cbb98e;
+  font-size: 0.48rem;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+@media (max-width: 760px) {
+  .mini-mapa-navegacao {
+    top: 10px;
+    left: 10px;
+    width: 190px;
+  }
+
+  .mini-mapa-navegacao header > div:first-child {
+    display: none;
+  }
+
+  .mini-mapa-navegacao header {
+    justify-content: center;
+  }
+
+  .mini-mapa-navegacao svg {
+    height: 110px;
+  }
+}

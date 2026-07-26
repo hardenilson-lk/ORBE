@@ -1,4 +1,5 @@
 import {
+  useCallback,
   useEffect,
   useRef,
   useState,
@@ -10,6 +11,7 @@ import {
 } from "react-router";
 
 import Dados3D from "../components/Dados3D.jsx";
+import useAutenticacaoOrbe from "../autenticacao/useAutenticacaoOrbe.js";
 
 import BarraLateralMesa from "../components/mestre/BarraLateralMesa.jsx";
 import { ComunicacaoMesa } from "../comunicacao/index.js";
@@ -43,12 +45,18 @@ import {
 
 import {
   carregarSessaoArquivos,
+  aplicarSessaoArquivosRemota,
   salvarSessaoArquivos,
 } from "../utils/sessoesArquivos.js";
 import {
+  carregarEstadoMesaRemoto,
+  listarSolicitacoesMigracaoFichaRemotas,
   publicarInicioRolagemMesaRealtime,
   publicarRolagemMesaRealtime,
+  publicarTokensMesaRealtime,
+  revisarMigracaoFichaRemota,
   salvarSegredosMestreRemotos,
+  sincronizarSessaoPublicaAgora,
 } from "../services/supabaseOrbe.js";
 import useRealtimeMesaOrbe from "../hooks/useRealtimeMesaOrbe.js";
 
@@ -88,6 +96,8 @@ function PaginaMestre() {
 
   const navegar =
     useNavigate();
+  const { usuario } =
+    useAutenticacaoOrbe();
 
   const dados3DRef =
     useRef(null);
@@ -143,6 +153,22 @@ function PaginaMestre() {
     ),
   );
 
+  const [
+    solicitacoesFichas,
+    setSolicitacoesFichas,
+  ] = useState([]);
+
+  const [
+    mesaAtual,
+    setMesaAtual,
+  ] = useState(() =>
+    lerMesasSalvas().find(
+      (item) =>
+        String(item.id) ===
+        String(mesaId),
+    ) || null,
+  );
+
   useEffect(() => {
     const sessaoCarregada =
       carregarSessaoArquivos(
@@ -161,6 +187,14 @@ function PaginaMestre() {
     setFichas(
       fichasCarregadas,
     );
+
+    setMesaAtual(
+      lerMesasSalvas().find(
+        (item) =>
+          String(item.id) ===
+          String(mesaId),
+      ) || null,
+    );
   }, [mesaId]);
 
   useEffect(() => {
@@ -178,11 +212,37 @@ function PaginaMestre() {
     return () => window.removeEventListener("storage", sincronizarOutraAba);
   }, [mesaId]);
 
-  useRealtimeMesaOrbe({
+  const carregarSolicitacoesFichas = useCallback(async () => {
+    if (!mesaId || mesaId === "local") {
+      setSolicitacoesFichas([]);
+      return;
+    }
+    try {
+      setSolicitacoesFichas(
+        await listarSolicitacoesMigracaoFichaRemotas(mesaId),
+      );
+    } catch (erro) {
+      console.warn("Não foi possível carregar as solicitações de ficha.", erro);
+    }
+  }, [mesaId]);
+
+  useEffect(() => {
+    void carregarSolicitacoesFichas();
+  }, [carregarSolicitacoesFichas]);
+
+  const { mestreOnline } =
+    useRealtimeMesaOrbe({
     mesaId,
     mestre: true,
+    usuarioId: usuario?.id || "",
+    nomePresenca:
+      usuario?.user_metadata?.nome ||
+      usuario?.email?.split("@")[0] ||
+      "Mestre",
+    aoMesa: setMesaAtual,
     aoSessao: setSessao,
     aoFichas: setFichas,
+    aoSolicitacoesFichasAlteradas: carregarSolicitacoesFichas,
     aoInicioRolagem: (configuracao) => {
       setResultadoRolagem(
         `${configuracao.nome || "Jogador"} está rolando...`,
@@ -218,13 +278,9 @@ function PaginaMestre() {
     },
   });
 
-  const mesasSalvas =
-    lerMesasSalvas();
-
   const mesa =
-    criarListaSegura(
-      mesasSalvas,
-    ).find(
+    mesaAtual ||
+    lerMesasSalvas().find(
       (item) =>
         String(item.id) ===
         String(mesaId),
@@ -286,6 +342,15 @@ function PaginaMestre() {
                 ...alteracoes,
               };
 
+        if (proximaSessao.mapa !== sessaoAnterior.mapa) {
+          void publicarTokensMesaRealtime(
+            mesaId,
+            proximaSessao.mapa?.tokens,
+          ).catch((erro) => {
+            console.warn("NÃ£o foi possÃ­vel transmitir o movimento dos tokens.", erro);
+          });
+        }
+
         return salvarSessaoArquivos(
           mesaId,
           proximaSessao,
@@ -332,6 +397,23 @@ function PaginaMestre() {
     } catch (erro) {
       setMensagemSistema(erro?.message || "Não foi possível salvar a ficha online.");
       return null;
+    }
+  }
+
+  async function revisarSolicitacaoFicha(ficha, aceitar) {
+    try {
+      await revisarMigracaoFichaRemota(ficha.id, aceitar);
+      await Promise.all([
+        carregarFichasArquivosConectadas(mesaId).then(setFichas),
+        carregarSolicitacoesFichas(),
+      ]);
+      setMensagemSistema(
+        aceitar
+          ? "Ficha aprovada e vinculada à campanha. A edição começa bloqueada."
+          : "Solicitação de ficha recusada.",
+      );
+    } catch (erro) {
+      setMensagemSistema(erro?.message || "Não foi possível revisar a solicitação de ficha.");
     }
   }
 
@@ -721,22 +803,33 @@ function PaginaMestre() {
   }
 
   async function recarregarCampanha() {
-    const sessaoCarregada =
-      carregarSessaoArquivos(
-        mesaId,
-      );
-
     let fichasCarregadas;
     try {
+      const estadoRemoto =
+        await carregarEstadoMesaRemoto(
+          mesaId,
+          {
+            incluirSegredos: true,
+          },
+        );
       fichasCarregadas = await carregarFichasArquivosConectadas(mesaId);
+      if (estadoRemoto?.mesa) {
+        setMesaAtual(
+          estadoRemoto.mesa,
+        );
+      }
+      if (estadoRemoto?.sessao) {
+        setSessao(
+          aplicarSessaoArquivosRemota(
+            mesaId,
+            estadoRemoto.sessao,
+          ),
+        );
+      }
     } catch (erro) {
       setMensagemSistema(erro?.message || "Não foi possível carregar as fichas online.");
       return;
     }
-
-    setSessao(
-      sessaoCarregada,
-    );
 
     setFichas(
       fichasCarregadas,
@@ -747,7 +840,7 @@ function PaginaMestre() {
     );
   }
 
-  function salvarArquivoAtual() {
+  async function salvarArquivoAtual() {
     const sessaoSalva =
       salvarSessaoArquivos(
         mesaId,
@@ -758,9 +851,29 @@ function PaginaMestre() {
       sessaoSalva,
     );
 
-    setMensagemSistema(
-      "Arquivo salvo.",
-    );
+    try {
+      const sessaoConfirmada =
+        await sincronizarSessaoPublicaAgora(
+          mesaId,
+          sessaoSalva,
+        );
+
+      setSessao(
+        aplicarSessaoArquivosRemota(
+          mesaId,
+          sessaoConfirmada,
+        ),
+      );
+
+      setMensagemSistema(
+        "Arquivo salvo e sincronizado.",
+      );
+    } catch (erro) {
+      setMensagemSistema(
+        erro?.message ||
+          "Não foi possível salvar a campanha online.",
+      );
+    }
   }
 
   function adicionarArquivo(
@@ -867,6 +980,7 @@ function PaginaMestre() {
             fichaAtiva
           }
           jogadores={sessao.jogadores || []}
+          solicitacoes={solicitacoesFichas}
           jogadorInicialId={jogadorCriacaoId}
           aoCriarFicha={criarFichaDaSessao}
           aoAbrirFicha={(
@@ -882,6 +996,7 @@ function PaginaMestre() {
           }
           aoAlternarPermissao={(ficha) => salvarFicha({ ...ficha, editLocked: !ficha.editLocked })}
           aoRemoverFicha={removerFicha}
+          aoRevisarSolicitacao={revisarSolicitacaoFicha}
         />
       );
     }
@@ -1448,6 +1563,7 @@ function PaginaMestre() {
             <SolicitacoesEntradaMesa
               mesaId={mesaId}
               exigirAprovacaoInicial={mesa?.exigeAprovacaoConvite}
+              aoMesaAtualizada={setMesaAtual}
             />
 
             <BarraLateralMesa
@@ -1464,6 +1580,7 @@ function PaginaMestre() {
                 sessao.jogadores ||
                 []
               }
+              mestreOnline={mestreOnline}
               aoCopiarConvite={() =>
                 setMensagemSistema(
                   "Código de convite copiado.",

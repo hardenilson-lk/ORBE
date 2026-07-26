@@ -199,7 +199,21 @@ export function normalizarFichaRemota(registro = {}) {
     id: String(registro.id || registro.dados?.id || ""),
     nome: registro.nome || registro.dados?.nome || "Agente",
     jogadorId: registro.responsavel_id || registro.dados?.jogadorId || "",
+    ownerId: registro.owner_id || registro.dados?.ownerId || "",
     editLocked: registro.edit_locked === true,
+    atualizadoEm: registro.updated_at || registro.dados?.atualizadoEm,
+    remoto: true,
+  };
+}
+
+export function normalizarFichaPessoalRemota(registro = {}) {
+  return {
+    ...(registro.dados || {}),
+    id: String(registro.id || registro.dados?.id || ""),
+    nome: registro.nome || registro.dados?.nome || "Agente",
+    jogadorId: registro.owner_id || registro.responsavel_id || "",
+    mesaSolicitadaId: registro.mesa_solicitada_id || "",
+    statusMigracao: registro.status_migracao || "",
     atualizadoEm: registro.updated_at || registro.dados?.atualizadoEm,
     remoto: true,
   };
@@ -221,6 +235,84 @@ export async function listarFichasRemotas(mesaId) {
     .order("updated_at", { ascending: false });
   if (error) throw error;
   return (data || []).map(normalizarFichaRemota);
+}
+
+export async function listarFichasPessoaisRemotas() {
+  const cliente = exigirCliente();
+  const {
+    data: { user },
+    error: erroUsuario,
+  } = await cliente.auth.getUser();
+  if (erroUsuario || !user) {
+    throw new Error("Sua sessÃ£o expirou. Entre novamente para acessar suas fichas.");
+  }
+
+  const { data, error } = await cliente
+    .from("fichas_orbe")
+    .select("*")
+    .eq("owner_id", user.id)
+    .is("mesa_id", null)
+    .order("updated_at", { ascending: false });
+  if (error) throw error;
+  return (data || []).map(normalizarFichaPessoalRemota);
+}
+
+export async function salvarFichaPessoalRemota(ficha) {
+  const cliente = exigirCliente();
+  const {
+    data: { user },
+    error: erroUsuario,
+  } = await cliente.auth.getUser();
+  if (erroUsuario || !user) {
+    throw new Error("Sua sessÃ£o expirou. Entre novamente para salvar a ficha.");
+  }
+
+  const { data, error } = await cliente.rpc("salvar_ficha_pessoal_orbe", {
+    ficha_id_informada: String(ficha.id),
+    nome_informado: ficha.nome || "Agente",
+    dados_informados: {
+      ...ficha,
+      jogadorId: user.id,
+      origemFicha: "pessoal",
+    },
+  });
+  if (error) throw error;
+  const registro = Array.isArray(data) ? data[0] : data;
+  return normalizarFichaPessoalRemota(registro);
+}
+
+export async function solicitarMigracaoFichaRemota(fichaId, mesaId) {
+  const cliente = exigirCliente();
+  const { data, error } = await cliente.rpc("solicitar_migracao_ficha_orbe", {
+    ficha_id_informada: String(fichaId),
+    mesa_id_informada: String(mesaId),
+  });
+  if (error) throw error;
+  const registro = Array.isArray(data) ? data[0] : data;
+  return registro ? normalizarFichaPessoalRemota(registro) : null;
+}
+
+export async function listarSolicitacoesMigracaoFichaRemotas(mesaId) {
+  const cliente = exigirCliente();
+  const { data, error } = await cliente
+    .from("fichas_orbe")
+    .select("*")
+    .eq("mesa_solicitada_id", String(mesaId))
+    .eq("status_migracao", "pendente")
+    .order("updated_at", { ascending: true });
+  if (error) throw error;
+  return (data || []).map(normalizarFichaPessoalRemota);
+}
+
+export async function revisarMigracaoFichaRemota(fichaId, aceitar) {
+  const cliente = exigirCliente();
+  const { data, error } = await cliente.rpc("revisar_migracao_ficha_orbe", {
+    ficha_id_informada: String(fichaId),
+    aceitar: Boolean(aceitar),
+  });
+  if (error) throw error;
+  const registro = Array.isArray(data) ? data[0] : data;
+  return registro ? normalizarFichaRemota(registro) : null;
 }
 
 export async function carregarSessaoPublicaRemota(mesaId) {
@@ -270,6 +362,27 @@ export async function listarMembrosMesaRemotos(mesaId) {
       atualizadoEm: perfil.updated_at || membro.created_at,
     };
   });
+}
+
+export async function buscarMinhaAssociacaoMesaRemota(mesaId) {
+  const cliente = exigirCliente();
+  const {
+    data: { user },
+    error: erroUsuario,
+  } = await cliente.auth.getUser();
+
+  if (erroUsuario) throw erroUsuario;
+  if (!user?.id) throw new Error("Sua sessão expirou. Entre novamente.");
+
+  const { data, error } = await cliente
+    .from("mesa_membros_orbe")
+    .select("mesa_id,user_id,papel,status,created_at")
+    .eq("mesa_id", String(mesaId))
+    .eq("user_id", String(user.id))
+    .maybeSingle();
+
+  if (error) throw error;
+  return data;
 }
 
 export async function listarSolicitacoesEntradaRemotas(mesaId) {
@@ -376,6 +489,107 @@ function topicoMesaRealtime(mesaId) {
   return `orbe-mesa:${String(mesaId)}`;
 }
 
+function topicoPresencaMesa(mesaId) {
+  return `orbe-presenca:${String(mesaId)}`;
+}
+
+function normalizarPresencas(estado = {}) {
+  return Object.entries(estado).flatMap(([chave, presencas]) =>
+    (Array.isArray(presencas) ? presencas : []).map((presenca) => ({
+      ...presenca,
+      user_id: String(presenca?.user_id || chave),
+      mesa_id: String(presenca?.mesa_id || ""),
+      ficha_id: presenca?.ficha_id ? String(presenca.ficha_id) : "",
+    })),
+  );
+}
+
+export async function assinarPresencaMesaOrbe(
+  mesaId,
+  dadosPresenca = {},
+  callbacks = {},
+) {
+  if (!supabaseOrbe || !mesaId || mesaId === "local") {
+    return {
+      atualizar: async () => false,
+      remover: () => {},
+    };
+  }
+
+  const {
+    data: { user },
+    error,
+  } = await supabaseOrbe.auth.getUser();
+
+  if (error) throw error;
+  if (!user?.id) throw new Error("Sua sessão expirou. Entre novamente na mesa.");
+
+  let dadosAtuais = { ...dadosPresenca };
+  let inscrito = false;
+  const usuarioId = String(user.id);
+  const canal = supabaseOrbe
+    .channel(topicoPresencaMesa(mesaId), {
+      config: {
+        presence: {
+          key: usuarioId,
+        },
+      },
+    })
+    .on("presence", { event: "sync" }, () => {
+      callbacks.aoAlterar?.(normalizarPresencas(canal.presenceState()));
+    })
+    .on("presence", { event: "join" }, () => {
+      callbacks.aoAlterar?.(normalizarPresencas(canal.presenceState()));
+    })
+    .on("presence", { event: "leave" }, () => {
+      callbacks.aoAlterar?.(normalizarPresencas(canal.presenceState()));
+    });
+
+  async function rastrear() {
+    const resultado = await canal.track({
+      user_id: usuarioId,
+      nome:
+        String(dadosAtuais.nome || user.user_metadata?.nome || user.email || "Investigador"),
+      mesa_id: String(mesaId),
+      ficha_id: dadosAtuais.fichaId ? String(dadosAtuais.fichaId) : "",
+      papel: String(dadosAtuais.papel || "jogador").toLowerCase(),
+      online_at: new Date().toISOString(),
+    });
+    return resultado === "ok";
+  }
+
+  canal.subscribe((status, erroCanal) => {
+    callbacks.aoStatus?.(status);
+    if (erroCanal) callbacks.aoErro?.(erroCanal);
+    if (status === "SUBSCRIBED") {
+      inscrito = true;
+      void rastrear().catch((falha) => callbacks.aoErro?.(falha));
+    }
+    if (["CHANNEL_ERROR", "TIMED_OUT", "CLOSED"].includes(status)) {
+      inscrito = false;
+    }
+  });
+
+  return {
+    atualizar: async (proximosDados = {}) => {
+      dadosAtuais = {
+        ...dadosAtuais,
+        ...proximosDados,
+      };
+      if (!inscrito) return false;
+      return rastrear();
+    },
+    remover: () => {
+      void canal
+        .untrack()
+        .catch(() => {})
+        .finally(() => {
+          void supabaseOrbe.removeChannel(canal);
+        });
+    },
+  };
+}
+
 export async function publicarRolagemMesaRealtime(mesaId, rolagem) {
   if (!supabaseOrbe || !mesaId || mesaId === "local" || !rolagem?.id) {
     return false;
@@ -410,6 +624,26 @@ export async function publicarInicioRolagemMesaRealtime(mesaId, configuracao) {
   return resultado === "ok";
 }
 
+export async function publicarTokensMesaRealtime(mesaId, tokens = []) {
+  if (!supabaseOrbe || !mesaId || mesaId === "local") {
+    return false;
+  }
+
+  const canal = canaisMesaRealtime.get(String(mesaId));
+  if (!canal) return false;
+
+  const resultado = await canal.send({
+    type: "broadcast",
+    event: "tokens_mapa",
+    payload: {
+      tokens: Array.isArray(tokens) ? tokens : [],
+      atualizadoEm: new Date().toISOString(),
+    },
+  });
+
+  return resultado === "ok";
+}
+
 export function assinarMesaOrbeRealtime(mesaId, callbacks = {}) {
   if (!supabaseOrbe || !mesaId || mesaId === "local") return () => {};
 
@@ -425,11 +659,17 @@ export function assinarMesaOrbeRealtime(mesaId, callbacks = {}) {
     .on("broadcast", { event: "inicio_rolagem_dados" }, (evento) => {
       callbacks.aoInicioRolagem?.(evento.payload);
     })
+    .on("broadcast", { event: "tokens_mapa" }, (evento) => {
+      callbacks.aoTokens?.(evento.payload);
+    })
     .on("postgres_changes", { event: "*", schema: "public", table: "mesas_orbe", filter: `id=eq.${mesaId}` }, (evento) => {
       callbacks.aoMesa?.(evento.eventType === "DELETE" ? null : normalizarMesaRemota(evento.new));
     })
     .on("postgres_changes", { event: "*", schema: "public", table: "fichas_orbe", filter: `mesa_id=eq.${mesaId}` }, () => {
       callbacks.aoFichasAlteradas?.();
+    })
+    .on("postgres_changes", { event: "*", schema: "public", table: "fichas_orbe", filter: `mesa_solicitada_id=eq.${mesaId}` }, () => {
+      callbacks.aoSolicitacoesFichasAlteradas?.();
     })
     .on("postgres_changes", { event: "*", schema: "public", table: "sessoes_orbe", filter: `mesa_id=eq.${mesaId}` }, (evento) => {
       callbacks.aoSessao?.(evento.eventType === "DELETE" ? null : {
@@ -604,6 +844,11 @@ export async function salvarFichaRemota(
     ...dadosPermitidos,
     id: String(ficha.id),
     mesa_id: String(mesaId),
+    owner_id:
+      ficha.ownerId ||
+      ficha.owner_id ||
+      responsavelFinal ||
+      user.id,
     responsavel_id: responsavelFinal || null,
     edit_locked: Boolean(ficha.editLocked),
   };
@@ -632,7 +877,10 @@ export async function salvarSessaoPublicaRemota(mesaId, sessao) {
     updated_at: new Date().toISOString(),
   }).select().single();
   if (error) throw error;
-  return data;
+  return {
+    ...(data?.dados || {}),
+    atualizadoEm: data?.updated_at || data?.dados?.atualizadoEm,
+  };
 }
 
 export async function salvarSegredosMestreRemotos(mesaId, anotacoesMestre) {
@@ -657,4 +905,10 @@ export function agendarSessaoPublicaRemota(mesaId, sessao) {
       console.warn("Não foi possível sincronizar a sessão pública.", erro);
     });
   }, 650));
+}
+
+export async function sincronizarSessaoPublicaAgora(mesaId, sessao) {
+  clearTimeout(sincronizacoesPendentes.get(mesaId));
+  sincronizacoesPendentes.delete(mesaId);
+  return salvarSessaoPublicaRemota(mesaId, sessao);
 }
