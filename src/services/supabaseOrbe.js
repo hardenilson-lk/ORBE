@@ -844,11 +844,7 @@ export async function salvarFichaRemota(
     ...dadosPermitidos,
     id: String(ficha.id),
     mesa_id: String(mesaId),
-    owner_id:
-      ficha.ownerId ||
-      ficha.owner_id ||
-      responsavelFinal ||
-      user.id,
+    owner_id: responsavelFinal || user.id,
     responsavel_id: responsavelFinal || null,
     edit_locked: Boolean(ficha.editLocked),
   };

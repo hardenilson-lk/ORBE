@@ -185,6 +185,7 @@ export default function PaginaLogin() {
       try {
         const mesaRemota = await entrarMesaRemota(normalizado);
         if (mesaRemota.statusEntrada === "pendente") {
+          aplicarMesaRemota(mesaRemota);
           setRetorno({
             tipo: "sucesso",
             texto: "Solicitação enviada. Aguarde o mestre aprovar sua entrada.",

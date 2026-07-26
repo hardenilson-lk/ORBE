@@ -42,7 +42,7 @@ export default function SolicitacoesEntradaMesa({
   useEffect(() => {
     if (!online) return undefined;
     void carregar();
-    return assinarSolicitacoesEntradaRealtime(
+    const cancelarCanal = assinarSolicitacoesEntradaRealtime(
       mesaId,
       carregar,
       (erro) =>
@@ -50,6 +50,14 @@ export default function SolicitacoesEntradaMesa({
           erro?.message || "A atualização das solicitações foi interrompida.",
         ),
     );
+    const intervalo = window.setInterval(() => {
+      void carregar();
+    }, 5000);
+
+    return () => {
+      window.clearInterval(intervalo);
+      cancelarCanal();
+    };
   }, [carregar, mesaId, online]);
 
   async function alternarAprovacao() {

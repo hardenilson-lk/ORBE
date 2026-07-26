@@ -1932,6 +1932,7 @@
 .painel-gerenciar-fichas__form input,
 .painel-gerenciar-fichas__form select { width: 100%; min-height: 40px; padding: 8px 10px; border: 1px solid #8e7048; background: rgba(255,246,218,.75); }
 .painel-gerenciar-fichas__form > button { grid-column: 1 / -1; min-height: 42px; border: 1px solid #7c4f16; color: #fff0c4; background: linear-gradient(#84601f,#51320e); font-weight: 700; text-transform: uppercase; cursor: pointer; }
+.painel-gerenciar-fichas__erro { grid-column: 1 / -1; padding: 9px 11px; border-left: 3px solid #9f2929; color: #7b1818; background: rgba(159,41,41,.09); font-size: .72rem; }
 .painel-gerenciar-fichas__subtitulo { display: flex; justify-content: space-between; align-items: end; gap: 18px; margin-bottom: 14px; }
 .painel-gerenciar-fichas__jogadores { display: grid; gap: 8px; }
 .painel-gerenciar-fichas__jogadores article { display: flex; align-items: center; gap: 15px; padding: 12px; border: 1px solid rgba(100,73,42,.35); background: rgba(255,245,213,.42); }

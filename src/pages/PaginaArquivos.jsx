@@ -21,6 +21,7 @@ export default function PaginaArquivos() {
       try {
         const mesaRemota = await entrarMesaRemota(normalizado);
         if (mesaRemota.statusEntrada === "pendente") {
+          aplicarMesaRemota(mesaRemota);
           setErroConvite(
             "Solicitação enviada. Aguarde o mestre aprovar sua entrada.",
           );

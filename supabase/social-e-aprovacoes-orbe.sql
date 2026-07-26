@@ -63,22 +63,11 @@ begin
       message = 'Código de convite não encontrado.';
   end if;
 
-  if mesa_encontrada.owner_id = auth.uid() then
-    status_final := 'ativo';
-  else
-    select membro.status
-    into status_final
-    from public.mesa_membros_orbe membro
-    where membro.mesa_id = mesa_encontrada.id
-      and membro.user_id = auth.uid();
-
-    if status_final is distinct from 'ativo' then
-      status_final := case
-        when mesa_encontrada.exigir_aprovacao_convite then 'pendente'
-        else 'ativo'
-      end;
-    end if;
-  end if;
+  status_final := case
+    when mesa_encontrada.owner_id = auth.uid() then 'ativo'
+    when mesa_encontrada.exigir_aprovacao_convite then 'pendente'
+    else 'ativo'
+  end;
 
   insert into public.mesa_membros_orbe (
     mesa_id,
@@ -98,10 +87,7 @@ begin
       when public.mesa_membros_orbe.papel = 'mestre' then 'mestre'
       else excluded.papel
     end,
-    status = case
-      when public.mesa_membros_orbe.status = 'ativo' then 'ativo'
-      else excluded.status
-    end;
+    status = excluded.status;
 
   return query
   select
