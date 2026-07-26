@@ -422,3 +422,26 @@
     grid-column: 2;
   }
 }
+
+.barra-lateral-mesa__moderacao {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-column: 1 / -1;
+  gap: 6px;
+}
+
+.barra-lateral-mesa__moderacao button {
+  min-height: 28px;
+  border: 1px solid #725126;
+  color: #2a1a0e;
+  background: #d1b177;
+  font: 700 0.55rem "Courier Prime", monospace;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.barra-lateral-mesa__moderacao button.banir {
+  border-color: #7d1f1f;
+  color: #ffe1c3;
+  background: #731f1f;
+}

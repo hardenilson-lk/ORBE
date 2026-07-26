@@ -24,6 +24,7 @@ export default function PaginaPortalMesas() {
   const [codigo, setCodigo] = useState("");
   const [erro, setErro] = useState(localizacao.state?.aviso || "");
   const [carregandoConvite, setCarregandoConvite] = useState(false);
+  const [reenviandoMesaId, setReenviandoMesaId] = useState("");
   const [mesaAguardandoId, setMesaAguardandoId] = useState("");
   const [mesas, setMesas] = useMesasOrbe();
 
@@ -33,7 +34,7 @@ export default function PaginaPortalMesas() {
     const mesaAprovada = mesas.find(
       (mesa) =>
         String(mesa.id) === String(mesaAguardandoId) &&
-        mesa.statusEntrada !== "pendente",
+        mesa.statusEntrada === "ativo",
     );
 
     if (!mesaAprovada) return;
@@ -76,6 +77,22 @@ export default function PaginaPortalMesas() {
     navegar(`/arquivos/jogador/${mesa.id}`);
   }
 
+  async function reenviarSolicitacao(mesa) {
+    if (!mesa?.codigoConvite || reenviandoMesaId) return;
+    setReenviandoMesaId(String(mesa.id));
+    setErro("");
+    try {
+      const atualizada = await entrarMesaRemota(mesa.codigoConvite);
+      setMesas(aplicarMesaRemota(atualizada));
+      setMesaAguardandoId(String(atualizada.id));
+      setErro("Solicitação reenviada. Aguarde a aprovação do mestre.");
+    } catch (falha) {
+      setErro(mensagemErroConviteOrbe(falha));
+    } finally {
+      setReenviandoMesaId("");
+    }
+  }
+
   return (
     <PortalLayout titulo="Mesas e campanhas" subtitulo={`Campanhas disponíveis para ${lerUsuarioAtual()?.nome || "você"}.`}>
       <section className="portal-grade">
@@ -83,7 +100,7 @@ export default function PaginaPortalMesas() {
         <article className="portal-card"><span className="portal-etiqueta">Convite</span><h2>Entrar em uma mesa</h2><form className="portal-form" onSubmit={entrar}><label>Código<input required value={codigo} onChange={(e) => { setCodigo(e.target.value); setErro(""); }} placeholder="ORBE-000000" /></label>{erro ? <small className="portal-erro">{erro}</small> : null}<button className="portal-botao" type="submit" disabled={carregandoConvite}>{carregandoConvite ? "Entrando..." : "Entrar como jogador"}</button></form></article>
         <article className="portal-card"><span className="portal-etiqueta">Sistema atual</span><h2>Arquivos</h2><p>O grid, escudo, dados, missões, arquivos e fichas permanecem exatamente no sistema novo.</p><Link className="portal-botao" to="/arquivos">Abrir central Arquivos</Link></article>
       </section>
-      <section className="portal-painel" style={{ marginTop: 20 }}><h2>Campanhas</h2>{mesas.length ? <div className="portal-lista">{mesas.map((mesa) => <article className="portal-lista__item" key={mesa.id}><div><span className="portal-etiqueta">{mesa.arquivoInicial || "ARQUIVO 0001"} · {formatarData(mesa.criadaEm)}</span><h3>{mesa.nomeCampanha || mesa.nome}</h3><p>{mesa.descricao || "Investigação sem descrição."}</p></div><div className="portal-acoes">{usuarioPodeAdministrarMesa(mesa, usuarioId) ? <Link className="portal-botao" to={`/arquivos/mesa/${mesa.id}`}>Mestre</Link> : null}{mesa.statusEntrada === "pendente" ? <span className="portal-etiqueta">Aguardando aprovação</span> : <Link className="portal-botao" to={`/arquivos/jogador/${mesa.id}`}>Jogador</Link>}</div></article>)}</div> : <p className="portal-vazio">Nenhuma campanha criada ainda.</p>}</section>
+      <section className="portal-painel" style={{ marginTop: 20 }}><h2>Campanhas</h2>{mesas.length ? <div className="portal-lista">{mesas.map((mesa) => <article className="portal-lista__item" key={mesa.id}><div><span className="portal-etiqueta">{mesa.arquivoInicial || "ARQUIVO 0001"} · {formatarData(mesa.criadaEm)}</span><h3>{mesa.nomeCampanha || mesa.nome}</h3><p>{mesa.descricao || "Investigação sem descrição."}</p></div><div className="portal-acoes">{usuarioPodeAdministrarMesa(mesa, usuarioId) ? <Link className="portal-botao" to={`/arquivos/mesa/${mesa.id}`}>Mestre</Link> : null}{mesa.statusEntrada === "pendente" ? <><span className="portal-etiqueta">Aguardando aprovação</span><button className="portal-botao" type="button" disabled={Boolean(reenviandoMesaId)} onClick={() => reenviarSolicitacao(mesa)}>{reenviandoMesaId === String(mesa.id) ? "Reenviando..." : "Reenviar solicitação"}</button></> : <Link className="portal-botao" to={`/arquivos/jogador/${mesa.id}`}>Jogador</Link>}</div></article>)}</div> : <p className="portal-vazio">Nenhuma campanha criada ainda.</p>}</section>
     </PortalLayout>
   );
 }

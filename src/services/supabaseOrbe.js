@@ -429,6 +429,45 @@ export async function responderSolicitacaoEntradaRemota(
   return data;
 }
 
+export async function moderarMembroMesaRemoto(mesaId, usuarioId, acao) {
+  const cliente = exigirCliente();
+  const mesa = String(mesaId || "");
+  const usuario = String(usuarioId || "");
+
+  if (!mesa || !usuario) {
+    throw new Error("Participante inválido.");
+  }
+
+  if (acao === "expulsar") {
+    const { data, error } = await cliente
+      .from("mesa_membros_orbe")
+      .delete()
+      .eq("mesa_id", mesa)
+      .eq("user_id", usuario)
+      .neq("papel", "mestre")
+      .select("mesa_id,user_id")
+      .maybeSingle();
+    if (error) throw error;
+    if (!data) throw new Error("Somente jogadores podem ser expulsos.");
+    return { mesaId: mesa, usuarioId: usuario, status: "expulso" };
+  }
+
+  if (acao === "banir") {
+    const { data, error } = await cliente
+      .from("mesa_membros_orbe")
+      .update({ status: "banido" })
+      .eq("mesa_id", mesa)
+      .eq("user_id", usuario)
+      .neq("papel", "mestre")
+      .select("mesa_id,user_id,status")
+      .single();
+    if (error) throw error;
+    return data;
+  }
+
+  throw new Error("Ação de moderação inválida.");
+}
+
 export async function configurarAprovacaoConvitesRemota(mesaId, exigir) {
   const cliente = exigirCliente();
   const { data, error } = await cliente
@@ -796,6 +835,9 @@ export function mensagemErroConviteOrbe(falha) {
   const codigoErro = String(falha?.code || "").toUpperCase();
   const detalhe = String(falha?.message || "").toLowerCase();
 
+  if (detalhe.includes("banido")) {
+    return "Você foi banido desta mesa e não pode reenviar a solicitação.";
+  }
   if (codigoErro === "P0002" || detalhe.includes("não encontrado") || detalhe.includes("nao encontrado")) {
     return "Código de convite não encontrado.";
   }
@@ -849,11 +891,30 @@ export async function salvarFichaRemota(
     edit_locked: Boolean(ficha.editLocked),
   };
 
-  const { data, error } = await cliente
+  let { data, error } = await cliente
     .from("fichas_orbe")
     .upsert(payload, { onConflict: "id" })
     .select()
     .single();
+
+  const colunaOwnerAusente =
+    error &&
+    /owner_id/i.test(String(error.message || "")) &&
+    /(column|coluna|schema cache|does not exist|not found)/i.test(
+      String(error.message || ""),
+    );
+
+  if (colunaOwnerAusente) {
+    const { owner_id: _ownerId, ...payloadLegado } = payload;
+    const resultadoLegado = await cliente
+      .from("fichas_orbe")
+      .upsert(payloadLegado, { onConflict: "id" })
+      .select()
+      .single();
+    data = resultadoLegado.data;
+    error = resultadoLegado.error;
+  }
+
   if (error) throw error;
   return normalizarFichaRemota(data);
 }

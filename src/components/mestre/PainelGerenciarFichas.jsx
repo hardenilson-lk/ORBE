@@ -33,18 +33,22 @@ function PainelGerenciarFichas({
       setErroCriacao("Informe o nome da ficha ou escolha um jogador.");
       return;
     }
-    const fichaCriada = await aoCriarFicha?.({
-      nome: nomeFinal,
-      tipo,
-      jogadorId: jogadorFinalId,
-      jogador: jogador?.nome || "",
-      permissao,
-    });
-    if (fichaCriada) {
-      setNome("");
-      return;
+    try {
+      const fichaCriada = await aoCriarFicha?.({
+        nome: nomeFinal,
+        tipo,
+        jogadorId: jogadorFinalId,
+        jogador: jogador?.nome || "",
+        permissao,
+      });
+      if (fichaCriada) {
+        setNome("");
+        return;
+      }
+      setErroCriacao("A ficha não foi criada. Confira o aviso do sistema e tente novamente.");
+    } catch (erro) {
+      setErroCriacao(erro?.message || "Não foi possível criar e vincular a ficha.");
     }
-    setErroCriacao("A ficha não foi criada. Confira o aviso do sistema e tente novamente.");
   }
 
   return (

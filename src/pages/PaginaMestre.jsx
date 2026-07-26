@@ -51,6 +51,7 @@ import {
 import {
   carregarEstadoMesaRemoto,
   listarSolicitacoesMigracaoFichaRemotas,
+  moderarMembroMesaRemoto,
   publicarInicioRolagemMesaRealtime,
   publicarRolagemMesaRealtime,
   publicarTokensMesaRealtime,
@@ -417,6 +418,35 @@ function PaginaMestre() {
     }
   }
 
+  async function moderarJogador(jogador, acao) {
+    if (!jogador?.id) return;
+    const verbo = acao === "banir" ? "banir" : "expulsar";
+    const complemento =
+      acao === "banir"
+        ? " Ele não poderá solicitar entrada novamente."
+        : " Ele poderá enviar uma nova solicitação depois.";
+    if (!window.confirm(`Deseja ${verbo} ${jogador.nome || "este jogador"}?${complemento}`)) {
+      return;
+    }
+
+    try {
+      await moderarMembroMesaRemoto(mesaId, jogador.id, acao);
+      setSessao((atual) => ({
+        ...atual,
+        jogadores: criarListaSegura(atual.jogadores).filter(
+          (item) => String(item.id) !== String(jogador.id),
+        ),
+      }));
+      setMensagemSistema(
+        acao === "banir"
+          ? `${jogador.nome || "Jogador"} foi banido da mesa.`
+          : `${jogador.nome || "Jogador"} foi expulso da mesa.`,
+      );
+    } catch (erro) {
+      setMensagemSistema(erro?.message || "Não foi possível moderar o participante.");
+    }
+  }
+
   async function criarFichaDaSessao(configuracao = {}) {
     const jogador = criarListaSegura(sessao.jogadores).find(
       (item) => item.id === configuracao.jogadorId,
@@ -437,7 +467,7 @@ function PaginaMestre() {
       );
     } catch (erro) {
       setMensagemSistema(erro?.message || "Não foi possível criar a ficha online.");
-      return;
+      throw erro;
     }
 
     const listaAtualizada = atualizarListaFichas();
@@ -1581,6 +1611,8 @@ function PaginaMestre() {
                 []
               }
               mestreOnline={mestreOnline}
+              aoExpulsarJogador={(jogador) => moderarJogador(jogador, "expulsar")}
+              aoBanirJogador={(jogador) => moderarJogador(jogador, "banir")}
               aoCopiarConvite={() =>
                 setMensagemSistema(
                   "Código de convite copiado.",

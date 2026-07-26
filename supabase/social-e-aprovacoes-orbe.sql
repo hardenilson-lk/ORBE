@@ -63,6 +63,18 @@ begin
       message = 'Código de convite não encontrado.';
   end if;
 
+  if exists (
+    select 1
+    from public.mesa_membros_orbe membro
+    where membro.mesa_id = mesa_encontrada.id
+      and membro.user_id = auth.uid()
+      and membro.status = 'banido'
+  ) then
+    raise exception using
+      errcode = '42501',
+      message = 'Você foi banido desta mesa.';
+  end if;
+
   status_final := case
     when mesa_encontrada.owner_id = auth.uid() then 'ativo'
     when mesa_encontrada.exigir_aprovacao_convite then 'pendente'

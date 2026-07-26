@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Navigate, Outlet, useParams } from "react-router";
 
 import {
+  assinarMesasUsuarioRealtime,
   buscarMinhaAssociacaoMesaRemota,
   orbeOnlineHabilitado,
 } from "../services/supabaseOrbe.js";
@@ -16,6 +17,7 @@ export default function RotaJogadorMesa() {
 
   useEffect(() => {
     let ativo = true;
+    let cancelarCanal = () => {};
 
     async function verificar() {
       if (!orbeOnlineHabilitado() || mesaId === "local") {
@@ -39,6 +41,8 @@ export default function RotaJogadorMesa() {
           aviso:
             associacao?.status === "pendente"
               ? "Sua entrada ainda aguarda aprovação do mestre."
+              : associacao?.status === "banido"
+                ? "Você foi banido desta campanha."
               : "Você não possui acesso ativo a esta campanha.",
         });
       } catch (erro) {
@@ -54,8 +58,18 @@ export default function RotaJogadorMesa() {
     }
 
     void verificar();
+    const intervalo = window.setInterval(() => {
+      void verificar();
+    }, 5000);
+    void assinarMesasUsuarioRealtime(verificar).then((cancelar) => {
+      if (!ativo) cancelar();
+      else cancelarCanal = cancelar;
+    });
+
     return () => {
       ativo = false;
+      window.clearInterval(intervalo);
+      cancelarCanal();
     };
   }, [mesaId]);
 

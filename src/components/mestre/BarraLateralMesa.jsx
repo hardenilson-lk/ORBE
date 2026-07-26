@@ -12,6 +12,8 @@ function BarraLateralMesa({
   jogadores = [],
   mestreOnline = true,
   aoCopiarConvite,
+  aoExpulsarJogador,
+  aoBanirJogador,
   aoAbrirConfiguracoes,
   aoEncerrarSessao,
 }) {
@@ -207,6 +209,14 @@ function BarraLateralMesa({
                         ? "Online"
                         : "Offline"}
                     </small>
+                    <div className="barra-lateral-mesa__moderacao">
+                      <button type="button" onClick={() => aoExpulsarJogador?.(jogador)}>
+                        Expulsar
+                      </button>
+                      <button className="banir" type="button" onClick={() => aoBanirJogador?.(jogador)}>
+                        Banir
+                      </button>
+                    </div>
                   </article>
                 );
               },

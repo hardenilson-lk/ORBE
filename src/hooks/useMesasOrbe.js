@@ -11,7 +11,11 @@ import { salvarListaFichasArquivos } from "../utils/fichasArquivos.js";
 
 function mesclarMesas(locais, remotas) {
   const remotasPorId = new Map(remotas.map((mesa) => [String(mesa.id), mesa]));
-  const locaisPendentes = locais.filter((mesa) => !mesa.remoto && !remotasPorId.has(String(mesa.id)));
+  const locaisPendentes = locais.filter(
+    (mesa) =>
+      (!mesa.remoto || mesa.statusEntrada === "pendente") &&
+      !remotasPorId.has(String(mesa.id)),
+  );
   return [...remotas, ...locaisPendentes];
 }
 
