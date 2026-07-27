@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 512 512"
+  width="512"
+  height="512"
+>
+  <defs>
+    <filter
+      id="sombra"
+      x="-35%"
+      y="-35%"
+      width="170%"
+      height="170%"
+    >
+      <feDropShadow
+        dx="0"
+        dy="13"
+        stdDeviation="12"
+        flood-color="#000000"
+        flood-opacity="0.45"
+      />
+    </filter>
+
+    <filter
+      id="sombraLeve"
+      x="-25%"
+      y="-25%"
+      width="150%"
+      height="150%"
+    >
+      <feDropShadow
+        dx="0"
+        dy="7"
+        stdDeviation="7"
+        flood-color="#000000"
+        flood-opacity="0.34"
+      />
+    </filter>
+
+    <linearGradient
+      id="metal"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#d5dbd8"
+      />
+
+      <stop
+        offset="0.35"
+        stop-color="#8b9691"
+      />
+
+      <stop
+        offset="0.7"
+        stop-color="#4a5551"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#1b211f"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="metalEscuro"
+      x1="0"
+      y1="0"
+      x2="0"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#5c6863"
+      />
+
+      <stop
+        offset="0.48"
+        stop-color="#343c39"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#151918"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="madeira"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#b27a43"
+      />
+
+      <stop
+        offset="0.52"
+        stop-color="#754727"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#382318"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="madeiraClara"
+      x1="0"
+      y1="0"
+      x2="0"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#d3a267"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#81502d"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="plastico"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#505b57"
+      />
+
+      <stop
+        offset="0.55"
+        stop-color="#272e2c"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#111514"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="papel"
+      x1="0"
+      y1="0"
+      x2="0"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#eee5c6"
+      />
+
+      <stop
+        offset="0.55"
+        stop-color="#c8b88d"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#8c7956"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="vidro"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#d1f0ed"
+        stop-opacity=".85"
+      />
+
+      <stop
+        offset="0.46"
+        stop-color="#60918f"
+        stop-opacity=".64"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#263d3d"
+        stop-opacity=".9"
+      />
+    </linearGradient>
+
+    <radialGradient
+      id="tela"
+      cx="50%"
+      cy="45%"
+      r="68%"
+    >
+      <stop
+        offset="0"
+        stop-color="#8ee9db"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#387e78"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#102524"
+      />
+    </radialGradient>
+
+    <radialGradient
+      id="vermelho"
+      cx="42%"
+      cy="36%"
+      r="72%"
+    >
+      <stop
+        offset="0"
+        stop-color="#ff7468"
+      />
+
+      <stop
+        offset="0.48"
+        stop-color="#c93635"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#5b171b"
+      />
+    </radialGradient>
+  </defs>
+
+
+  <g filter="url(#sombra)">
+    <rect
+      x="62"
+      y="89"
+      width="388"
+      height="255"
+      rx="34"
+      fill="#171a19"
+      stroke="#080a09"
+      stroke-width="18"
+    />
+
+    <rect
+      x="86"
+      y="113"
+      width="340"
+      height="207"
+      rx="22"
+      fill="url(#madeiraClara)"
+      stroke="#654021"
+      stroke-width="9"
+    />
+
+    <path
+      d="M171 119v195M256 119v195M341 119v195"
+      stroke="#764724"
+      stroke-width="8"
+      opacity=".75"
+    />
+
+    <path
+      d="M110 169c66-21 112 16 183-3 48-13 81 8 110 1M108 254c79 17 136-15 213 4 31 8 59 0 82-8"
+      fill="none"
+      stroke="#87562f"
+      stroke-width="7"
+      stroke-linecap="round"
+      opacity=".65"
+    />
+
+    <path
+      d="M112 339 75 452M400 339l37 113M174 339l-11 121M338 339l11 121"
+      stroke="#38312a"
+      stroke-width="25"
+      stroke-linecap="round"
+    />
+
+    <path
+      d="M59 450h105M348 450h105M123 466h83M306 466h83"
+      stroke="#111413"
+      stroke-width="13"
+      stroke-linecap="round"
+    />
+
+    <rect
+      x="194"
+      y="170"
+      width="124"
+      height="82"
+      rx="13"
+      fill="#e8dfc3"
+      stroke="#6a604d"
+      stroke-width="7"
+      transform="rotate(-5 256 211)"
+    />
+
+    <path
+      d="M215 198h81M215 218h62"
+      stroke="#716a58"
+      stroke-width="6"
+      stroke-linecap="round"
+    />
+  </g>
+</svg>

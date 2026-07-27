@@ -1,0 +1,27 @@
+.biblioteca-mapas { display:grid; gap:14px; padding:18px; border:1px solid #8b693b; background:#e7d1a4; color:#27180f; }
+.biblioteca-mapas__cabecalho,.biblioteca-mapas__item,.biblioteca-mapas__acoes,.biblioteca-mapas__abas,.biblioteca-mapas__modal form,.biblioteca-mapas__modal>div { display:flex; gap:10px; align-items:center; }
+.biblioteca-mapas__cabecalho { justify-content:space-between; border-bottom:1px dashed #8f7550; padding-bottom:12px; }
+.biblioteca-mapas__cabecalho span,.biblioteca-mapas__chamada>span { color:#9b2525; font:700 .68rem monospace; letter-spacing:.12em; text-transform:uppercase; }
+.biblioteca-mapas h2,.biblioteca-mapas h3 { margin:2px 0; font-family:Georgia,serif; text-transform:uppercase; }
+.biblioteca-mapas button { min-height:34px; border:1px solid #795426; background:linear-gradient(#d7b879,#aa7c3f); color:#29190e; font:700 .67rem monospace; text-transform:uppercase; cursor:pointer; }
+.biblioteca-mapas button.perigo { background:#69251f; color:#fff0d1; }
+.biblioteca-mapas__abas { padding:7px; background:#2a190f; }
+.biblioteca-mapas__abas button[aria-current="page"] { background:#76251f; color:#fff1cf; }
+.biblioteca-mapas__lista { display:grid; gap:8px; }
+.biblioteca-mapas__item { display:grid; grid-template-columns:140px minmax(200px,1fr) minmax(155px,.4fr) minmax(280px,.8fr); padding:9px; border:1px solid #9a7b50; background:#f0ddb6; }
+.biblioteca-mapas__item img { width:140px; height:82px; object-fit:cover; border:1px solid #5e472d; background:#28332f; }
+.biblioteca-mapas__identidade,.biblioteca-mapas__estado { display:grid; gap:3px; align-content:center; }
+.biblioteca-mapas__identidade strong { font:700 1rem Georgia,serif; text-transform:uppercase; }
+.biblioteca-mapas__identidade span,.biblioteca-mapas__identidade small,.biblioteca-mapas__estado small { font:.69rem monospace; }
+.biblioteca-mapas__estado b { color:#7f2421; font:.72rem monospace; text-transform:uppercase; }
+.biblioteca-mapas__acoes { flex-wrap:wrap; justify-content:flex-end; }
+.biblioteca-mapas__acoes button { min-height:28px; padding:4px 7px; }
+.biblioteca-mapas__mensagem { margin:0; padding:9px 12px; border-left:3px solid #9b2525; background:rgba(255,255,255,.35); }
+.biblioteca-mapas__chamada,.biblioteca-mapas__historico,.biblioteca-mapas__vazio { padding:28px; border:1px dashed #92764e; background:rgba(255,255,255,.24); }
+.biblioteca-mapas__historico p { display:flex; justify-content:space-between; gap:14px; padding:9px; border-bottom:1px dashed #a88b5f; }
+.biblioteca-mapas__modal { position:fixed; inset:0; z-index:10020; display:grid; place-items:center; padding:20px; background:rgba(15,9,6,.75); }
+.biblioteca-mapas__modal form,.biblioteca-mapas__modal>div { min-width:min(520px,90vw); align-items:stretch; flex-direction:column; padding:20px; border:2px solid #a77b3c; background:#ead4a7; box-shadow:0 18px 50px #000; }
+.biblioteca-mapas__modal label { display:grid; gap:5px; font:700 .7rem monospace; text-transform:uppercase; }
+.biblioteca-mapas__modal input { min-height:38px; padding:7px; border:1px solid #876739; background:#fff3d6; }
+.biblioteca-mapas__modal form>div,.biblioteca-mapas__modal>div>div { display:flex; justify-content:flex-end; gap:8px; }
+@media (max-width:1050px){.biblioteca-mapas__item{grid-template-columns:110px 1fr}.biblioteca-mapas__item img{width:110px}.biblioteca-mapas__acoes,.biblioteca-mapas__estado{grid-column:1/-1;justify-content:flex-start}}

@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 512 512"
+  width="512"
+  height="512"
+>
+  <defs>
+    <linearGradient
+      id="madeira"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#a16c3c"
+      />
+
+      <stop
+        offset="0.45"
+        stop-color="#68401f"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#2e1a10"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="madeira-clara"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#c9965d"
+      />
+
+      <stop
+        offset="0.48"
+        stop-color="#8a582d"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#4b2b18"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="madeira-escura"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#4b2d1b"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#291810"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#120b08"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="papel-parede"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#9f9278"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#736550"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#453b30"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="vinho"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#8c3447"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#571d2d"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#290e17"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="metal"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#d0c8ad"
+      />
+
+      <stop
+        offset="0.48"
+        stop-color="#8a8067"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#494331"
+      />
+    </linearGradient>
+
+    <radialGradient
+      id="ouro"
+      cx="40%"
+      cy="35%"
+      r="70%"
+    >
+      <stop
+        offset="0"
+        stop-color="#ffe8a2"
+      />
+
+      <stop
+        offset="0.42"
+        stop-color="#c99a43"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#604116"
+      />
+    </radialGradient>
+
+    <radialGradient
+      id="vidro"
+      cx="40%"
+      cy="30%"
+      r="75%"
+    >
+      <stop
+        offset="0"
+        stop-color="#e4d9bd"
+        stop-opacity=".92"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#887d69"
+        stop-opacity=".65"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#342d26"
+        stop-opacity=".88"
+      />
+    </radialGradient>
+
+    <pattern
+      id="ornamento"
+      width="96"
+      height="96"
+      patternUnits="userSpaceOnUse"
+    >
+      <rect
+        width="96"
+        height="96"
+        fill="url(#papel-parede)"
+      />
+
+      <circle
+        cx="48"
+        cy="48"
+        r="26"
+        fill="none"
+        stroke="#b29e70"
+        stroke-width="5"
+        opacity=".3"
+      />
+
+      <path
+        d="M48 12C62 29 68 35 84 48C68 61 62 67 48 84C34 67 28 61 12 48C28 35 34 29 48 12Z"
+        fill="none"
+        stroke="#4f4435"
+        stroke-width="5"
+        opacity=".4"
+      />
+
+      <circle
+        cx="48"
+        cy="48"
+        r="7"
+        fill="#c2a96d"
+        opacity=".45"
+      />
+    </pattern>
+
+    <pattern
+      id="faixa-corrente"
+      width="74"
+      height="74"
+      patternUnits="userSpaceOnUse"
+      patternTransform="rotate(-35)"
+    >
+      <rect
+        width="74"
+        height="74"
+        fill="#311116"
+      />
+
+      <path
+        d="M18 4C5 4 5 31 18 31H37C50 31 50 58 37 58H18"
+        fill="none"
+        stroke="#a99f83"
+        stroke-width="12"
+        stroke-linecap="round"
+      />
+    </pattern>
+
+    <filter
+      id="sombra"
+      x="-30%"
+      y="-30%"
+      width="160%"
+      height="160%"
+    >
+      <feDropShadow
+        dx="10"
+        dy="14"
+        stdDeviation="11"
+        flood-color="#000000"
+        flood-opacity=".65"
+      />
+    </filter>
+
+    <filter
+      id="textura"
+      x="-10%"
+      y="-10%"
+      width="120%"
+      height="120%"
+    >
+      <feTurbulence
+        type="fractalNoise"
+        baseFrequency=".027"
+        numOctaves="3"
+        seed="71"
+        result="ruido"
+      />
+
+      <feColorMatrix
+        in="ruido"
+        type="saturate"
+        values="0"
+        result="ruido-cinza"
+      />
+
+      <feComponentTransfer
+        in="ruido-cinza"
+        result="ruido-suave"
+      >
+        <feFuncA
+          type="table"
+          tableValues="0 .17"
+        />
+      </feComponentTransfer>
+
+      <feBlend
+        in="SourceGraphic"
+        in2="ruido-suave"
+        mode="multiply"
+      />
+    </filter>
+  </defs>
+
+  
+        <g filter="url(#sombra)">
+          <rect
+            x="62"
+            y="101"
+            width="388"
+            height="310"
+            rx="24"
+            fill="#150d08"
+          />
+
+          <rect
+            x="86"
+            y="125"
+            width="340"
+            height="262"
+            rx="14"
+            fill="#0b0705"
+            stroke="#65442b"
+            stroke-width="14"
+          />
+
+          <rect
+            x="87"
+            y="145"
+            width="106"
+            height="226"
+            rx="12"
+            fill="url(#madeira)"
+            stroke="#2e190f"
+            stroke-width="12"
+            transform="rotate(-21 87 145)"
+          />
+
+          <rect
+            x="319"
+            y="145"
+            width="106"
+            height="226"
+            rx="12"
+            fill="url(#madeira)"
+            stroke="#2e190f"
+            stroke-width="12"
+            transform="rotate(21 425 145)"
+          />
+
+          <path
+            d="M191 160H321V351H191Z"
+            fill="#030201"
+            stroke="#57412d"
+            stroke-width="11"
+            stroke-dasharray="24 15"
+          />
+
+          <path
+            d="M207 178H305V334H207Z"
+            fill="#000000"
+            opacity=".96"
+          />
+
+          <path
+            d="M218 196H294M218 317H294"
+            stroke="#a8864c"
+            stroke-width="7"
+            opacity=".3"
+          />
+
+          <rect
+            x="91"
+            y="95"
+            width="330"
+            height="44"
+            rx="10"
+            fill="url(#madeira-escura)"
+            stroke="#150d08"
+            stroke-width="9"
+          />
+
+          <path
+            d="M122 117H390"
+            stroke="url(#ouro)"
+            stroke-width="8"
+            stroke-linecap="round"
+          />
+        </g>
+      
+</svg>

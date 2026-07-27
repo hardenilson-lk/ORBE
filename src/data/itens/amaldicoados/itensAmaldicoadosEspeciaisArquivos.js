@@ -22,23 +22,24 @@ export function criarItemAmaldicoadoEspecial(
 
   return {
     tipo: "Item especial",
+
     categoria:
       "Item amaldiçoado especial",
-    categoriaNumerica,
-    categoriaOficial:
-      CATEGORIAS_ROMANAS[
-        categoriaNumerica
-      ] || "II",
+
     quantidade: 1,
     volume: 1,
     ativo: true,
     amaldicoado: true,
     itemAmaldicoadoEspecial: true,
     numeroMaldicoes: 1,
+
     patenteMinima:
       "Agente Especial",
+
     ...item,
+
     categoriaNumerica,
+
     categoriaOficial:
       CATEGORIAS_ROMANAS[
         categoriaNumerica

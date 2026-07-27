@@ -1,0 +1,457 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 512 512"
+  width="512"
+  height="512"
+  preserveAspectRatio="none"
+>
+  <defs>
+    <filter
+      id="ruido"
+      x="-20%"
+      y="-20%"
+      width="140%"
+      height="140%"
+    >
+      <feTurbulence
+        type="fractalNoise"
+        baseFrequency="0.73"
+        numOctaves="3"
+        seed="63"
+        result="textura"
+      />
+
+      <feColorMatrix
+        in="textura"
+        type="saturate"
+        values="0"
+        result="texturaCinza"
+      />
+
+      <feComponentTransfer
+        in="texturaCinza"
+        result="texturaSuave"
+      >
+        <feFuncA
+          type="table"
+          tableValues="0 0.16"
+        />
+      </feComponentTransfer>
+
+      <feBlend
+        in="SourceGraphic"
+        in2="texturaSuave"
+        mode="soft-light"
+      />
+    </filter>
+
+    <linearGradient
+      id="metalSala"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#87938f"
+      />
+
+      <stop
+        offset="0.48"
+        stop-color="#59645f"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#2c3431"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="metalCorredor"
+      x1="0"
+      y1="0"
+      x2="0"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#485552"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#2b3532"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#121817"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="metalEspecial"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#273235"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#141c1e"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#070b0c"
+      />
+    </linearGradient>
+
+    <radialGradient
+      id="luzAzul"
+      cx="50%"
+      cy="50%"
+      r="68%"
+    >
+      <stop
+        offset="0"
+        stop-color="#d7ffff"
+        stop-opacity=".95"
+      />
+
+      <stop
+        offset="0.38"
+        stop-color="#5ad0d5"
+        stop-opacity=".64"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#164652"
+        stop-opacity="0"
+      />
+    </radialGradient>
+
+    <radialGradient
+      id="luzVermelha"
+      cx="50%"
+      cy="50%"
+      r="68%"
+    >
+      <stop
+        offset="0"
+        stop-color="#ffb09d"
+        stop-opacity=".95"
+      />
+
+      <stop
+        offset="0.38"
+        stop-color="#db3e3c"
+        stop-opacity=".68"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#67161a"
+        stop-opacity="0"
+      />
+    </radialGradient>
+
+    <pattern
+      id="placasSala"
+      width="128"
+      height="128"
+      patternUnits="userSpaceOnUse"
+    >
+      <rect
+        width="128"
+        height="128"
+        fill="url(#metalSala)"
+      />
+
+      <path
+        d="M0 0H128V128H0Z"
+        fill="none"
+        stroke="#202825"
+        stroke-width="7"
+        opacity=".86"
+      />
+
+      <path
+        d="M14 14H114V114H14Z"
+        fill="none"
+        stroke="#98a39e"
+        stroke-width="4"
+        opacity=".34"
+      />
+
+      <circle
+        cx="18"
+        cy="18"
+        r="6"
+        fill="#aeb7b2"
+        stroke="#313936"
+        stroke-width="3"
+      />
+
+      <circle
+        cx="110"
+        cy="18"
+        r="6"
+        fill="#aeb7b2"
+        stroke="#313936"
+        stroke-width="3"
+      />
+
+      <circle
+        cx="18"
+        cy="110"
+        r="6"
+        fill="#aeb7b2"
+        stroke="#313936"
+        stroke-width="3"
+      />
+
+      <circle
+        cx="110"
+        cy="110"
+        r="6"
+        fill="#aeb7b2"
+        stroke="#313936"
+        stroke-width="3"
+      />
+
+      <path
+        d="M27 64H101M64 27V101"
+        stroke="#c4ccc8"
+        stroke-width="3"
+        stroke-dasharray="14 10"
+        opacity=".18"
+      />
+    </pattern>
+
+    <pattern
+      id="placasCorredor"
+      width="128"
+      height="128"
+      patternUnits="userSpaceOnUse"
+    >
+      <rect
+        width="128"
+        height="128"
+        fill="url(#metalCorredor)"
+      />
+
+      <path
+        d="M0 0H128V128H0Z"
+        fill="none"
+        stroke="#080d0c"
+        stroke-width="7"
+        opacity=".94"
+      />
+
+      <path
+        d="M14 14H114V114H14Z"
+        fill="none"
+        stroke="#58645f"
+        stroke-width="4"
+        opacity=".45"
+      />
+
+      <rect
+        x="0"
+        y="52"
+        width="128"
+        height="24"
+        fill="#c59e2c"
+        opacity=".34"
+      />
+
+      <path
+        d="M0 64H128"
+        stroke="#e4be3b"
+        stroke-width="7"
+        stroke-dasharray="31 16"
+        opacity=".62"
+      />
+
+      <circle
+        cx="18"
+        cy="18"
+        r="5"
+        fill="#89948f"
+      />
+
+      <circle
+        cx="110"
+        cy="110"
+        r="5"
+        fill="#89948f"
+      />
+    </pattern>
+
+    <pattern
+      id="placasEspeciais"
+      width="128"
+      height="128"
+      patternUnits="userSpaceOnUse"
+    >
+      <rect
+        width="128"
+        height="128"
+        fill="url(#metalEspecial)"
+      />
+
+      <path
+        d="M0 0H128V128H0Z"
+        fill="none"
+        stroke="#030607"
+        stroke-width="8"
+        opacity=".98"
+      />
+
+      <path
+        d="M15 15H113V113H15Z"
+        fill="none"
+        stroke="#3a4b4e"
+        stroke-width="4"
+        opacity=".58"
+      />
+
+      <path
+        d="M64 15V113M15 64H113"
+        stroke="#263538"
+        stroke-width="4"
+        opacity=".55"
+      />
+
+      <circle
+        cx="18"
+        cy="18"
+        r="6"
+        fill="#75868a"
+        stroke="#11191b"
+        stroke-width="3"
+      />
+
+      <circle
+        cx="110"
+        cy="18"
+        r="6"
+        fill="#75868a"
+        stroke="#11191b"
+        stroke-width="3"
+      />
+
+      <circle
+        cx="18"
+        cy="110"
+        r="6"
+        fill="#75868a"
+        stroke="#11191b"
+        stroke-width="3"
+      />
+
+      <circle
+        cx="110"
+        cy="110"
+        r="6"
+        fill="#75868a"
+        stroke="#11191b"
+        stroke-width="3"
+      />
+    </pattern>
+
+    <pattern
+      id="faixaPerigo"
+      width="72"
+      height="72"
+      patternUnits="userSpaceOnUse"
+      patternTransform="rotate(35)"
+    >
+      <rect
+        width="36"
+        height="72"
+        fill="#c49b27"
+      />
+
+      <rect
+        x="36"
+        width="36"
+        height="72"
+        fill="#171d1c"
+      />
+    </pattern>
+  </defs>
+
+
+  <g filter="url(#ruido)">
+    <rect
+      width="512"
+      height="512"
+      fill="url(#placasCorredor)"
+    />
+
+    <path
+      d="M0 128H512M0 256H512M0 384H512"
+      stroke="#080d0c"
+      stroke-width="6"
+      opacity=".76"
+    />
+
+    <path
+      d="M0 64H512M0 320H512"
+      stroke="#d8ae31"
+      stroke-width="10"
+      stroke-dasharray="42 19"
+      opacity=".54"
+    />
+
+    <path
+      d="M20 20H492V492H20Z"
+      fill="none"
+      stroke="#77837e"
+      stroke-width="6"
+      opacity=".25"
+    />
+
+    <path
+      d="M48 103h416M48 407h416"
+      stroke="#9da8a3"
+      stroke-width="4"
+      stroke-dasharray="20 12"
+      opacity=".22"
+    />
+
+    <g
+      fill="#060a09"
+      opacity=".37"
+    >
+      <circle
+        cx="86"
+        cy="183"
+        r="7"
+      />
+
+      <circle
+        cx="406"
+        cy="343"
+        r="6"
+      />
+
+      <circle
+        cx="281"
+        cy="461"
+        r="5"
+      />
+    </g>
+  </g>
+</svg>

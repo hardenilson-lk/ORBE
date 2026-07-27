@@ -38,6 +38,7 @@ function PainelEstruturasMapa({ ferramenta, paredes, portas, bloqueada, aoEscolh
             </div>
             {item.tipo !== "parede" ? <button type="button" onClick={() => aoAlterar(item.tipo, item.id, { aberta: !item.aberta })}>{item.aberta ? "Fechar" : "Abrir"}</button> : null}
             {item.tipo === "porta" ? <button type="button" onClick={() => aoAlterar(item.tipo, item.id, { trancada: !item.trancada, aberta: item.trancada ? item.aberta : false })}>{item.trancada ? "Destrancar" : "Trancar"}</button> : null}
+            {item.tipo === "parede" ? <button type="button" onClick={() => aoAlterar(item.tipo, item.id, { visivelJogador: !item.visivelJogador })}>{item.visivelJogador ? "Ocultar parede visual" : "Exibir parede visualmente"}</button> : null}
             <button type="button" onClick={() => aoAlterar(item.tipo, item.id, { oculta: !item.oculta })}>{item.oculta ? "Mostrar" : "Ocultar de jogadores"}</button>
             <button className="painel-mapa__botao-perigo" type="button" onClick={() => aoRemover(item.tipo, item.id)}>Remover</button>
           </article>

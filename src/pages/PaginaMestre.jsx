@@ -30,6 +30,7 @@ import PainelMissoes from "../components/mestre/PainelMissoes.jsx";
 import PainelRituais from "../components/mestre/PainelRituais.jsx";
 import MesaSonora from "../components/mestre/mesaSonora/MesaSonora.jsx";
 import { MesaSonoraLiveKitProvider } from "../components/mestre/mesaSonora/livekit/MesaSonoraLiveKitContext.jsx";
+import PainelBibliotecaMapas from "../geradorMapa/components/PainelBibliotecaMapas.jsx";
 
 import {
   criarFichaArquivosVazia,
@@ -997,6 +998,19 @@ function PaginaMestre() {
   }
 
   function renderizarPainel() {
+    if (menuAtivo === "gerador-mapas") {
+      return (
+        <PainelBibliotecaMapas
+          mesaId={mesaId}
+          sistemaCampanha={mesaAtual?.sistema || "arquivos"}
+          mapaGridAtual={sessao.mapa || {}}
+          aoAlterarMapaGrid={(mapaAtualizado) =>
+            persistirSessao({ mapa: mapaAtualizado })
+          }
+        />
+      );
+    }
+
     if (
       menuAtivo ===
       "gerenciar-fichas"
@@ -1298,6 +1312,8 @@ function PaginaMestre() {
           <PainelMapa
             papelAtual="mestre"
             arquivoInicial={arquivoAtual}
+            sistemaCampanha={mesaAtual?.sistema || "arquivos"}
+            mesaId={mesaId}
             mapa={sessao.mapa}
             fichas={fichas}
             aoAtualizarFicha={salvarFicha}

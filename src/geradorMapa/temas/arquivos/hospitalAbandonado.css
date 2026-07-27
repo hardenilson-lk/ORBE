@@ -1,0 +1,64 @@
+.tema-mapa--hospital-abandonado .editor-mapa__fundo {
+  fill: #17201f;
+}
+
+.tema-mapa--hospital-abandonado .editor-mapa__chao {
+  fill: url("#hospital-piso-salas");
+  opacity: 1;
+}
+
+.tema-mapa--hospital-abandonado .editor-mapa__corredor rect {
+  fill: url("#hospital-piso-corredor");
+  opacity: .96;
+}
+
+.tema-mapa--hospital-abandonado .editor-mapa__sala {
+  fill: url("#hospital-piso-salas");
+  stroke: #65706d;
+  stroke-width: .1;
+}
+
+.tema-mapa--hospital-abandonado .editor-mapa__parede {
+  stroke: #cad4cf;
+  stroke-width: .2;
+  filter: drop-shadow(0 .05px .03px #17201f);
+}
+
+.tema-mapa--hospital-abandonado .editor-mapa__porta line {
+  stroke: #89a39e;
+  stroke-width: .3;
+}
+
+.tema-mapa--hospital-abandonado .editor-mapa__porta--aberta line {
+  stroke: #77b98c;
+}
+
+.tema-mapa--hospital-abandonado .editor-mapa__porta--trancada line {
+  stroke: #bd665e;
+}
+
+.tema-mapa--hospital-abandonado .editor-mapa__porta--secreta line {
+  stroke: #cad4cf;
+  stroke-dasharray: none;
+}
+
+.tema-mapa--hospital-abandonado .editor-mapa__texto {
+  fill: #24302d;
+}
+
+.gerador-mapa__preview--hospital-abandonado .gerador-mapa__fundo-planta {
+  fill: #17201f;
+}
+
+.gerador-mapa__preview--hospital-abandonado .gerador-mapa__sala {
+  fill: #aeb9b4;
+  stroke: #66736f;
+}
+
+.gerador-mapa__preview--hospital-abandonado .gerador-mapa__celula-corredor {
+  fill: #7f918c;
+}
+
+.gerador-mapa__preview--hospital-abandonado .gerador-mapa__parede {
+  stroke: #d0d8d4;
+}

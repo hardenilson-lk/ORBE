@@ -1,0 +1,537 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 512 512"
+  width="512"
+  height="512"
+>
+  <defs>
+    <linearGradient
+      id="pedra"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#62595f"
+      />
+
+      <stop
+        offset="0.48"
+        stop-color="#3c343b"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#1b171c"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="pedra-clara"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#8c8188"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#5d5159"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#302931"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="pedra-escura"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#2b232b"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#171219"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#080609"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="energia-roxa"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#d784ee"
+      />
+
+      <stop
+        offset="0.48"
+        stop-color="#8b3aaa"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#421453"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="energia-vermelha"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#e45b70"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#9f263e"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#4a0e1d"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="metal"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#b7aeb4"
+      />
+
+      <stop
+        offset="0.48"
+        stop-color="#756b72"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#3b343b"
+      />
+    </linearGradient>
+
+    <radialGradient
+      id="brilho-roxo"
+      cx="50%"
+      cy="50%"
+      r="70%"
+    >
+      <stop
+        offset="0"
+        stop-color="#f3b4ff"
+        stop-opacity="1"
+      />
+
+      <stop
+        offset="0.38"
+        stop-color="#be5be0"
+        stop-opacity=".82"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#531568"
+        stop-opacity="0"
+      />
+    </radialGradient>
+
+    <radialGradient
+      id="brilho-vermelho"
+      cx="50%"
+      cy="50%"
+      r="70%"
+    >
+      <stop
+        offset="0"
+        stop-color="#ffb1a9"
+        stop-opacity="1"
+      />
+
+      <stop
+        offset="0.4"
+        stop-color="#e04658"
+        stop-opacity=".82"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#681221"
+        stop-opacity="0"
+      />
+    </radialGradient>
+
+    <pattern
+      id="blocos-pedra"
+      width="128"
+      height="96"
+      patternUnits="userSpaceOnUse"
+    >
+      <rect
+        width="128"
+        height="96"
+        fill="url(#pedra)"
+      />
+
+      <path
+        d="M0 0H128V96H0Z"
+        fill="none"
+        stroke="#130f14"
+        stroke-width="7"
+        opacity=".86"
+      />
+
+      <path
+        d="M64 0V96M0 48H128"
+        stroke="#756a72"
+        stroke-width="4"
+        opacity=".34"
+      />
+
+      <path
+        d="M14 18C31 7 47 28 64 16C82 5 97 26 115 15"
+        fill="none"
+        stroke="#91858d"
+        stroke-width="4"
+        stroke-linecap="round"
+        opacity=".22"
+      />
+
+      <path
+        d="M13 76C30 64 47 84 65 72C82 61 99 82 115 70"
+        fill="none"
+        stroke="#1b151c"
+        stroke-width="5"
+        stroke-linecap="round"
+        opacity=".4"
+      />
+
+      <circle
+        cx="15"
+        cy="15"
+        r="5"
+        fill="#827780"
+        stroke="#292229"
+        stroke-width="3"
+      />
+
+      <circle
+        cx="113"
+        cy="81"
+        r="5"
+        fill="#827780"
+        stroke="#292229"
+        stroke-width="3"
+      />
+    </pattern>
+
+    <pattern
+      id="simbolos"
+      width="112"
+      height="112"
+      patternUnits="userSpaceOnUse"
+    >
+      <rect
+        width="112"
+        height="112"
+        fill="url(#pedra-escura)"
+      />
+
+      <circle
+        cx="56"
+        cy="56"
+        r="34"
+        fill="none"
+        stroke="#8f3daa"
+        stroke-width="6"
+        opacity=".56"
+      />
+
+      <path
+        d="M56 18L66 45L95 47L72 65L80 94L56 78L32 94L40 65L17 47L46 45Z"
+        fill="none"
+        stroke="#b6476c"
+        stroke-width="6"
+        stroke-linejoin="round"
+        opacity=".58"
+      />
+
+      <circle
+        cx="56"
+        cy="56"
+        r="8"
+        fill="#c465d7"
+        opacity=".5"
+      />
+    </pattern>
+
+    <pattern
+      id="faixa-ritual"
+      width="72"
+      height="72"
+      patternUnits="userSpaceOnUse"
+      patternTransform="rotate(45)"
+    >
+      <rect
+        width="36"
+        height="72"
+        fill="#8e2948"
+      />
+
+      <rect
+        x="36"
+        width="36"
+        height="72"
+        fill="#25131f"
+      />
+    </pattern>
+
+    <filter
+      id="sombra"
+      x="-30%"
+      y="-30%"
+      width="160%"
+      height="160%"
+    >
+      <feDropShadow
+        dx="10"
+        dy="14"
+        stdDeviation="11"
+        flood-color="#000000"
+        flood-opacity=".72"
+      />
+    </filter>
+
+    <filter
+      id="textura"
+      x="-10%"
+      y="-10%"
+      width="120%"
+      height="120%"
+    >
+      <feTurbulence
+        type="fractalNoise"
+        baseFrequency=".032"
+        numOctaves="3"
+        seed="97"
+        result="ruido"
+      />
+
+      <feColorMatrix
+        in="ruido"
+        type="saturate"
+        values="0"
+        result="ruido-cinza"
+      />
+
+      <feComponentTransfer
+        in="ruido-cinza"
+        result="ruido-suave"
+      >
+        <feFuncA
+          type="table"
+          tableValues="0 .18"
+        />
+      </feComponentTransfer>
+
+      <feBlend
+        in="SourceGraphic"
+        in2="ruido-suave"
+        mode="multiply"
+      />
+    </filter>
+
+    <filter
+      id="brilho"
+      x="-40%"
+      y="-40%"
+      width="180%"
+      height="180%"
+    >
+      <feGaussianBlur
+        stdDeviation="8"
+        result="desfoque"
+      />
+
+      <feMerge>
+        <feMergeNode
+          in="desfoque"
+        />
+
+        <feMergeNode
+          in="SourceGraphic"
+        />
+      </feMerge>
+    </filter>
+  </defs>
+
+  
+        <g filter="url(#sombra)">
+          <rect
+            x="55"
+            y="114"
+            width="402"
+            height="284"
+            rx="24"
+            fill="#080609"
+          />
+
+          <rect
+            x="75"
+            y="135"
+            width="362"
+            height="242"
+            rx="15"
+            fill="url(#energia-vermelha)"
+            stroke="#48101e"
+            stroke-width="16"
+            filter="url(#textura)"
+          />
+
+          <rect
+            x="100"
+            y="159"
+            width="312"
+            height="191"
+            rx="10"
+            fill="url(#simbolos)"
+            stroke="#280d2c"
+            stroke-width="11"
+          />
+
+          <rect
+            x="98"
+            y="247"
+            width="316"
+            height="104"
+            rx="9"
+            fill="url(#faixa-ritual)"
+            opacity=".72"
+            stroke="#46101d"
+            stroke-width="10"
+          />
+
+          <circle
+            cx="256"
+            cy="256"
+            r="98"
+            fill="url(#brilho-vermelho)"
+            opacity=".42"
+          />
+
+          <circle
+            cx="256"
+            cy="256"
+            r="74"
+            fill="#1b0913"
+            stroke="#d44762"
+            stroke-width="13"
+            filter="url(#brilho)"
+          />
+
+          <circle
+            cx="256"
+            cy="256"
+            r="48"
+            fill="none"
+            stroke="#db78e9"
+            stroke-width="9"
+            stroke-dasharray="21 12"
+          />
+
+          <path
+            d="M256 176L274 226L327 229L285 262L298 313L256 284L214 313L227 262L185 229L238 226Z"
+            fill="none"
+            stroke="#e3536e"
+            stroke-width="11"
+            stroke-linejoin="round"
+          />
+
+          <rect
+            x="220"
+            y="223"
+            width="72"
+            height="78"
+            rx="13"
+            fill="url(#metal)"
+            stroke="#231b23"
+            stroke-width="10"
+          />
+
+          <path
+            d="M234 227V204C234 171 278 171 278 204V227"
+            fill="none"
+            stroke="#c5bac2"
+            stroke-width="16"
+            stroke-linecap="round"
+          />
+
+          <circle
+            cx="256"
+            cy="259"
+            r="12"
+            fill="#e45b70"
+            stroke="#4d101d"
+            stroke-width="6"
+          />
+
+          <path
+            d="M256 271V288"
+            stroke="#291720"
+            stroke-width="8"
+            stroke-linecap="round"
+          />
+
+          <rect
+            x="91"
+            y="101"
+            width="330"
+            height="45"
+            rx="10"
+            fill="url(#pedra-escura)"
+            stroke="#080609"
+            stroke-width="9"
+          />
+
+          <path
+            d="M126 123H386"
+            stroke="url(#energia-vermelha)"
+            stroke-width="8"
+            stroke-linecap="round"
+          />
+        </g>
+      
+</svg>

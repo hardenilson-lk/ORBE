@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 512 512"
+  width="512"
+  height="512"
+>
+  <defs>
+    <filter
+      id="sombra"
+      x="-35%"
+      y="-35%"
+      width="170%"
+      height="170%"
+    >
+      <feDropShadow
+        dx="0"
+        dy="14"
+        stdDeviation="13"
+        flood-color="#000000"
+        flood-opacity="0.42"
+      />
+    </filter>
+
+    <filter
+      id="sombraLeve"
+      x="-25%"
+      y="-25%"
+      width="150%"
+      height="150%"
+    >
+      <feDropShadow
+        dx="0"
+        dy="8"
+        stdDeviation="7"
+        flood-color="#000000"
+        flood-opacity="0.34"
+      />
+    </filter>
+
+    <linearGradient
+      id="madeira"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#c88943"
+      />
+      <stop
+        offset="0.5"
+        stop-color="#8b4f25"
+      />
+      <stop
+        offset="1"
+        stop-color="#512b19"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="madeiraClara"
+      x1="0"
+      y1="0"
+      x2="0"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#dbad68"
+      />
+      <stop
+        offset="1"
+        stop-color="#8d5429"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="metal"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#d8ddd6"
+      />
+      <stop
+        offset="0.45"
+        stop-color="#7f8985"
+      />
+      <stop
+        offset="1"
+        stop-color="#343b3b"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="lonaVerde"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#83945c"
+      />
+      <stop
+        offset="0.5"
+        stop-color="#52643c"
+      />
+      <stop
+        offset="1"
+        stop-color="#2d3929"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="lonaBege"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#d6bc83"
+      />
+      <stop
+        offset="0.55"
+        stop-color="#a47f48"
+      />
+      <stop
+        offset="1"
+        stop-color="#5f472d"
+      />
+    </linearGradient>
+
+    <radialGradient
+      id="fogo"
+      cx="50%"
+      cy="62%"
+      r="48%"
+    >
+      <stop
+        offset="0"
+        stop-color="#fff8a8"
+      />
+      <stop
+        offset="0.33"
+        stop-color="#ffc43d"
+      />
+      <stop
+        offset="0.68"
+        stop-color="#f36a20"
+      />
+      <stop
+        offset="1"
+        stop-color="#7b1e16"
+      />
+    </radialGradient>
+
+    <radialGradient
+      id="folha"
+      cx="35%"
+      cy="30%"
+      r="78%"
+    >
+      <stop
+        offset="0"
+        stop-color="#8db467"
+      />
+      <stop
+        offset="0.45"
+        stop-color="#426e3b"
+      />
+      <stop
+        offset="1"
+        stop-color="#173622"
+      />
+    </radialGradient>
+  </defs>
+
+
+  <g filter="url(#sombra)">
+    <rect
+      x="82"
+      y="88"
+      width="348"
+      height="336"
+      rx="38"
+      fill="#252924"
+      stroke="#111512"
+      stroke-width="17"
+    />
+
+    <rect
+      x="104"
+      y="108"
+      width="304"
+      height="296"
+      rx="29"
+      fill="url(#lonaVerde)"
+      stroke="#9b8e62"
+      stroke-width="8"
+    />
+
+    <path
+      d="M114 145h284M114 366h284"
+      stroke="#c5b47a"
+      stroke-width="7"
+      opacity=".54"
+    />
+
+    <rect
+      x="127"
+      y="126"
+      width="258"
+      height="77"
+      rx="28"
+      fill="#c9b882"
+      stroke="#6d6042"
+      stroke-width="6"
+    />
+
+    <path
+      d="M101 102 65 54M411 102l36-48M101 410l-36 48M411 410l36 48"
+      stroke="#555f5b"
+      stroke-width="16"
+      stroke-linecap="round"
+    />
+
+    <path
+      d="M81 79 431 433M431 79 81 433"
+      stroke="#7e8984"
+      stroke-width="12"
+      opacity=".86"
+    />
+
+    <circle
+      cx="84"
+      cy="82"
+      r="14"
+      fill="#b8beb5"
+      stroke="#303735"
+      stroke-width="6"
+    />
+
+    <circle
+      cx="428"
+      cy="82"
+      r="14"
+      fill="#b8beb5"
+      stroke="#303735"
+      stroke-width="6"
+    />
+
+    <circle
+      cx="84"
+      cy="430"
+      r="14"
+      fill="#b8beb5"
+      stroke="#303735"
+      stroke-width="6"
+    />
+
+    <circle
+      cx="428"
+      cy="430"
+      r="14"
+      fill="#b8beb5"
+      stroke="#303735"
+      stroke-width="6"
+    />
+  </g>
+</svg>

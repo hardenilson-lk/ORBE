@@ -12,10 +12,21 @@ import PainelEstruturasMapa from "./mapa/PainelEstruturasMapa.jsx";
 import CamadaNeblinaMapa from "./mapa/CamadaNeblinaMapa.jsx";
 import PainelNeblinaMapa from "./mapa/PainelNeblinaMapa.jsx";
 import CamadaIluminacaoMapa from "./mapa/CamadaIluminacaoMapa.jsx";
+import CamadaObjetosCenarioMapa from "./mapa/CamadaObjetosCenarioMapa.jsx";
+import CamadaArquiteturaGeradaMapa from "./mapa/CamadaArquiteturaGeradaMapa.jsx";
+import CamadaRotulosCenarioMapa from "./mapa/CamadaRotulosCenarioMapa.jsx";
 import PainelIluminacaoMapa from "./mapa/PainelIluminacaoMapa.jsx";
 import PainelPermissoesMapa from "./mapa/PainelPermissoesMapa.jsx";
 import MiniMapaNavegacao from "./mapa/MiniMapaNavegacao.jsx";
+import LegendaMapa from "./mapa/LegendaMapa.jsx";
 import { podeControlarTokenMapa } from "./mapa/permissoesTokensMapa.js";
+import {
+  avaliarMovimentoTokenMapa,
+  segmentoCruzaBarreiraMapa,
+} from "./mapa/politicaMovimentoTokenMapa.js";
+import PainelGeradorMapa from "../../geradorMapa/components/PainelGeradorMapa.jsx";
+import { removerMapaGeradoDoGrid } from "../../geradorMapa/integracao/adaptarMapaGeradoParaGrid.js";
+import { GERADOR_MAPAS_ATIVO } from "../../config/recursosOrbe.js";
 import "./PainelMapa.css";
 const GRID_PADRAO = {
     colunas: 32,
@@ -36,6 +47,9 @@ const CAMERA_PADRAO = {
     x: 0,
     y: 0,
 };
+const ZOOM_MINIMO_MAPA = 0.25;
+const ZOOM_MAXIMO_MAPA = 3;
+const FATOR_ZOOM_RODA = 1.1;
 const CAMADAS_PADRAO = {
     mapa: { visivel: true, bloqueada: true },
     objetos: { visivel: true, bloqueada: false },
@@ -118,19 +132,6 @@ function limitarNumero(valor, padrao, minimo, maximo) {
         return padrao;
     }
     return Math.min(maximo, Math.max(minimo, numero));
-}
-function segmentoCruzaBarreira(origem, destino, barreira) {
-    const rx = destino.x - origem.x;
-    const ry = destino.y - origem.y;
-    const sx = barreira.fim.x - barreira.inicio.x;
-    const sy = barreira.fim.y - barreira.inicio.y;
-    const divisor = rx * sy - ry * sx;
-    if (Math.abs(divisor) < 0.00001) return false;
-    const qpx = barreira.inicio.x - origem.x;
-    const qpy = barreira.inicio.y - origem.y;
-    const t = (qpx * sy - qpy * sx) / divisor;
-    const u = (qpx * ry - qpy * rx) / divisor;
-    return t > 0.025 && t <= 1 && u >= 0 && u <= 1;
 }
 function diferencaAngular(anguloA, anguloB) {
     const volta = Math.PI * 2;
@@ -243,6 +244,9 @@ function normalizarEstrutura(itemRecebido, indice, tipo) {
         aberta,
         trancada: tipoEstrutura === "porta" && item.trancada === true,
         oculta: item.oculta === true,
+        visivelJogador: (item.origem === "gerador-mapas" && item.oculta !== true)
+            || item.visivelJogador === true
+            || (item.visivelJogador == null && tipoEstrutura !== "parede"),
         bloqueiaVisao: tipoEstrutura === "parede" || !aberta,
         bloqueiaMovimento: tipoEstrutura === "parede" || tipoEstrutura === "janela" || !aberta,
         camada: "paredes",
@@ -314,8 +318,12 @@ function normalizarMapa(mapaRecebido) {
             ...CAMERA_PADRAO,
             ...(mapaSeguro.camera ||
                 {}),
-            zoom: limitarNumero(mapaSeguro.camera
-                ?.zoom, 1, 0.35, 2.5),
+            zoom: limitarNumero(
+                mapaSeguro.camera?.zoom,
+                1,
+                ZOOM_MINIMO_MAPA,
+                ZOOM_MAXIMO_MAPA,
+            ),
         },
         fundo: fundoAtivo,
         mapas,
@@ -450,7 +458,7 @@ async function compactarImagemMapa(arquivo) {
         alturaOriginal: imagem.naturalHeight,
     };
 }
-function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [], papelAtual = "mestre", jogadorAtualId = "", aoAtualizarFicha, aoAlterarMapa, aoAlterarMensagem, aoAbrirMiniFicha, }) {
+function PainelMapa({ arquivoInicial = "ARQUIVO 0001", sistemaCampanha = "arquivos", mesaId = "local", mapa = null, fichas = [], papelAtual = "mestre", jogadorAtualId = "", aoAtualizarFicha, aoAlterarMapa, aoAlterarMensagem, aoAbrirMiniFicha, }) {
     const viewportRef = useRef(null);
     const arquivoFundoRef = useRef(null);
     const arrasteMapaRef = useRef(null);
@@ -483,6 +491,7 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
     const [painelDestravado, setPainelDestravado] = useState(false);
     const [posicaoPainel, setPosicaoPainel] = useState(null);
     const [menuFerramentasAberto, setMenuFerramentasAberto] = useState(false);
+    const [geradorMapaAberto, setGeradorMapaAberto] = useState(false);
     const [guiaAberto, setGuiaAberto,] = useState(false);
     const [arrastandoMapa, setArrastandoMapa,] = useState(false);
     const [arrastandoFundo, setArrastandoFundo,] = useState(false);
@@ -669,10 +678,6 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
         ...mapaLocal.paredes,
         ...mapaLocal.portas.filter((estrutura) => estrutura.bloqueiaVisao),
     ];
-    const barreirasMovimento = [
-        ...mapaLocal.paredes,
-        ...mapaLocal.portas.filter((estrutura) => estrutura.bloqueiaMovimento),
-    ];
     const tokensDoJogador = papelEfetivo === "jogador"
         ? tokens.filter((token) => podeControlarTokenMapa({
             token: { ...token, bloqueado: false },
@@ -695,7 +700,7 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
             if (alcance <= 0 || distancia > alcance) return maiorOpacidade;
             const origem = { x: centroJogadorX, y: centroJogadorY };
             const destino = { x: centroAlvoX, y: centroAlvoY };
-            if (barreirasVisao.some((barreira) => segmentoCruzaBarreira(origem, destino, barreira))) {
+            if (barreirasVisao.some((barreira) => segmentoCruzaBarreiraMapa(origem, destino, barreira))) {
                 return maiorOpacidade;
             }
             const estaNoHaloProximo = distancia <= grid.tamanhoCelula;
@@ -838,6 +843,8 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
             id: `${ferramentaEstrutura}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
             inicio,
             fim,
+            origem: "manual",
+            visivelJogador: ferramentaEstrutura !== "parede",
         }, mapaRef.current[campo].length, ferramentaEstrutura);
         const nome = ferramentaEstrutura === "janela" ? "Janela" : ferramentaEstrutura === "porta" ? "Porta" : "Parede";
         registrarMapa({ ...mapaRef.current, [campo]: [...mapaRef.current[campo], novo] }, `${nome} criada.`);
@@ -1300,11 +1307,15 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
     function podeControlarToken(token) {
         return podeControlarTokenMapa({ token, papelAtual: papelEfetivo, jogadorAtualId: jogadorEfetivoId });
     }
-    function movimentoCruzaEstrutura(token, alteracao) {
-        const metade = (token.tamanho * grid.tamanhoCelula) / 2;
-        const origem = { x: token.x + metade, y: token.y + metade };
-        const destino = { x: alteracao.x + metade, y: alteracao.y + metade };
-        return barreirasMovimento.some((barreira) => segmentoCruzaBarreira(origem, destino, barreira));
+    function avaliarMovimento(token, alteracao) {
+        return avaliarMovimentoTokenMapa({
+            papelAtual: papelEfetivo,
+            possuiPermissao: podeControlarToken(token),
+            token,
+            origem: { x: token.x, y: token.y },
+            destino: alteracao,
+            mapa: mapaRef.current,
+        });
     }
     function moverTokenSelecionadoPorClique(evento) {
         if (ignorarCliqueMapaRef.current) {
@@ -1320,8 +1331,8 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
         const alteracao = grid.encaixarTokens
             ? criarAlteracaoCasa(Math.floor(pontoX / grid.tamanhoCelula), Math.floor(pontoY / grid.tamanhoCelula), tokenSelecionado.tamanho)
             : criarAlteracaoPosicao(pontoX - (tokenSelecionado.tamanho * grid.tamanhoCelula) / 2, pontoY - (tokenSelecionado.tamanho * grid.tamanhoCelula) / 2, tokenSelecionado.tamanho);
-        if (movimentoCruzaEstrutura(tokenSelecionado, alteracao)) {
-            mostrarAviso("Movimento bloqueado por uma parede ou porta fechada.");
+        if (!avaliarMovimento(tokenSelecionado, alteracao).permitido) {
+            mostrarAviso("Movimento bloqueado.");
             return;
         }
         atualizarToken(tokenSelecionado.id, alteracao, grid.encaixarTokens ? "Token movido para a casa escolhida." : "Token reposicionado.");
@@ -1379,7 +1390,7 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
         );
         const tokenAtual = mapaRef.current.tokens.find((token) => token.id ===
             arraste.tokenId);
-        if (tokenAtual && movimentoCruzaEstrutura(tokenAtual, alteracao)) {
+        if (tokenAtual && !avaliarMovimento(tokenAtual, alteracao).permitido) {
             arraste.bloqueado = true;
             return;
         }
@@ -1415,7 +1426,7 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
             null;
         setTokenArrastandoId("");
         if (arraste.bloqueado) {
-            mostrarAviso("Movimento bloqueado por uma parede ou porta fechada.");
+            mostrarAviso("Movimento bloqueado.");
         } else if (arraste.movimentou) {
             ignorarCliqueTokenRef.current = true;
             registrarMapa(mapaRef.current, grid.encaixarTokens
@@ -1481,7 +1492,12 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
         const viewport = viewportRef.current;
         const zoomAnterior = mapaRef.current
             .camera.zoom;
-        const novoZoom = Math.round(limitarNumero(valor, zoomAnterior, 0.35, 2.5) * 10) / 10;
+        const novoZoom = Math.round(limitarNumero(
+            valor,
+            zoomAnterior,
+            ZOOM_MINIMO_MAPA,
+            ZOOM_MAXIMO_MAPA,
+        ) * 1000) / 1000;
         let centroMundoX = larguraMundo / 2;
         let centroMundoY = alturaMundo / 2;
         let ancoraTelaX = viewport?.clientWidth / 2 || 0;
@@ -1570,7 +1586,7 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
             34) /
             larguraMundo, Math.max(100, viewport.clientHeight -
             34) /
-            alturaMundo), 1, 0.35, 2.5);
+            alturaMundo), 1, ZOOM_MINIMO_MAPA, ZOOM_MAXIMO_MAPA);
         registrarMapa({
             ...mapaRef.current,
             camera: {
@@ -1802,9 +1818,14 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
         registrarMapa(mapaRef.current, "Tamanho da imagem atualizado.");
     }
     function controlarRoda(evento) {
-        if (!evento.ctrlKey && !evento.metaKey) return;
         evento.preventDefault();
-        alterarZoom(mapaRef.current.camera.zoom + (evento.deltaY < 0 ? 0.1 : -0.1), { x: evento.clientX, y: evento.clientY });
+        const fator = evento.deltaY < 0
+            ? FATOR_ZOOM_RODA
+            : 1 / FATOR_ZOOM_RODA;
+        alterarZoom(mapaRef.current.camera.zoom * fator, {
+            x: evento.clientX,
+            y: evento.clientY,
+        });
     }
     function controlarScroll() {
         const viewport = viewportRef.current;
@@ -3548,6 +3569,22 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
         />
       ) : null}
 
+      {geradorMapaAberto ? (
+        <PainelGeradorMapa
+          sistemaCampanha={sistemaCampanha}
+          mesaId={mesaId}
+          mapaAtual={mapaLocal}
+          aoAplicarMapa={(proximoMapa) => registrarMapa(proximoMapa, "Mapa gerado aplicado ao grid.")}
+          aoFechar={() => setGeradorMapaAberto(false)}
+        />
+      ) : null}
+
+      {papelAtual === "mestre" && previsualizacaoJogadorId ? (
+        <p className="painel-mapa__modo-jogador" role="status">
+          Visão do jogador ativa — movimento limitado pelas colisões.
+        </p>
+      ) : null}
+
       <header className="painel-mapa__cabecalho">
         <span>
           Mapa
@@ -3557,6 +3594,17 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
           {arquivoInicial} —
           Arquivo inicial
         </strong>
+        {papelEfetivo === "mestre" && mapaLocal.mapaAplicadoId ? (
+          <button
+            type="button"
+            onClick={() => registrarMapa(
+              removerMapaGeradoDoGrid(mapaRef.current),
+              "Mapa gerado removido do grid. Elementos manuais e tokens foram preservados.",
+            )}
+          >
+            Remover mapa do grid
+          </button>
+        ) : null}
       </header>
 
       <div className="painel-mapa__ferramentas">
@@ -3585,6 +3633,9 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
           <button type="button" title="Configurar grid" disabled={papelEfetivo !== "mestre"} aria-pressed={painelGrid} onClick={() => alternarPainel("grid")}><i aria-hidden="true">▦</i><span>Grid</span></button>
           <button type="button" title="Imagens do cenário" disabled={papelEfetivo !== "mestre"} aria-pressed={painelFundo} onClick={() => alternarPainel("fundo")}><i aria-hidden="true">▧</i><span>Fundo</span></button>
           <button type="button" title="Organizar camadas" disabled={papelEfetivo !== "mestre"} aria-pressed={painelCamadas} onClick={() => alternarPainel("camadas")}><i aria-hidden="true">▤</i><span>Camadas</span></button>
+          {GERADOR_MAPAS_ATIVO && papelEfetivo === "mestre" ? (
+            <button type="button" title="Abrir Gerador de Mapas" aria-pressed={geradorMapaAberto} onClick={() => { setGeradorMapaAberto(true); setMenuFerramentasAberto(false); }}><i aria-hidden="true">⌗</i><span>Gerador</span></button>
+          ) : null}
         </div>
 
         <div className="painel-mapa__ferramentas-grupo">
@@ -4064,7 +4115,7 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
           </h3>
 
           <p>
-            Selecione um token e clique em uma casa para movê-lo, ou arraste a peça. Paredes, portas fechadas e janelas bloqueiam a passagem. Dê dois cliques em uma abertura para usá-la. A câmera só se move com Espaço + arraste, botão do meio ou toque; use Ctrl + roda para aplicar zoom.
+            Selecione um token e clique em uma casa para movê-lo, ou arraste a peça. Paredes, portas fechadas e janelas bloqueiam a passagem. Dê dois cliques em uma abertura para usá-la. A câmera só se move com Espaço + arraste, botão do meio ou toque; use a roda sobre o mapa para aplicar zoom no ponto indicado pelo cursor.
           </p>
         </section>) : null}
 
@@ -4132,6 +4183,14 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
               })}
               </div>) : null}
 
+              <CamadaArquiteturaGeradaMapa
+                arquitetura={mapaLocal.arquiteturaVisual}
+                tamanhoCelula={grid.tamanhoCelula}
+                largura={larguraMundo}
+                altura={alturaMundo}
+                papelAtual={papelEfetivo}
+              />
+
               <div className="painel-mapa__grid-camada" style={{
             backgroundImage: configuracaoGrid
                 .imagem,
@@ -4140,6 +4199,8 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
         }}/>
 
               <div className="painel-mapa__sombra-camada"/>
+
+              <CamadaObjetosCenarioMapa objetos={mapaLocal.objetosCenario || []} />
 
               {mapaLocal.camadas.interface.visivel ? (<CamadaMedicaoMapa
                 ativa={painelMedicao}
@@ -4189,6 +4250,17 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
                   papelAtual={papelEfetivo}
                   ativaEdicao={painelLuz && ferramentaLuz === "luz" && !mapaLocal.camadas.efeitos.bloqueada && papelEfetivo === "mestre"}
                   aoAdicionarLuz={adicionarLuz}
+                />
+              ) : null}
+
+              {mapaLocal.camadas.interface.visivel ? (
+                <CamadaRotulosCenarioMapa
+                  arquitetura={mapaLocal.arquiteturaVisual}
+                  objetos={mapaLocal.objetosCenario || []}
+                  tamanhoCelula={grid.tamanhoCelula}
+                  largura={larguraMundo}
+                  altura={alturaMundo}
+                  papelAtual={papelEfetivo}
                 />
               ) : null}
 
@@ -4393,6 +4465,7 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
           }}
           limitesCamera={posicaoCameraVisual}
           fundos={mapaLocal.camadas.mapa.visivel ? mapas : []}
+          arquitetura={mapaLocal.arquiteturaVisual}
           tokens={mapaLocal.camadas.tokens.visivel ? tokensVisiveis.map((token) => ({
             ...token,
             opacidadeMiniMapa: papelEfetivo === "jogador" && token.modoVisibilidade === "proximidade"
@@ -4415,6 +4488,15 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
           aoNavegar={navegarPeloMiniMapa}
           aoAlterarZoom={alterarZoom}
         />
+        <LegendaMapa mapa={mapaLocal} papelAtual={papelEfetivo} />
+
+        {mapaLocal.geradorMapa ? (
+          <div className="painel-mapa__identidade-gerada">
+            <strong>{mapaLocal.geradorMapa.nome || "Mapa gerado"}</strong>
+            <span>{String(mapaLocal.geradorMapa.tema || "").replaceAll("-", " ")}</span>
+            <small>{grid.colunas} × {grid.linhas} · versão {mapaLocal.geradorMapa.versaoFormato || 1}</small>
+          </div>
+        ) : null}
 
         <div className="painel-mapa__informacao">
           <strong>
@@ -4451,7 +4533,7 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", mapa = null, fichas = [],
       </p>
 
       <footer className="painel-mapa__controles" data-assistente="mapa-camera">
-        <span className="painel-mapa__camera-ajuda">Câmera: Espaço + arrastar · Zoom: Ctrl + roda</span>
+        <span className="painel-mapa__camera-ajuda">Câmera: Espaço + arrastar · Zoom: roda do mouse no cursor</span>
         <button type="button" aria-label="Diminuir zoom" onClick={() => alterarZoom(camera.zoom -
             0.1)}>
           −

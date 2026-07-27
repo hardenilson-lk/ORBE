@@ -97,7 +97,10 @@ function EstruturaInterativa({ estrutura, papelAtual, aoAlternarAbertura, aoAlte
 
 function CamadaEstruturasMapa({ ativa, largura, altura, paredes, portas, papelAtual, aoCriar, aoAlternarAbertura, aoAlternarTranca }) {
   const [rascunho, setRascunho] = useState(null);
-  const estruturasVisiveis = portas.filter((estrutura) => papelAtual === "mestre" || !estrutura.oculta);
+  const estruturasVisiveis = portas.filter((estrutura) => (
+    papelAtual === "mestre"
+    || (!estrutura.oculta && estrutura.visivelJogador !== false)
+  ));
   return (
     <svg
       className={ativa ? "camada-estruturas-mapa camada-estruturas-mapa--ativa" : "camada-estruturas-mapa"}
@@ -125,9 +128,9 @@ function CamadaEstruturasMapa({ ativa, largura, altura, paredes, portas, papelAt
       }}
       onPointerCancel={() => setRascunho(null)}
     >
-      {papelAtual === "mestre" ? paredes.map((parede) => (
+      {paredes.filter((parede) => papelAtual === "mestre" || parede.visivelJogador === true).map((parede) => (
         <line className="camada-estruturas-mapa__parede" key={parede.id} x1={parede.inicio.x} y1={parede.inicio.y} x2={parede.fim.x} y2={parede.fim.y} />
-      )) : null}
+      ))}
       {estruturasVisiveis.map((estrutura) => (
         <EstruturaInterativa
           key={estrutura.id}

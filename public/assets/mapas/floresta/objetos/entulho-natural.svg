@@ -1,0 +1,306 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 512 512"
+  width="512"
+  height="512"
+>
+  <defs>
+    <radialGradient
+      id="folhagem"
+      cx="42%"
+      cy="36%"
+      r="68%"
+    >
+      <stop
+        offset="0"
+        stop-color="#8aa45a"
+      />
+
+      <stop
+        offset="0.46"
+        stop-color="#4f713b"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#263b28"
+      />
+    </radialGradient>
+
+    <radialGradient
+      id="folhagem-escura"
+      cx="38%"
+      cy="32%"
+      r="70%"
+    >
+      <stop
+        offset="0"
+        stop-color="#678249"
+      />
+
+      <stop
+        offset="0.52"
+        stop-color="#365134"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#17271e"
+      />
+    </radialGradient>
+
+    <linearGradient
+      id="madeira"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#9a6539"
+      />
+
+      <stop
+        offset="0.48"
+        stop-color="#694125"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#352319"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="madeira-clara"
+      x1="0"
+      y1="0"
+      x2="0"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#bd8750"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#684025"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="pedra"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#9a9b87"
+      />
+
+      <stop
+        offset="0.48"
+        stop-color="#666b61"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#343936"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="lona"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#c7a85c"
+      />
+
+      <stop
+        offset="0.52"
+        stop-color="#866e35"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#41391f"
+      />
+    </linearGradient>
+
+    <radialGradient
+      id="lama"
+      cx="42%"
+      cy="35%"
+      r="70%"
+    >
+      <stop
+        offset="0"
+        stop-color="#806a48"
+      />
+
+      <stop
+        offset="0.6"
+        stop-color="#51462f"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#29291f"
+      />
+    </radialGradient>
+
+    <radialGradient
+      id="agua"
+      cx="40%"
+      cy="30%"
+      r="72%"
+    >
+      <stop
+        offset="0"
+        stop-color="#83b6b0"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#477b78"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#243f42"
+      />
+    </radialGradient>
+
+    <filter
+      id="sombra"
+      x="-35%"
+      y="-35%"
+      width="170%"
+      height="170%"
+    >
+      <feDropShadow
+        dx="12"
+        dy="16"
+        stdDeviation="13"
+        flood-color="#000000"
+        flood-opacity="0.58"
+      />
+    </filter>
+
+    <filter
+      id="sombra-suave"
+      x="-30%"
+      y="-30%"
+      width="160%"
+      height="160%"
+    >
+      <feDropShadow
+        dx="7"
+        dy="10"
+        stdDeviation="9"
+        flood-color="#000000"
+        flood-opacity="0.42"
+      />
+    </filter>
+
+    <filter
+      id="textura"
+      x="-15%"
+      y="-15%"
+      width="130%"
+      height="130%"
+    >
+      <feTurbulence
+        type="fractalNoise"
+        baseFrequency="0.025"
+        numOctaves="3"
+        seed="31"
+        result="ruido"
+      />
+
+      <feColorMatrix
+        in="ruido"
+        type="saturate"
+        values="0"
+        result="cinza"
+      />
+
+      <feComponentTransfer
+        in="cinza"
+        result="ruido-suave"
+      >
+        <feFuncA
+          type="table"
+          tableValues="0 0.14"
+        />
+      </feComponentTransfer>
+
+      <feBlend
+        in="SourceGraphic"
+        in2="ruido-suave"
+        mode="multiply"
+      />
+    </filter>
+  </defs>
+
+  
+        <g filter="url(#sombra-suave)">
+          <ellipse
+            cx="259"
+            cy="384"
+            rx="177"
+            ry="41"
+            fill="#111612"
+            opacity="0.4"
+          />
+
+          <g
+            fill="url(#pedra)"
+            stroke="#292e2b"
+            stroke-width="10"
+          >
+            <path d="M85 311 L117 230 L190 243 L208 329 L143 371 Z" />
+            <path d="M278 296 L315 211 L391 232 L426 318 L354 366 Z" />
+            <path d="M190 341 L225 281 L294 293 L309 368 L239 398 Z" />
+          </g>
+
+          <g
+            stroke="url(#madeira)"
+            stroke-width="35"
+            stroke-linecap="round"
+          >
+            <path d="M112 177 L344 355" />
+            <path d="M386 162 L179 357" />
+          </g>
+
+          <g
+            stroke="#b17b46"
+            stroke-width="8"
+            stroke-linecap="round"
+            opacity="0.48"
+          >
+            <path d="M119 171 L342 343" />
+            <path d="M377 162 L185 347" />
+          </g>
+
+          <g
+            fill="#45673a"
+            stroke="#203622"
+            stroke-width="6"
+          >
+            <path d="M94 298 C55 261 51 213 75 177 C103 220 112 258 94 298 Z" />
+            <path d="M411 311 C447 266 453 218 431 183 C401 225 393 270 411 311 Z" />
+            <path d="M258 223 C232 186 234 149 255 119 C278 155 281 192 258 223 Z" />
+          </g>
+        </g>
+      
+</svg>

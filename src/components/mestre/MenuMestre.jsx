@@ -9,6 +9,11 @@ const ITENS_MENU = [
     texto: "Mapa",
   },
   {
+    id: "gerador-mapas",
+    simbolo: "⌗",
+    texto: "Gerador de mapas",
+  },
+  {
     id: "gerenciar-fichas",
     simbolo: "☰",
     texto: "Gerenciar fichas",
@@ -52,6 +57,7 @@ const ITENS_MENU = [
 
 const ASSISTENTE_POR_MENU = {
   mapa: "menu-mapa",
+  "gerador-mapas": "menu-gerador-mapas",
   fichas: "menu-fichas",
   inventario: "menu-inventario",
   rituais: "menu-rituais",

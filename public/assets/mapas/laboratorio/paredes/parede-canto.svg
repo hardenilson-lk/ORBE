@@ -1,0 +1,426 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 512 512"
+  width="512"
+  height="512"
+>
+  <defs>
+    <linearGradient
+      id="painel-claro"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#edf3ef"
+      />
+
+      <stop
+        offset="0.48"
+        stop-color="#c2cfca"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#879792"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="painel-escuro"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#526763"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#314743"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#172724"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="faixa-laboratorio"
+      x1="0"
+      y1="0"
+      x2="0"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#54a69f"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#297870"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#155049"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="metal"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#d9e1df"
+      />
+
+      <stop
+        offset="0.48"
+        stop-color="#8f9c99"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#475350"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="metal-escuro"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#485956"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#293936"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#101a18"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="porta-laboratorio"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#dce8e4"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#a2b5af"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#617671"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="porta-contencao"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#dd5b52"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#9e302d"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#501719"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="vidro"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#e5ffff"
+        stop-opacity=".94"
+      />
+
+      <stop
+        offset="0.48"
+        stop-color="#83c8c4"
+        stop-opacity=".72"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#286b6a"
+        stop-opacity=".86"
+      />
+    </linearGradient>
+
+    <radialGradient
+      id="luz-ciano"
+      cx="50%"
+      cy="50%"
+      r="70%"
+    >
+      <stop
+        offset="0"
+        stop-color="#d9ffff"
+        stop-opacity="1"
+      />
+
+      <stop
+        offset="0.42"
+        stop-color="#55d4d1"
+        stop-opacity=".75"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#176264"
+        stop-opacity="0"
+      />
+    </radialGradient>
+
+    <pattern
+      id="placas"
+      width="72"
+      height="72"
+      patternUnits="userSpaceOnUse"
+    >
+      <rect
+        width="72"
+        height="72"
+        fill="url(#painel-claro)"
+      />
+
+      <path
+        d="M0 0H72V72H0Z"
+        fill="none"
+        stroke="#71807c"
+        stroke-width="4"
+        opacity=".58"
+      />
+
+      <circle
+        cx="9"
+        cy="9"
+        r="4"
+        fill="#dce5e2"
+        stroke="#53615e"
+        stroke-width="2"
+      />
+
+      <circle
+        cx="63"
+        cy="63"
+        r="4"
+        fill="#dce5e2"
+        stroke="#53615e"
+        stroke-width="2"
+      />
+    </pattern>
+
+    <pattern
+      id="faixa-perigo"
+      width="64"
+      height="64"
+      patternUnits="userSpaceOnUse"
+      patternTransform="rotate(45)"
+    >
+      <rect
+        width="32"
+        height="64"
+        fill="#d7b33d"
+      />
+
+      <rect
+        x="32"
+        width="32"
+        height="64"
+        fill="#202827"
+      />
+    </pattern>
+
+    <filter
+      id="sombra"
+      x="-30%"
+      y="-30%"
+      width="160%"
+      height="160%"
+    >
+      <feDropShadow
+        dx="9"
+        dy="13"
+        stdDeviation="10"
+        flood-color="#000000"
+        flood-opacity=".56"
+      />
+    </filter>
+
+    <filter
+      id="textura"
+      x="-10%"
+      y="-10%"
+      width="120%"
+      height="120%"
+    >
+      <feTurbulence
+        type="fractalNoise"
+        baseFrequency=".028"
+        numOctaves="3"
+        seed="57"
+        result="ruido"
+      />
+
+      <feColorMatrix
+        in="ruido"
+        type="saturate"
+        values="0"
+        result="ruido-cinza"
+      />
+
+      <feComponentTransfer
+        in="ruido-cinza"
+        result="ruido-suave"
+      >
+        <feFuncA
+          type="table"
+          tableValues="0 .12"
+        />
+      </feComponentTransfer>
+
+      <feBlend
+        in="SourceGraphic"
+        in2="ruido-suave"
+        mode="multiply"
+      />
+    </filter>
+  </defs>
+
+  
+        <g filter="url(#sombra)">
+          <path
+            d="
+              M58 72
+              H302
+              V210
+              H440
+              V454
+              H276
+              V236
+              H58
+              Z
+            "
+            fill="#263633"
+          />
+
+          <path
+            d="
+              M73 88
+              H286
+              V226
+              H424
+              V438
+              H292
+              V220
+              H73
+              Z
+            "
+            fill="url(#painel-claro)"
+            stroke="#52625e"
+            stroke-width="13"
+            filter="url(#textura)"
+          />
+
+          <path
+            d="M91 112H260V250H399"
+            fill="none"
+            stroke="#f2f7f4"
+            stroke-width="17"
+            opacity=".46"
+          />
+
+          <path
+            d="M89 180H220V311H359V416"
+            fill="none"
+            stroke="url(#faixa-laboratorio)"
+            stroke-width="42"
+          />
+
+          <path
+            d="M92 174H226V305H365"
+            fill="none"
+            stroke="#8ed0c9"
+            stroke-width="6"
+            opacity=".44"
+          />
+
+          <g
+            fill="#b9c2bf"
+            stroke="#3b4845"
+            stroke-width="5"
+          >
+            <circle
+              cx="98"
+              cy="103"
+              r="9"
+            />
+
+            <circle
+              cx="276"
+              cy="104"
+              r="9"
+            />
+
+            <circle
+              cx="303"
+              cy="239"
+              r="9"
+            />
+
+            <circle
+              cx="409"
+              cy="418"
+              r="9"
+            />
+          </g>
+        </g>
+      
+</svg>

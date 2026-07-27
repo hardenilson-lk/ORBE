@@ -1,0 +1,448 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 512 512"
+  width="512"
+  height="512"
+>
+  <defs>
+    <linearGradient
+      id="concreto"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#d0d5d4"
+      />
+
+      <stop
+        offset="0.48"
+        stop-color="#a3acad"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#707a7c"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="concreto-escuro"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#687376"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#434e52"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#252d30"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="faixa-azul"
+      x1="0"
+      y1="0"
+      x2="0"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#497b9b"
+      />
+
+      <stop
+        offset="0.48"
+        stop-color="#285879"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#15384f"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="metal"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#bcc5c5"
+      />
+
+      <stop
+        offset="0.46"
+        stop-color="#758184"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#3a4447"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="metal-escuro"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#4d595d"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#2d373b"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#151b1e"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="porta-azul"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#477896"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#285572"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#143247"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="porta-vermelha"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#c94d4a"
+      />
+
+      <stop
+        offset="0.52"
+        stop-color="#8d2928"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#481415"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="vidro"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#d9eef1"
+        stop-opacity=".9"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#81aeb8"
+        stop-opacity=".75"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#345f6a"
+        stop-opacity=".86"
+      />
+    </linearGradient>
+
+    <pattern
+      id="placas-metal"
+      width="64"
+      height="64"
+      patternUnits="userSpaceOnUse"
+    >
+      <rect
+        width="64"
+        height="64"
+        fill="url(#metal)"
+      />
+
+      <path
+        d="M0 0H64V64H0Z"
+        fill="none"
+        stroke="#3d484b"
+        stroke-width="4"
+        opacity=".64"
+      />
+
+      <circle
+        cx="9"
+        cy="9"
+        r="4"
+        fill="#c2caca"
+        stroke="#3a4345"
+        stroke-width="2"
+      />
+
+      <circle
+        cx="55"
+        cy="55"
+        r="4"
+        fill="#c2caca"
+        stroke="#3a4345"
+        stroke-width="2"
+      />
+    </pattern>
+
+    <pattern
+      id="grade"
+      width="42"
+      height="42"
+      patternUnits="userSpaceOnUse"
+    >
+      <rect
+        width="42"
+        height="42"
+        fill="#161c1f"
+      />
+
+      <path
+        d="M10 0V42M32 0V42"
+        stroke="#839093"
+        stroke-width="7"
+      />
+
+      <path
+        d="M0 10H42M0 32H42"
+        stroke="#687579"
+        stroke-width="4"
+      />
+    </pattern>
+
+    <pattern
+      id="faixa-alerta"
+      width="64"
+      height="64"
+      patternUnits="userSpaceOnUse"
+      patternTransform="rotate(45)"
+    >
+      <rect
+        width="32"
+        height="64"
+        fill="#d2ad37"
+      />
+
+      <rect
+        x="32"
+        width="32"
+        height="64"
+        fill="#252a2b"
+      />
+    </pattern>
+
+    <filter
+      id="sombra"
+      x="-30%"
+      y="-30%"
+      width="160%"
+      height="160%"
+    >
+      <feDropShadow
+        dx="9"
+        dy="13"
+        stdDeviation="10"
+        flood-color="#000000"
+        flood-opacity=".58"
+      />
+    </filter>
+
+    <filter
+      id="textura"
+      x="-10%"
+      y="-10%"
+      width="120%"
+      height="120%"
+    >
+      <feTurbulence
+        type="fractalNoise"
+        baseFrequency=".028"
+        numOctaves="3"
+        seed="43"
+        result="ruido"
+      />
+
+      <feColorMatrix
+        in="ruido"
+        type="saturate"
+        values="0"
+        result="ruido-cinza"
+      />
+
+      <feComponentTransfer
+        in="ruido-cinza"
+        result="ruido-suave"
+      >
+        <feFuncA
+          type="table"
+          tableValues="0 .15"
+        />
+      </feComponentTransfer>
+
+      <feBlend
+        in="SourceGraphic"
+        in2="ruido-suave"
+        mode="multiply"
+      />
+    </filter>
+  </defs>
+
+  
+        <g filter="url(#sombra)">
+          <rect
+            x="61"
+            y="121"
+            width="390"
+            height="270"
+            rx="22"
+            fill="#252d30"
+          />
+
+          <rect
+            x="79"
+            y="140"
+            width="354"
+            height="232"
+            rx="14"
+            fill="url(#porta-vermelha)"
+            stroke="#451415"
+            stroke-width="15"
+            filter="url(#textura)"
+          />
+
+          <rect
+            x="103"
+            y="162"
+            width="306"
+            height="69"
+            rx="8"
+            fill="url(#grade)"
+            stroke="#252d30"
+            stroke-width="10"
+          />
+
+          <rect
+            x="100"
+            y="247"
+            width="312"
+            height="96"
+            rx="9"
+            fill="url(#faixa-alerta)"
+            opacity=".78"
+            stroke="#451514"
+            stroke-width="10"
+          />
+
+          <rect
+            x="206"
+            y="230"
+            width="100"
+            height="118"
+            rx="15"
+            fill="url(#metal)"
+            stroke="#22292b"
+            stroke-width="11"
+          />
+
+          <path
+            d="M226 235V201C226 157 286 157 286 201V235"
+            fill="none"
+            stroke="#d0d5d3"
+            stroke-width="19"
+            stroke-linecap="round"
+          />
+
+          <circle
+            cx="256"
+            cy="282"
+            r="16"
+            fill="#d7c863"
+            stroke="#35321a"
+            stroke-width="7"
+          />
+
+          <path
+            d="M256 298V323"
+            stroke="#25291f"
+            stroke-width="10"
+            stroke-linecap="round"
+          />
+
+          <rect
+            x="96"
+            y="108"
+            width="320"
+            height="40"
+            rx="9"
+            fill="url(#concreto-escuro)"
+            stroke="#252d30"
+            stroke-width="8"
+          />
+
+          <rect
+            x="173"
+            y="112"
+            width="166"
+            height="30"
+            rx="7"
+            fill="#ecd8d8"
+            stroke="#6a2929"
+            stroke-width="5"
+          />
+
+          <path
+            d="M196 126H316"
+            stroke="#9a2929"
+            stroke-width="7"
+            stroke-linecap="round"
+          />
+        </g>
+      
+</svg>

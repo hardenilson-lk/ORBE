@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 512 512"
+  width="512"
+  height="512"
+>
+  <defs>
+    <filter
+      id="sombra"
+      x="-35%"
+      y="-35%"
+      width="170%"
+      height="170%"
+    >
+      <feDropShadow
+        dx="0"
+        dy="14"
+        stdDeviation="13"
+        flood-color="#000000"
+        flood-opacity="0.46"
+      />
+    </filter>
+
+    <filter
+      id="sombraLeve"
+      x="-25%"
+      y="-25%"
+      width="150%"
+      height="150%"
+    >
+      <feDropShadow
+        dx="0"
+        dy="8"
+        stdDeviation="7"
+        flood-color="#000000"
+        flood-opacity="0.34"
+      />
+    </filter>
+
+    <linearGradient
+      id="madeira"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#c58b4d"
+      />
+
+      <stop
+        offset="0.48"
+        stop-color="#784526"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#2f1b13"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="madeiraClara"
+      x1="0"
+      y1="0"
+      x2="0"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#dbb071"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#86522e"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="madeiraEscura"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#68402c"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#3b241a"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#17100d"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="tecidoVermelho"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#9f4252"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#652434"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#2b111c"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="tecidoVerde"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#73856a"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#465646"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#202a23"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="tecidoBege"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#e2c999"
+      />
+
+      <stop
+        offset="0.55"
+        stop-color="#ad895d"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#64482f"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="metal"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#e1d6b0"
+      />
+
+      <stop
+        offset="0.38"
+        stop-color="#9e8b5c"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#413623"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="papel"
+      x1="0"
+      y1="0"
+      x2="0"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#f0e4bf"
+      />
+
+      <stop
+        offset="0.58"
+        stop-color="#c8b486"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#88714d"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="vidro"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#e9ffff"
+        stop-opacity=".85"
+      />
+
+      <stop
+        offset="0.45"
+        stop-color="#8fb6b6"
+        stop-opacity=".62"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#365255"
+        stop-opacity=".88"
+      />
+    </linearGradient>
+
+    <radialGradient
+      id="ouro"
+      cx="38%"
+      cy="30%"
+      r="76%"
+    >
+      <stop
+        offset="0"
+        stop-color="#fff0a1"
+      />
+
+      <stop
+        offset="0.45"
+        stop-color="#d9a438"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#6d4318"
+      />
+    </radialGradient>
+  </defs>
+
+
+  <g filter="url(#sombra)">
+    <rect
+      x="61"
+      y="54"
+      width="390"
+      height="404"
+      rx="22"
+      fill="#1a100c"
+      stroke="#080504"
+      stroke-width="18"
+    />
+
+    <rect
+      x="88"
+      y="81"
+      width="336"
+      height="350"
+      rx="12"
+      fill="url(#ouro)"
+      stroke="#60461c"
+      stroke-width="10"
+    />
+
+    <rect
+      x="111"
+      y="104"
+      width="290"
+      height="304"
+      rx="7"
+      fill="#2a4039"
+      stroke="#19120e"
+      stroke-width="9"
+    />
+
+    <path
+      d="M124 342c52-88 98-129 138-122 39 7 60 47 126 122"
+      fill="#4d6751"
+      stroke="#1f3129"
+      stroke-width="8"
+    />
+
+    <path
+      d="M129 341h258v55H129z"
+      fill="#2d483c"
+    />
+
+    <circle
+      cx="335"
+      cy="165"
+      r="44"
+      fill="#d8b45d"
+      opacity=".82"
+    />
+
+    <path
+      d="M177 244c16-50 45-78 81-78s65 28 81 78"
+      fill="#495354"
+      stroke="#20282a"
+      stroke-width="8"
+    />
+
+    <ellipse
+      cx="258"
+      cy="206"
+      rx="34"
+      ry="44"
+      fill="#b99170"
+      stroke="#4d3426"
+      stroke-width="7"
+    />
+
+    <path
+      d="M227 200c5-43 58-55 69-6"
+      fill="#362419"
+      stroke="#1d130e"
+      stroke-width="8"
+    />
+
+    <path
+      d="M225 256c25-24 48-32 66-24 20 8 32 27 43 53"
+      fill="#6d2737"
+      stroke="#32101a"
+      stroke-width="8"
+    />
+  </g>
+</svg>

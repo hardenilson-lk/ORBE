@@ -11,6 +11,8 @@
     "start:comunicacao": "node --env-file-if-exists=server/.env server/comunicacao/livekit-token.js",
     "build": "vite build",
     "lint": "oxlint",
+    "test:gerador": "node scripts/testar-gerador-mapas.mjs",
+    "gerar:packs": "node scripts/gerar-todos-packs.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

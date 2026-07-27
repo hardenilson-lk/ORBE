@@ -1,0 +1,507 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 512 512"
+  width="512"
+  height="512"
+>
+  <defs>
+    <linearGradient
+      id="pedra"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#62595f"
+      />
+
+      <stop
+        offset="0.48"
+        stop-color="#3c343b"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#1b171c"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="pedra-clara"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#8c8188"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#5d5159"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#302931"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="pedra-escura"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#2b232b"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#171219"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#080609"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="energia-roxa"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#d784ee"
+      />
+
+      <stop
+        offset="0.48"
+        stop-color="#8b3aaa"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#421453"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="energia-vermelha"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#e45b70"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#9f263e"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#4a0e1d"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="metal"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#b7aeb4"
+      />
+
+      <stop
+        offset="0.48"
+        stop-color="#756b72"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#3b343b"
+      />
+    </linearGradient>
+
+    <radialGradient
+      id="brilho-roxo"
+      cx="50%"
+      cy="50%"
+      r="70%"
+    >
+      <stop
+        offset="0"
+        stop-color="#f3b4ff"
+        stop-opacity="1"
+      />
+
+      <stop
+        offset="0.38"
+        stop-color="#be5be0"
+        stop-opacity=".82"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#531568"
+        stop-opacity="0"
+      />
+    </radialGradient>
+
+    <radialGradient
+      id="brilho-vermelho"
+      cx="50%"
+      cy="50%"
+      r="70%"
+    >
+      <stop
+        offset="0"
+        stop-color="#ffb1a9"
+        stop-opacity="1"
+      />
+
+      <stop
+        offset="0.4"
+        stop-color="#e04658"
+        stop-opacity=".82"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#681221"
+        stop-opacity="0"
+      />
+    </radialGradient>
+
+    <pattern
+      id="blocos-pedra"
+      width="128"
+      height="96"
+      patternUnits="userSpaceOnUse"
+    >
+      <rect
+        width="128"
+        height="96"
+        fill="url(#pedra)"
+      />
+
+      <path
+        d="M0 0H128V96H0Z"
+        fill="none"
+        stroke="#130f14"
+        stroke-width="7"
+        opacity=".86"
+      />
+
+      <path
+        d="M64 0V96M0 48H128"
+        stroke="#756a72"
+        stroke-width="4"
+        opacity=".34"
+      />
+
+      <path
+        d="M14 18C31 7 47 28 64 16C82 5 97 26 115 15"
+        fill="none"
+        stroke="#91858d"
+        stroke-width="4"
+        stroke-linecap="round"
+        opacity=".22"
+      />
+
+      <path
+        d="M13 76C30 64 47 84 65 72C82 61 99 82 115 70"
+        fill="none"
+        stroke="#1b151c"
+        stroke-width="5"
+        stroke-linecap="round"
+        opacity=".4"
+      />
+
+      <circle
+        cx="15"
+        cy="15"
+        r="5"
+        fill="#827780"
+        stroke="#292229"
+        stroke-width="3"
+      />
+
+      <circle
+        cx="113"
+        cy="81"
+        r="5"
+        fill="#827780"
+        stroke="#292229"
+        stroke-width="3"
+      />
+    </pattern>
+
+    <pattern
+      id="simbolos"
+      width="112"
+      height="112"
+      patternUnits="userSpaceOnUse"
+    >
+      <rect
+        width="112"
+        height="112"
+        fill="url(#pedra-escura)"
+      />
+
+      <circle
+        cx="56"
+        cy="56"
+        r="34"
+        fill="none"
+        stroke="#8f3daa"
+        stroke-width="6"
+        opacity=".56"
+      />
+
+      <path
+        d="M56 18L66 45L95 47L72 65L80 94L56 78L32 94L40 65L17 47L46 45Z"
+        fill="none"
+        stroke="#b6476c"
+        stroke-width="6"
+        stroke-linejoin="round"
+        opacity=".58"
+      />
+
+      <circle
+        cx="56"
+        cy="56"
+        r="8"
+        fill="#c465d7"
+        opacity=".5"
+      />
+    </pattern>
+
+    <pattern
+      id="faixa-ritual"
+      width="72"
+      height="72"
+      patternUnits="userSpaceOnUse"
+      patternTransform="rotate(45)"
+    >
+      <rect
+        width="36"
+        height="72"
+        fill="#8e2948"
+      />
+
+      <rect
+        x="36"
+        width="36"
+        height="72"
+        fill="#25131f"
+      />
+    </pattern>
+
+    <filter
+      id="sombra"
+      x="-30%"
+      y="-30%"
+      width="160%"
+      height="160%"
+    >
+      <feDropShadow
+        dx="10"
+        dy="14"
+        stdDeviation="11"
+        flood-color="#000000"
+        flood-opacity=".72"
+      />
+    </filter>
+
+    <filter
+      id="textura"
+      x="-10%"
+      y="-10%"
+      width="120%"
+      height="120%"
+    >
+      <feTurbulence
+        type="fractalNoise"
+        baseFrequency=".032"
+        numOctaves="3"
+        seed="97"
+        result="ruido"
+      />
+
+      <feColorMatrix
+        in="ruido"
+        type="saturate"
+        values="0"
+        result="ruido-cinza"
+      />
+
+      <feComponentTransfer
+        in="ruido-cinza"
+        result="ruido-suave"
+      >
+        <feFuncA
+          type="table"
+          tableValues="0 .18"
+        />
+      </feComponentTransfer>
+
+      <feBlend
+        in="SourceGraphic"
+        in2="ruido-suave"
+        mode="multiply"
+      />
+    </filter>
+
+    <filter
+      id="brilho"
+      x="-40%"
+      y="-40%"
+      width="180%"
+      height="180%"
+    >
+      <feGaussianBlur
+        stdDeviation="8"
+        result="desfoque"
+      />
+
+      <feMerge>
+        <feMergeNode
+          in="desfoque"
+        />
+
+        <feMergeNode
+          in="SourceGraphic"
+        />
+      </feMerge>
+    </filter>
+  </defs>
+
+  
+        <g filter="url(#sombra)">
+          <rect
+            x="18"
+            y="168"
+            width="476"
+            height="176"
+            rx="14"
+            fill="#09070a"
+          />
+
+          <rect
+            x="29"
+            y="180"
+            width="454"
+            height="152"
+            rx="9"
+            fill="url(#blocos-pedra)"
+            stroke="#171218"
+            stroke-width="11"
+            filter="url(#textura)"
+          />
+
+          <rect
+            x="44"
+            y="196"
+            width="424"
+            height="58"
+            rx="5"
+            fill="url(#pedra-clara)"
+            stroke="#3d333d"
+            stroke-width="6"
+          />
+
+          <rect
+            x="44"
+            y="254"
+            width="424"
+            height="62"
+            rx="5"
+            fill="url(#simbolos)"
+            stroke="#160b18"
+            stroke-width="6"
+          />
+
+          <path
+            d="M49 204H463"
+            stroke="#b6a8b2"
+            stroke-width="7"
+            opacity=".35"
+          />
+
+          <path
+            d="M49 261H463"
+            stroke="url(#energia-roxa)"
+            stroke-width="8"
+            opacity=".68"
+          />
+
+          <path
+            d="M70 224C103 198 136 244 169 218C202 192 235 240 268 216C301 192 334 240 367 216C392 198 416 217 440 226"
+            fill="none"
+            stroke="#4c3e49"
+            stroke-width="7"
+            opacity=".58"
+          />
+
+          <path
+            d="M76 287H169M196 287H282M309 287H438"
+            stroke="#561b62"
+            stroke-width="8"
+            stroke-linecap="round"
+            opacity=".62"
+          />
+
+          <g
+            fill="url(#energia-roxa)"
+            stroke="#28112d"
+            stroke-width="4"
+          >
+            <circle
+              cx="49"
+              cy="256"
+              r="9"
+            />
+
+            <circle
+              cx="463"
+              cy="256"
+              r="9"
+            />
+
+            <circle
+              cx="256"
+              cy="190"
+              r="8"
+            />
+
+            <circle
+              cx="256"
+              cy="322"
+              r="8"
+            />
+          </g>
+        </g>
+      
+</svg>

@@ -393,7 +393,7 @@ function PaginaJogador() {
       );
     }
 
-    return <PainelMapa papelAtual="jogador" jogadorAtualId={fichaAtiva.id} arquivoInicial={arquivoAtual} mapa={sessao.mapa} fichas={[fichaAtiva]} aoAtualizarFicha={salvarFicha} aoAlterarMapa={(mapa) => persistirSessao({ mapa })} aoAlterarMensagem={setMensagemSistema} />;
+    return <PainelMapa papelAtual="jogador" mesaId={mesaId} jogadorAtualId={fichaAtiva.id} arquivoInicial={arquivoAtual} mapa={sessao.mapa} fichas={[fichaAtiva]} aoAtualizarFicha={salvarFicha} aoAlterarMapa={(mapa) => persistirSessao({ mapa })} aoAlterarMensagem={setMensagemSistema} />;
   }
 
   const trilhaAtiva = listaSegura(sessao.trilhas).find((trilha) => trilha.id === sessao.trilhaAtivaId);

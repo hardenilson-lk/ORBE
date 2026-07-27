@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 512 512"
+  width="512"
+  height="512"
+>
+  <defs>
+    <filter
+      id="sombra"
+      x="-35%"
+      y="-35%"
+      width="170%"
+      height="170%"
+    >
+      <feDropShadow
+        dx="0"
+        dy="13"
+        stdDeviation="12"
+        flood-color="#000000"
+        flood-opacity="0.45"
+      />
+    </filter>
+
+    <filter
+      id="sombraLeve"
+      x="-25%"
+      y="-25%"
+      width="150%"
+      height="150%"
+    >
+      <feDropShadow
+        dx="0"
+        dy="7"
+        stdDeviation="7"
+        flood-color="#000000"
+        flood-opacity="0.34"
+      />
+    </filter>
+
+    <linearGradient
+      id="metal"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#d5dbd8"
+      />
+
+      <stop
+        offset="0.35"
+        stop-color="#8b9691"
+      />
+
+      <stop
+        offset="0.7"
+        stop-color="#4a5551"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#1b211f"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="metalEscuro"
+      x1="0"
+      y1="0"
+      x2="0"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#5c6863"
+      />
+
+      <stop
+        offset="0.48"
+        stop-color="#343c39"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#151918"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="madeira"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#b27a43"
+      />
+
+      <stop
+        offset="0.52"
+        stop-color="#754727"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#382318"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="madeiraClara"
+      x1="0"
+      y1="0"
+      x2="0"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#d3a267"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#81502d"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="plastico"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#505b57"
+      />
+
+      <stop
+        offset="0.55"
+        stop-color="#272e2c"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#111514"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="papel"
+      x1="0"
+      y1="0"
+      x2="0"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#eee5c6"
+      />
+
+      <stop
+        offset="0.55"
+        stop-color="#c8b88d"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#8c7956"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="vidro"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#d1f0ed"
+        stop-opacity=".85"
+      />
+
+      <stop
+        offset="0.46"
+        stop-color="#60918f"
+        stop-opacity=".64"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#263d3d"
+        stop-opacity=".9"
+      />
+    </linearGradient>
+
+    <radialGradient
+      id="tela"
+      cx="50%"
+      cy="45%"
+      r="68%"
+    >
+      <stop
+        offset="0"
+        stop-color="#8ee9db"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#387e78"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#102524"
+      />
+    </radialGradient>
+
+    <radialGradient
+      id="vermelho"
+      cx="42%"
+      cy="36%"
+      r="72%"
+    >
+      <stop
+        offset="0"
+        stop-color="#ff7468"
+      />
+
+      <stop
+        offset="0.48"
+        stop-color="#c93635"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#5b171b"
+      />
+    </radialGradient>
+  </defs>
+
+
+  <g filter="url(#sombra)">
+    <path
+      d="M63 166c0-31 25-56 56-56h274c31 0 56 25 56 56v230c0 31-25 56-56 56H119c-31 0-56-25-56-56V166Z"
+      fill="#191c1b"
+      stroke="#090b0a"
+      stroke-width="18"
+    />
+
+    <rect
+      x="84"
+      y="132"
+      width="344"
+      height="293"
+      rx="32"
+      fill="url(#madeira)"
+      stroke="#41281b"
+      stroke-width="10"
+    />
+
+    <rect
+      x="49"
+      y="79"
+      width="414"
+      height="107"
+      rx="27"
+      fill="#222725"
+      stroke="#0c0f0e"
+      stroke-width="18"
+    />
+
+    <rect
+      x="73"
+      y="102"
+      width="366"
+      height="61"
+      rx="15"
+      fill="url(#madeiraClara)"
+      stroke="#674023"
+      stroke-width="8"
+    />
+
+    <path
+      d="M104 209h304M104 288h304M104 367h304"
+      stroke="#59351f"
+      stroke-width="9"
+      opacity=".78"
+    />
+
+    <rect
+      x="181"
+      y="227"
+      width="150"
+      height="91"
+      rx="17"
+      fill="#202624"
+      stroke="#0d100f"
+      stroke-width="10"
+    />
+
+    <path
+      d="M208 263h96M208 286h72"
+      stroke="#9aa59f"
+      stroke-width="8"
+      stroke-linecap="round"
+    />
+
+    <circle
+      cx="367"
+      cy="271"
+      r="22"
+      fill="#a72b31"
+      stroke="#4b1116"
+      stroke-width="7"
+    />
+  </g>
+</svg>

@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 512 512"
+  width="512"
+  height="512"
+>
+  <defs>
+    <filter
+      id="sombra"
+      x="-35%"
+      y="-35%"
+      width="170%"
+      height="170%"
+    >
+      <feDropShadow
+        dx="0"
+        dy="13"
+        stdDeviation="12"
+        flood-color="#000000"
+        flood-opacity="0.45"
+      />
+    </filter>
+
+    <filter
+      id="sombraLeve"
+      x="-25%"
+      y="-25%"
+      width="150%"
+      height="150%"
+    >
+      <feDropShadow
+        dx="0"
+        dy="7"
+        stdDeviation="7"
+        flood-color="#000000"
+        flood-opacity="0.34"
+      />
+    </filter>
+
+    <linearGradient
+      id="metal"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#eef3f0"
+      />
+
+      <stop
+        offset="0.3"
+        stop-color="#a7b3ae"
+      />
+
+      <stop
+        offset="0.68"
+        stop-color="#59645f"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#222826"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="metalEscuro"
+      x1="0"
+      y1="0"
+      x2="0"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#65716c"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#343d39"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#151a18"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="plasticoBranco"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#f5f6ef"
+      />
+
+      <stop
+        offset="0.55"
+        stop-color="#c4cbc4"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#737d78"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="plasticoEscuro"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#4e5b57"
+      />
+
+      <stop
+        offset="0.55"
+        stop-color="#29322f"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#111716"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="vidro"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#e1fbf8"
+        stop-opacity=".88"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#75aaa8"
+        stop-opacity=".68"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#284747"
+        stop-opacity=".9"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="liquidoAzul"
+      x1="0"
+      y1="0"
+      x2="0"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#90f7ef"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#27b8bf"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#16536c"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="liquidoVerde"
+      x1="0"
+      y1="0"
+      x2="0"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#d0ff9d"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#6acb59"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#1f603c"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="tela"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#9df7e9"
+      />
+
+      <stop
+        offset="0.45"
+        stop-color="#3aa79d"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#112f31"
+      />
+    </linearGradient>
+
+    <radialGradient
+      id="alerta"
+      cx="42%"
+      cy="36%"
+      r="72%"
+    >
+      <stop
+        offset="0"
+        stop-color="#ff9c86"
+      />
+
+      <stop
+        offset="0.48"
+        stop-color="#e5443f"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#67191d"
+      />
+    </radialGradient>
+
+    <radialGradient
+      id="energia"
+      cx="50%"
+      cy="45%"
+      r="68%"
+    >
+      <stop
+        offset="0"
+        stop-color="#d7ffff"
+      />
+
+      <stop
+        offset="0.42"
+        stop-color="#59d7da"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#16455a"
+      />
+    </radialGradient>
+
+    <pattern
+      id="perigo"
+      width="72"
+      height="72"
+      patternUnits="userSpaceOnUse"
+      patternTransform="rotate(35)"
+    >
+      <rect
+        width="36"
+        height="72"
+        fill="#d3ad31"
+      />
+
+      <rect
+        x="36"
+        width="36"
+        height="72"
+        fill="#242826"
+      />
+    </pattern>
+  </defs>
+
+
+  <g filter="url(#sombra)">
+    <rect
+      x="68"
+      y="55"
+      width="376"
+      height="287"
+      rx="36"
+      fill="#171b1a"
+      stroke="#080a09"
+      stroke-width="18"
+    />
+
+    <rect
+      x="94"
+      y="82"
+      width="324"
+      height="228"
+      rx="21"
+      fill="url(#tela)"
+      stroke="#31504e"
+      stroke-width="10"
+    />
+
+    <path
+      d="M125 130h116M125 164h181M125 198h95M125 232h152"
+      stroke="#c2fff4"
+      stroke-width="9"
+      stroke-linecap="round"
+      opacity=".72"
+    />
+
+    <path
+      d="M285 136c24 18 34 40 42 69 7 25 19 42 48 57"
+      fill="none"
+      stroke="#e0fff8"
+      stroke-width="7"
+      stroke-linecap="round"
+      opacity=".7"
+    />
+
+    <rect
+      x="218"
+      y="340"
+      width="76"
+      height="76"
+      rx="13"
+      fill="url(#metalEscuro)"
+      stroke="#151a18"
+      stroke-width="8"
+    />
+
+    <rect
+      x="153"
+      y="401"
+      width="206"
+      height="43"
+      rx="17"
+      fill="#202624"
+      stroke="#0d100f"
+      stroke-width="9"
+    />
+
+    <rect
+      x="88"
+      y="456"
+      width="336"
+      height="38"
+      rx="15"
+      fill="#333c38"
+      stroke="#111514"
+      stroke-width="8"
+    />
+
+    <path
+      d="M118 475h276"
+      stroke="#9eaaa4"
+      stroke-width="6"
+      stroke-dasharray="18 9"
+      opacity=".65"
+    />
+
+    <circle
+      cx="387"
+      cy="322"
+      r="10"
+      fill="#61dd7f"
+    />
+  </g>
+</svg>

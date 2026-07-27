@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 512 512"
+  width="512"
+  height="512"
+>
+  <defs>
+    <filter
+      id="sombra"
+      x="-35%"
+      y="-35%"
+      width="170%"
+      height="170%"
+    >
+      <feDropShadow
+        dx="0"
+        dy="14"
+        stdDeviation="13"
+        flood-color="#000000"
+        flood-opacity="0.42"
+      />
+    </filter>
+
+    <filter
+      id="sombraLeve"
+      x="-25%"
+      y="-25%"
+      width="150%"
+      height="150%"
+    >
+      <feDropShadow
+        dx="0"
+        dy="8"
+        stdDeviation="7"
+        flood-color="#000000"
+        flood-opacity="0.34"
+      />
+    </filter>
+
+    <linearGradient
+      id="madeira"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#c88943"
+      />
+      <stop
+        offset="0.5"
+        stop-color="#8b4f25"
+      />
+      <stop
+        offset="1"
+        stop-color="#512b19"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="madeiraClara"
+      x1="0"
+      y1="0"
+      x2="0"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#dbad68"
+      />
+      <stop
+        offset="1"
+        stop-color="#8d5429"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="metal"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#d8ddd6"
+      />
+      <stop
+        offset="0.45"
+        stop-color="#7f8985"
+      />
+      <stop
+        offset="1"
+        stop-color="#343b3b"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="lonaVerde"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#83945c"
+      />
+      <stop
+        offset="0.5"
+        stop-color="#52643c"
+      />
+      <stop
+        offset="1"
+        stop-color="#2d3929"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="lonaBege"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#d6bc83"
+      />
+      <stop
+        offset="0.55"
+        stop-color="#a47f48"
+      />
+      <stop
+        offset="1"
+        stop-color="#5f472d"
+      />
+    </linearGradient>
+
+    <radialGradient
+      id="fogo"
+      cx="50%"
+      cy="62%"
+      r="48%"
+    >
+      <stop
+        offset="0"
+        stop-color="#fff8a8"
+      />
+      <stop
+        offset="0.33"
+        stop-color="#ffc43d"
+      />
+      <stop
+        offset="0.68"
+        stop-color="#f36a20"
+      />
+      <stop
+        offset="1"
+        stop-color="#7b1e16"
+      />
+    </radialGradient>
+
+    <radialGradient
+      id="folha"
+      cx="35%"
+      cy="30%"
+      r="78%"
+    >
+      <stop
+        offset="0"
+        stop-color="#8db467"
+      />
+      <stop
+        offset="0.45"
+        stop-color="#426e3b"
+      />
+      <stop
+        offset="1"
+        stop-color="#173622"
+      />
+    </radialGradient>
+  </defs>
+
+
+  <g filter="url(#sombra)">
+    <rect
+      x="78"
+      y="58"
+      width="356"
+      height="400"
+      rx="27"
+      fill="#232825"
+      stroke="#101311"
+      stroke-width="18"
+    />
+
+    <rect
+      x="100"
+      y="80"
+      width="312"
+      height="356"
+      rx="15"
+      fill="url(#madeira)"
+      stroke="#552f1c"
+      stroke-width="9"
+    />
+
+    <path
+      d="M256 82v352"
+      stroke="#4a2919"
+      stroke-width="11"
+    />
+
+    <path
+      d="M116 153h124M272 153h124M116 350h124M272 350h124"
+      stroke="#6f3f23"
+      stroke-width="8"
+      opacity=".78"
+    />
+
+    <rect
+      x="219"
+      y="224"
+      width="20"
+      height="77"
+      rx="10"
+      fill="url(#metal)"
+      stroke="#282e2c"
+      stroke-width="5"
+    />
+
+    <rect
+      x="273"
+      y="224"
+      width="20"
+      height="77"
+      rx="10"
+      fill="url(#metal)"
+      stroke="#282e2c"
+      stroke-width="5"
+    />
+
+    <path
+      d="M123 116c25 12 74-8 106 5M282 112c27 15 70-8 104 7M119 386c38-13 71 9 112-5M281 390c35-16 71 8 106-4"
+      fill="none"
+      stroke="#a46a39"
+      stroke-width="6"
+      opacity=".55"
+    />
+
+    <rect
+      x="96"
+      y="430"
+      width="72"
+      height="28"
+      rx="8"
+      fill="#242823"
+    />
+
+    <rect
+      x="344"
+      y="430"
+      width="72"
+      height="28"
+      rx="8"
+      fill="#242823"
+    />
+  </g>
+</svg>

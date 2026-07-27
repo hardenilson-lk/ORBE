@@ -31,6 +31,7 @@ function MiniMapaNavegacao({
   camera,
   limitesCamera = null,
   fundos = [],
+  arquitetura = null,
   tokens = [],
   paredes = [],
   portas = [],
@@ -184,6 +185,50 @@ function MiniMapaNavegacao({
               preserveAspectRatio="none"
             />
           ) : null)}
+          {arquitetura ? (
+            <g className="mini-mapa-navegacao__arquitetura">
+              {(arquitetura.salas || []).map((sala) => (
+                <rect
+                  key={sala.id}
+                  x={sala.x * tamanhoCelula}
+                  y={sala.y * tamanhoCelula}
+                  width={sala.largura * tamanhoCelula}
+                  height={sala.altura * tamanhoCelula}
+                  className="mini-mapa-navegacao__sala"
+                />
+              ))}
+              {(arquitetura.corredores || []).map((celula, indice) => (
+                <rect
+                  key={`${celula.x}-${celula.y}-${indice}`}
+                  x={celula.x * tamanhoCelula}
+                  y={celula.y * tamanhoCelula}
+                  width={tamanhoCelula}
+                  height={tamanhoCelula}
+                  className="mini-mapa-navegacao__corredor"
+                />
+              ))}
+              {(arquitetura.paredes || []).map((parede) => (
+                <line
+                  key={parede.id}
+                  className="mini-mapa-navegacao__parede-visual"
+                  x1={(parede.inicio?.x || 0) * tamanhoCelula}
+                  y1={(parede.inicio?.y || 0) * tamanhoCelula}
+                  x2={(parede.fim?.x || 0) * tamanhoCelula}
+                  y2={(parede.fim?.y || 0) * tamanhoCelula}
+                />
+              ))}
+              {(arquitetura.portas || []).filter((porta) => !porta.secreta || porta.revelada).map((porta) => (
+                <line
+                  key={porta.id}
+                  className="mini-mapa-navegacao__porta-visual"
+                  x1={(porta.inicio?.x || 0) * tamanhoCelula}
+                  y1={(porta.inicio?.y || 0) * tamanhoCelula}
+                  x2={(porta.fim?.x || 0) * tamanhoCelula}
+                  y2={(porta.fim?.y || 0) * tamanhoCelula}
+                />
+              ))}
+            </g>
+          ) : null}
           <rect width={larguraMundo} height={alturaMundo} fill={`url(#${idGrid})`} />
           {Number(grid?.linhaGrossaCada) > 0 ? (
             <rect width={larguraMundo} height={alturaMundo} fill={`url(#${idGridPrincipal})`} />

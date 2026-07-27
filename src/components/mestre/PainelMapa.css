@@ -468,6 +468,51 @@
   pointer-events: none;
 }
 
+.camada-objetos-cenario-mapa {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  pointer-events: none;
+}
+
+.camada-objetos-cenario-mapa__objeto {
+  position: absolute;
+  display: grid;
+  box-sizing: border-box;
+  place-items: center;
+  border: 1px solid rgba(48, 42, 34, 0.7);
+  background: linear-gradient(145deg, rgba(126, 128, 115, .86), rgba(62, 66, 61, .9));
+  color: rgba(245, 232, 196, 0.88);
+  font: 700 18px/1 Georgia, serif;
+  transform-origin: center;
+}
+
+.camada-objetos-cenario-mapa__objeto--sangue,
+.camada-objetos-cenario-mapa__objeto--marca-arrasto {
+  border-color: rgba(91, 17, 18, .8);
+  background: rgba(100, 17, 19, .48);
+  color: #d69286;
+}
+
+.camada-objetos-cenario-mapa__objeto--simbolo-ritualistico {
+  border-color: #8356a0;
+  background: rgba(66, 25, 76, .58);
+  color: #c9a2e2;
+}
+
+.camada-objetos-cenario-mapa__objeto--vegetacao,
+.camada-objetos-cenario-mapa__objeto--umidade {
+  border-color: #526a4b;
+  background: rgba(50, 79, 53, .55);
+  color: #a3bd88;
+}
+
+.camada-objetos-cenario-mapa__objeto--solido {
+  border-style: solid;
+  background: rgba(48, 34, 25, 0.68);
+  box-shadow: inset 0 0 0 2px rgba(21, 13, 9, 0.35);
+}
+
 .painel-mapa__lista-fundos {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
@@ -1372,4 +1417,126 @@
   .painel-mapa__janela-ferramenta .painel-mapa__painel-controle button {
     flex: 1 1 92px;
   }
+}
+.camada-arquitetura-gerada {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+}
+
+.camada-arquitetura-gerada__paredes line {
+  stroke: #3d332b;
+  stroke-linecap: square;
+  stroke-width: 12px;
+}
+
+.camada-arquitetura-gerada--hospital .camada-arquitetura-gerada__paredes line {
+  stroke: #53584f;
+  stroke-width: 14px;
+}
+
+.camada-arquitetura-gerada__portas line {
+  stroke: #795425;
+  stroke-linecap: square;
+  stroke-width: 10px;
+}
+
+.camada-arquitetura-gerada__portas .aberta {
+  opacity: .48;
+  stroke-dasharray: 9 6;
+}
+
+.camada-arquitetura-gerada__portas .trancada {
+  stroke: #7d2520;
+}
+
+.camada-arquitetura-gerada__portas .parede-disfarcada {
+  stroke: #53584f;
+  stroke-width: 14px;
+}
+
+.camada-rotulos-cenario-mapa {
+  position: absolute;
+  z-index: 8;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.camada-rotulos-cenario-mapa text {
+  paint-order: stroke;
+  stroke: rgba(20, 15, 11, .88);
+  stroke-width: 5px;
+  stroke-linejoin: round;
+  fill: #fff0bc;
+  font-family: "Courier Prime", monospace;
+  text-transform: uppercase;
+}
+
+.camada-rotulos-cenario-mapa__salas text {
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: .05em;
+}
+
+.camada-rotulos-cenario-mapa__objetos text {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .025em;
+}
+
+.legenda-mapa {
+  position: absolute;
+  z-index: 47;
+  top: 108px;
+  right: 24px;
+  width: min(260px, 32vw);
+  border: 1px solid #9e762e;
+  background: rgba(25, 16, 11, .92);
+  color: #efd9a6;
+  box-shadow: 0 8px 20px rgba(0,0,0,.45);
+}
+.legenda-mapa summary { cursor:pointer; padding:9px 11px; font:800 .66rem monospace; text-transform:uppercase; }
+.legenda-mapa>div { max-height:360px; overflow:auto; padding:0 10px 10px; display:grid; gap:8px; }
+.legenda-mapa section { border-top:1px dashed rgba(201,157,79,.35); padding-top:7px; }
+.legenda-mapa h4 { margin:0 0 5px; color:#c99c4e; font:800 .6rem monospace; text-transform:uppercase; }
+.legenda-mapa p { display:flex; align-items:center; gap:7px; margin:3px 0; font:600 .59rem monospace; }
+.legenda-mapa p>i { width:14px; text-align:center; color:#d7ac5a; font-style:normal; }
+.legenda-mapa__amostra { display:inline-block; width:14px!important; height:8px; border:1px solid #4b3e30; }
+.legenda-mapa__amostra--sala{background:#a7a391}.legenda-mapa__amostra--corredor{background:#8d8d80}
+.legenda-mapa__amostra--parede{height:3px;background:#53584f}.legenda-mapa__amostra--porta{height:3px;background:#a36d27}
+.legenda-mapa__amostra--luz{border-radius:50%;background:#efd06c;box-shadow:0 0 6px #efd06c}
+.legenda-mapa__amostra--agente{border-radius:50%;background:#355a75}.legenda-mapa__amostra--npc{border-radius:50%;background:#7b2925}
+.painel-mapa__identidade-gerada {
+  position: absolute;
+  z-index: 28;
+  right: 18px;
+  bottom: 52px;
+  display: grid;
+  gap: 2px;
+  max-width: 230px;
+  padding: 8px 11px;
+  border: 1px solid rgba(190, 143, 63, .65);
+  background: rgba(21, 13, 9, .82);
+  color: #efd8a4;
+  pointer-events: none;
+  text-transform: uppercase;
+}
+
+.painel-mapa__identidade-gerada strong { font: 700 .72rem Georgia, serif; }
+.painel-mapa__identidade-gerada span,
+.painel-mapa__identidade-gerada small { font: 600 .56rem monospace; opacity: .82; }
+.painel-mapa__modo-jogador {
+  margin: 0 0 8px;
+  padding: 8px 12px;
+  border-left: 4px solid #a47a2f;
+  background: #2a1a10;
+  color: #f1d89f;
+  font: 700 .7rem monospace;
+  text-transform: uppercase;
 }

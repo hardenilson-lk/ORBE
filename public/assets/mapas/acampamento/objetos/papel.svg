@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 512 512"
+  width="512"
+  height="512"
+>
+  <defs>
+    <filter
+      id="sombra"
+      x="-35%"
+      y="-35%"
+      width="170%"
+      height="170%"
+    >
+      <feDropShadow
+        dx="0"
+        dy="14"
+        stdDeviation="13"
+        flood-color="#000000"
+        flood-opacity="0.42"
+      />
+    </filter>
+
+    <filter
+      id="sombraLeve"
+      x="-25%"
+      y="-25%"
+      width="150%"
+      height="150%"
+    >
+      <feDropShadow
+        dx="0"
+        dy="8"
+        stdDeviation="7"
+        flood-color="#000000"
+        flood-opacity="0.34"
+      />
+    </filter>
+
+    <linearGradient
+      id="madeira"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#c88943"
+      />
+      <stop
+        offset="0.5"
+        stop-color="#8b4f25"
+      />
+      <stop
+        offset="1"
+        stop-color="#512b19"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="madeiraClara"
+      x1="0"
+      y1="0"
+      x2="0"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#dbad68"
+      />
+      <stop
+        offset="1"
+        stop-color="#8d5429"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="metal"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#d8ddd6"
+      />
+      <stop
+        offset="0.45"
+        stop-color="#7f8985"
+      />
+      <stop
+        offset="1"
+        stop-color="#343b3b"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="lonaVerde"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#83945c"
+      />
+      <stop
+        offset="0.5"
+        stop-color="#52643c"
+      />
+      <stop
+        offset="1"
+        stop-color="#2d3929"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="lonaBege"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#d6bc83"
+      />
+      <stop
+        offset="0.55"
+        stop-color="#a47f48"
+      />
+      <stop
+        offset="1"
+        stop-color="#5f472d"
+      />
+    </linearGradient>
+
+    <radialGradient
+      id="fogo"
+      cx="50%"
+      cy="62%"
+      r="48%"
+    >
+      <stop
+        offset="0"
+        stop-color="#fff8a8"
+      />
+      <stop
+        offset="0.33"
+        stop-color="#ffc43d"
+      />
+      <stop
+        offset="0.68"
+        stop-color="#f36a20"
+      />
+      <stop
+        offset="1"
+        stop-color="#7b1e16"
+      />
+    </radialGradient>
+
+    <radialGradient
+      id="folha"
+      cx="35%"
+      cy="30%"
+      r="78%"
+    >
+      <stop
+        offset="0"
+        stop-color="#8db467"
+      />
+      <stop
+        offset="0.45"
+        stop-color="#426e3b"
+      />
+      <stop
+        offset="1"
+        stop-color="#173622"
+      />
+    </radialGradient>
+  </defs>
+
+
+  <g filter="url(#sombraLeve)">
+    <path
+      d="M129 88 404 58l36 322-275 31-36-323Z"
+      fill="#d9c99c"
+      stroke="#584f3d"
+      stroke-width="10"
+    />
+
+    <path
+      d="M83 133 359 93l47 321-275 41-48-322Z"
+      fill="#eee2bd"
+      stroke="#665c48"
+      stroke-width="11"
+    />
+
+    <path
+      d="M126 183c71-5 135-22 211-27M132 229c65-9 129-19 197-28M140 278c55-9 111-19 175-27M148 327c46-8 93-16 145-23"
+      fill="none"
+      stroke="#6f654f"
+      stroke-width="8"
+      stroke-linecap="round"
+      opacity=".67"
+    />
+
+    <path
+      d="M122 133c29 21 35 39 45 65"
+      fill="none"
+      stroke="#9a3e2c"
+      stroke-width="9"
+      stroke-linecap="round"
+    />
+
+    <path
+      d="m299 343 41 40M340 343l-41 40"
+      stroke="#7d2925"
+      stroke-width="11"
+      stroke-linecap="round"
+    />
+
+    <path
+      d="M102 142 84 91M365 108l36-52M139 448l-7 42"
+      stroke="#5e4b34"
+      stroke-width="8"
+      opacity=".52"
+    />
+  </g>
+</svg>

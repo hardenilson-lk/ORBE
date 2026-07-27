@@ -8,6 +8,11 @@ import {
   listarMembrosMesaRemotos,
   orbeOnlineHabilitado,
 } from "../services/supabaseOrbe.js";
+import { GERADOR_MAPAS_SINCRONIZACAO_ATIVA } from "../config/recursosOrbe.js";
+import {
+  assinarMapaAplicadoRealtime,
+  carregarMapaAplicadoDaMesa,
+} from "../geradorMapa/online/mapasGeradorOnline.js";
 import { salvarListaFichasArquivos } from "../utils/fichasArquivos.js";
 import { aplicarMesaRemota } from "../utils/mesas.js";
 import {
@@ -44,6 +49,45 @@ function mesclarMembrosNaSessao(
   return aplicarSessaoArquivosRemota(mesaId, { ...sessaoAtual, jogadores });
 }
 
+function mesclarEstadoDinamicoDoMapa(gridAplicado, mapaAtual = {}) {
+  const porOrigem = (lista = []) =>
+    new Map(
+      lista.map((item) => [
+        String(item?.origemGeradorId || item?.id || ""),
+        item,
+      ]),
+    );
+  const portasAtuais = porOrigem(mapaAtual.portas);
+  const luzesAtuais = porOrigem(mapaAtual.luzes);
+
+  return {
+    ...gridAplicado,
+    camera: mapaAtual.camera || gridAplicado.camera,
+    tokens: Array.isArray(mapaAtual.tokens) ? mapaAtual.tokens : (gridAplicado.tokens || []),
+    npcs: Array.isArray(mapaAtual.npcs) ? mapaAtual.npcs : (gridAplicado.npcs || []),
+    portas: (gridAplicado.portas || []).map((porta) => {
+      const atual = portasAtuais.get(String(porta?.origemGeradorId || porta?.id || ""));
+      if (!atual) return porta;
+      return {
+        ...porta,
+        aberta: atual.aberta,
+        trancada: atual.trancada,
+        bloqueiaMovimento: atual.bloqueiaMovimento,
+        bloqueiaVisao: atual.bloqueiaVisao,
+      };
+    }),
+    luzes: (gridAplicado.luzes || []).map((luz) => {
+      const atual = luzesAtuais.get(String(luz?.origemGeradorId || luz?.id || ""));
+      if (!atual) return luz;
+      return {
+        ...luz,
+        ativa: atual.ativa,
+        intensidade: atual.intensidade,
+      };
+    }),
+  };
+}
+
 export default function useRealtimeMesaOrbe({
   mesaId,
   mestre = false,
@@ -66,6 +110,7 @@ export default function useRealtimeMesaOrbe({
   const membrosRef = useRef([]);
   const presencasRef = useRef([]);
   const controlePresencaRef = useRef(null);
+  const revisaoMapaAplicadoRef = useRef(0);
   const dadosPresencaRef = useRef({
     nome: nomePresenca,
     fichaId,
@@ -108,6 +153,8 @@ export default function useRealtimeMesaOrbe({
     membrosRef.current = [];
     let ativo = true;
     let cancelarCanal = () => {};
+    let cancelarCanalMapa = () => {};
+    revisaoMapaAplicadoRef.current = 0;
 
     const aplicarSessao = (dados) => {
       if (!ativo || !dados) return;
@@ -125,6 +172,25 @@ export default function useRealtimeMesaOrbe({
       if (!ativo) return;
       const fichas = salvarListaFichasArquivos(mesaId, lista || []);
       callbacksRef.current.aoFichas?.(fichas);
+    };
+
+    const aplicarMapaSeguro = (registro) => {
+      if (!ativo || mestre || !registro?.grid) return;
+      const revisao = Number(registro.revisao || 0);
+      if (revisao <= revisaoMapaAplicadoRef.current) return;
+      if (String(registro.mesaId || mesaId) !== String(mesaId)) return;
+      revisaoMapaAplicadoRef.current = revisao;
+      const sessaoAtual = carregarSessaoArquivos(mesaId);
+      aplicarSessao({
+        ...sessaoAtual,
+        mapa: mesclarEstadoDinamicoDoMapa(registro.grid, sessaoAtual.mapa),
+        mapaAplicado: {
+          id: registro.mapaId,
+          revisao,
+          hash: registro.hash,
+          atualizadoEm: registro.atualizadoEm,
+        },
+      });
     };
 
     const aplicarMembros = (membros) => {
@@ -224,6 +290,17 @@ export default function useRealtimeMesaOrbe({
       aoErro: (erro) => callbacksRef.current.aoErro?.(erro),
     });
 
+    if (!mestre && GERADOR_MAPAS_SINCRONIZACAO_ATIVA) {
+      cancelarCanalMapa = assinarMapaAplicadoRealtime(mesaId, {
+        revisaoInicial: revisaoMapaAplicadoRef.current,
+        aoMapa: aplicarMapaSeguro,
+        aoStatus: (status) => {
+          if (status === "SUBSCRIBED") callbacksRef.current.aoStatus?.("Mapa da mesa sincronizado.");
+        },
+        aoErro: (erro) => callbacksRef.current.aoErro?.(erro),
+      });
+    }
+
     async function carregarInicial() {
       try {
         const estado = await carregarEstadoMesaRemoto(mesaId, { incluirSegredos: mestre });
@@ -235,6 +312,15 @@ export default function useRealtimeMesaOrbe({
         if (estado.sessao) aplicarSessao(estado.sessao);
         aplicarFichas(estado.fichas);
         aplicarMembros(estado.membros);
+        if (!mestre && GERADOR_MAPAS_SINCRONIZACAO_ATIVA) {
+          try {
+            aplicarMapaSeguro(await carregarMapaAplicadoDaMesa(mesaId));
+          } catch (erro) {
+            if (!/mapas_aplicados_orbe/i.test(String(erro?.message || ""))) {
+              callbacksRef.current.aoErro?.(erro);
+            }
+          }
+        }
         if (mestre && estado.segredos) {
           aplicarSessao({
             ...carregarSessaoArquivos(mesaId),
@@ -250,6 +336,7 @@ export default function useRealtimeMesaOrbe({
     return () => {
       ativo = false;
       cancelarCanal();
+      cancelarCanalMapa();
     };
   }, [mesaId, mestre, online]);
 

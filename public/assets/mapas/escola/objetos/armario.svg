@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 512 512"
+  width="512"
+  height="512"
+>
+  <defs>
+    <filter
+      id="sombra"
+      x="-35%"
+      y="-35%"
+      width="170%"
+      height="170%"
+    >
+      <feDropShadow
+        dx="0"
+        dy="13"
+        stdDeviation="12"
+        flood-color="#000000"
+        flood-opacity="0.43"
+      />
+    </filter>
+
+    <filter
+      id="sombraLeve"
+      x="-25%"
+      y="-25%"
+      width="150%"
+      height="150%"
+    >
+      <feDropShadow
+        dx="0"
+        dy="7"
+        stdDeviation="7"
+        flood-color="#000000"
+        flood-opacity="0.33"
+      />
+    </filter>
+
+    <linearGradient
+      id="madeira"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#d4a76b"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#8c5d32"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#42291a"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="madeiraEscura"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#755039"
+      />
+
+      <stop
+        offset="0.55"
+        stop-color="#432c21"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#1d1511"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="metal"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#d7ddd8"
+      />
+
+      <stop
+        offset="0.4"
+        stop-color="#8d9992"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#303936"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="metalEscuro"
+      x1="0"
+      y1="0"
+      x2="0"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#5d6863"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#333b38"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#151918"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="plastico"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#6f7c75"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#3b4641"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#171d1a"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="papel"
+      x1="0"
+      y1="0"
+      x2="0"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#f1e7c9"
+      />
+
+      <stop
+        offset="0.55"
+        stop-color="#c9b98c"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#847351"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="tecido"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#5d7380"
+      />
+
+      <stop
+        offset="0.55"
+        stop-color="#344b57"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#17252b"
+      />
+    </linearGradient>
+
+    <radialGradient
+      id="tela"
+      cx="50%"
+      cy="45%"
+      r="68%"
+    >
+      <stop
+        offset="0"
+        stop-color="#a4f0e6"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#448e89"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#142c2b"
+      />
+    </radialGradient>
+  </defs>
+
+
+  <g filter="url(#sombra)">
+    <rect
+      x="75"
+      y="50"
+      width="362"
+      height="414"
+      rx="34"
+      fill="#171b19"
+      stroke="#080a09"
+      stroke-width="18"
+    />
+
+    <rect
+      x="99"
+      y="75"
+      width="314"
+      height="364"
+      rx="20"
+      fill="url(#metalEscuro)"
+      stroke="#5b6661"
+      stroke-width="9"
+    />
+
+    <path
+      d="M256 78v358"
+      stroke="#151918"
+      stroke-width="13"
+    />
+
+    <path
+      d="M119 151h117M276 151h117M119 349h117M276 349h117"
+      stroke="#7f8a84"
+      stroke-width="8"
+      opacity=".55"
+    />
+
+    <rect
+      x="208"
+      y="214"
+      width="21"
+      height="83"
+      rx="10"
+      fill="url(#metal)"
+      stroke="#303734"
+      stroke-width="5"
+    />
+
+    <rect
+      x="283"
+      y="214"
+      width="21"
+      height="83"
+      rx="10"
+      fill="url(#metal)"
+      stroke="#303734"
+      stroke-width="5"
+    />
+  </g>
+</svg>

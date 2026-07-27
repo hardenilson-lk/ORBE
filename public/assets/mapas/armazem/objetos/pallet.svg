@@ -1,0 +1,329 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 512 512"
+  width="512"
+  height="512"
+>
+  <defs>
+    <linearGradient
+      id="madeira"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#b87a3c"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#87512a"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#54301d"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="madeira-clara"
+      x1="0"
+      y1="0"
+      x2="0"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#cf9652"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#7d4725"
+      />
+    </linearGradient>
+
+    <filter
+      id="sombra"
+      x="-25%"
+      y="-25%"
+      width="150%"
+      height="150%"
+    >
+      <feDropShadow
+        dx="10"
+        dy="15"
+        stdDeviation="11"
+        flood-color="#000000"
+        flood-opacity="0.5"
+      />
+    </filter>
+
+    <filter
+      id="textura"
+      x="-10%"
+      y="-10%"
+      width="120%"
+      height="120%"
+    >
+      <feTurbulence
+        type="fractalNoise"
+        baseFrequency="0.025"
+        numOctaves="3"
+        seed="9"
+        result="ruido"
+      />
+
+      <feColorMatrix
+        in="ruido"
+        type="saturate"
+        values="0"
+        result="ruido-cinza"
+      />
+
+      <feComponentTransfer
+        in="ruido-cinza"
+        result="ruido-suave"
+      >
+        <feFuncA
+          type="table"
+          tableValues="0 0.18"
+        />
+      </feComponentTransfer>
+
+      <feBlend
+        in="SourceGraphic"
+        in2="ruido-suave"
+        mode="multiply"
+      />
+    </filter>
+  </defs>
+
+  <g filter="url(#sombra)">
+    <rect
+      x="57"
+      y="76"
+      width="398"
+      height="360"
+      rx="15"
+      fill="#28180f"
+      opacity="0.75"
+    />
+
+    <g
+      fill="url(#madeira)"
+      stroke="#402416"
+      stroke-width="10"
+      filter="url(#textura)"
+    >
+      <rect
+        x="70"
+        y="91"
+        width="70"
+        height="326"
+        rx="8"
+      />
+
+      <rect
+        x="164"
+        y="91"
+        width="70"
+        height="326"
+        rx="8"
+      />
+
+      <rect
+        x="258"
+        y="91"
+        width="70"
+        height="326"
+        rx="8"
+      />
+
+      <rect
+        x="352"
+        y="91"
+        width="70"
+        height="326"
+        rx="8"
+      />
+    </g>
+
+    <g
+      fill="url(#madeira-clara)"
+      stroke="#482819"
+      stroke-width="9"
+    >
+      <rect
+        x="49"
+        y="121"
+        width="414"
+        height="54"
+        rx="7"
+      />
+
+      <rect
+        x="49"
+        y="229"
+        width="414"
+        height="54"
+        rx="7"
+      />
+
+      <rect
+        x="49"
+        y="337"
+        width="414"
+        height="54"
+        rx="7"
+      />
+    </g>
+
+    <g
+      fill="#3b2115"
+      opacity="0.55"
+    >
+      <path
+        d="M81 132 C130 114 181 145 240 128"
+        fill="none"
+        stroke="#3b2115"
+        stroke-width="7"
+        stroke-linecap="round"
+      />
+
+      <path
+        d="M261 153 C310 132 363 163 426 143"
+        fill="none"
+        stroke="#3b2115"
+        stroke-width="6"
+        stroke-linecap="round"
+      />
+
+      <path
+        d="M69 250 C126 227 183 265 242 243"
+        fill="none"
+        stroke="#3b2115"
+        stroke-width="7"
+        stroke-linecap="round"
+      />
+
+      <path
+        d="M270 362 C319 341 369 375 434 352"
+        fill="none"
+        stroke="#3b2115"
+        stroke-width="6"
+        stroke-linecap="round"
+      />
+    </g>
+
+    <g
+      fill="#21130d"
+      opacity="0.88"
+    >
+      <rect
+        x="72"
+        y="403"
+        width="68"
+        height="42"
+        rx="5"
+      />
+
+      <rect
+        x="222"
+        y="403"
+        width="68"
+        height="42"
+        rx="5"
+      />
+
+      <rect
+        x="372"
+        y="403"
+        width="68"
+        height="42"
+        rx="5"
+      />
+    </g>
+
+    <g
+      fill="#bcb29a"
+      stroke="#28241e"
+      stroke-width="4"
+    >
+      <circle
+        cx="91"
+        cy="144"
+        r="8"
+      />
+
+      <circle
+        cx="199"
+        cy="144"
+        r="8"
+      />
+
+      <circle
+        cx="307"
+        cy="144"
+        r="8"
+      />
+
+      <circle
+        cx="415"
+        cy="144"
+        r="8"
+      />
+
+      <circle
+        cx="91"
+        cy="252"
+        r="8"
+      />
+
+      <circle
+        cx="199"
+        cy="252"
+        r="8"
+      />
+
+      <circle
+        cx="307"
+        cy="252"
+        r="8"
+      />
+
+      <circle
+        cx="415"
+        cy="252"
+        r="8"
+      />
+
+      <circle
+        cx="91"
+        cy="360"
+        r="8"
+      />
+
+      <circle
+        cx="199"
+        cy="360"
+        r="8"
+      />
+
+      <circle
+        cx="307"
+        cy="360"
+        r="8"
+      />
+
+      <circle
+        cx="415"
+        cy="360"
+        r="8"
+      />
+    </g>
+  </g>
+</svg>

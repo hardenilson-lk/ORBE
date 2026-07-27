@@ -180,3 +180,20 @@
     height: 110px;
   }
 }
+.mini-mapa-navegacao__sala {
+  fill: #aaa58f;
+}
+
+.mini-mapa-navegacao__corredor {
+  fill: #858477;
+}
+
+.mini-mapa-navegacao__parede-visual {
+  stroke: #302a24;
+  stroke-width: 10px;
+}
+
+.mini-mapa-navegacao__porta-visual {
+  stroke: #b17b2f;
+  stroke-width: 9px;
+}

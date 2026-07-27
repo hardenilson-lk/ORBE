@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 512 512"
+  width="512"
+  height="512"
+>
+  <defs>
+    <filter
+      id="sombra"
+      x="-35%"
+      y="-35%"
+      width="170%"
+      height="170%"
+    >
+      <feDropShadow
+        dx="0"
+        dy="13"
+        stdDeviation="12"
+        flood-color="#000000"
+        flood-opacity="0.48"
+      />
+    </filter>
+
+    <filter
+      id="sombraLeve"
+      x="-25%"
+      y="-25%"
+      width="150%"
+      height="150%"
+    >
+      <feDropShadow
+        dx="0"
+        dy="7"
+        stdDeviation="7"
+        flood-color="#000000"
+        flood-opacity="0.36"
+      />
+    </filter>
+
+    <linearGradient
+      id="metal"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#d5d8d5"
+      />
+
+      <stop
+        offset="0.35"
+        stop-color="#7b8581"
+      />
+
+      <stop
+        offset="0.7"
+        stop-color="#404946"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#171c1b"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="metalEscuro"
+      x1="0"
+      y1="0"
+      x2="0"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#505956"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#292f2d"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#101312"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="madeiraEscura"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#755038"
+      />
+
+      <stop
+        offset="0.45"
+        stop-color="#42291f"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#1c1310"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="tecido"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#5f243c"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#361627"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#160d14"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="papel"
+      x1="0"
+      y1="0"
+      x2="0"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#eee3bd"
+      />
+
+      <stop
+        offset="0.55"
+        stop-color="#c5b282"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#88724f"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="vidro"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#d9eff0"
+        stop-opacity=".8"
+      />
+
+      <stop
+        offset="0.48"
+        stop-color="#698d8e"
+        stop-opacity=".62"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#263f41"
+        stop-opacity=".82"
+      />
+    </linearGradient>
+
+    <radialGradient
+      id="luzVela"
+      cx="50%"
+      cy="38%"
+      r="64%"
+    >
+      <stop
+        offset="0"
+        stop-color="#fffbd0"
+      />
+
+      <stop
+        offset="0.28"
+        stop-color="#ffd45f"
+      />
+
+      <stop
+        offset="0.66"
+        stop-color="#ef6b25"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#8d1e20"
+      />
+    </radialGradient>
+
+    <radialGradient
+      id="energia"
+      cx="50%"
+      cy="45%"
+      r="60%"
+    >
+      <stop
+        offset="0"
+        stop-color="#f7b9ff"
+      />
+
+      <stop
+        offset="0.32"
+        stop-color="#b85aff"
+      />
+
+      <stop
+        offset="0.67"
+        stop-color="#6120a4"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#1a0d2d"
+      />
+    </radialGradient>
+
+    <radialGradient
+      id="sangue"
+      cx="42%"
+      cy="35%"
+      r="74%"
+    >
+      <stop
+        offset="0"
+        stop-color="#b42635"
+      />
+
+      <stop
+        offset="0.55"
+        stop-color="#711625"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#270b10"
+      />
+    </radialGradient>
+
+    <pattern
+      id="perigo"
+      width="72"
+      height="72"
+      patternUnits="userSpaceOnUse"
+      patternTransform="rotate(35)"
+    >
+      <rect
+        width="36"
+        height="72"
+        fill="#d0a529"
+      />
+
+      <rect
+        x="36"
+        width="36"
+        height="72"
+        fill="#202321"
+      />
+    </pattern>
+  </defs>
+
+
+  <g filter="url(#sombra)">
+    <ellipse
+      cx="256"
+      cy="438"
+      rx="115"
+      ry="34"
+      fill="#110e0d"
+      opacity=".72"
+    />
+
+    <path
+      d="M194 177h124l19 230c2 25-18 46-43 46h-76c-25 0-45-21-43-46l19-230Z"
+      fill="#d9cfaa"
+      stroke="#5b5344"
+      stroke-width="13"
+    />
+
+    <path
+      d="M213 202c15 28 5 67 18 98 12 29 5 75 19 112M296 194c-19 45-2 76-14 116-10 34 5 72-5 110"
+      fill="none"
+      stroke="#a99d77"
+      stroke-width="9"
+      stroke-linecap="round"
+      opacity=".7"
+    />
+
+    <ellipse
+      cx="256"
+      cy="180"
+      rx="63"
+      ry="23"
+      fill="#f0e8c9"
+      stroke="#665f4d"
+      stroke-width="10"
+    />
+
+    <ellipse
+      cx="256"
+      cy="182"
+      rx="28"
+      ry="11"
+      fill="#4c3930"
+    />
+
+    <path
+      d="M256 183v-34"
+      stroke="#2a211e"
+      stroke-width="9"
+      stroke-linecap="round"
+    />
+
+    <path
+      d="M256 151c-39-22-37-63-4-95 4 29 31 42 19 72 21-13 30-33 28-55 31 35 22 75-11 91-12 6-22 5-32-13Z"
+      fill="url(#luzVela)"
+      stroke="#9c2e21"
+      stroke-width="7"
+      stroke-linejoin="round"
+    />
+
+    <path
+      d="M257 139c-15-13-14-31-2-46 2 15 14 23 9 36 9-5 13-15 12-26 11 18 6 34-7 40-5 2-8 1-12-4Z"
+      fill="#fff9bc"
+    />
+  </g>
+</svg>

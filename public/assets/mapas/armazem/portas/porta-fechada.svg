@@ -1,0 +1,279 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 512 512"
+  width="512"
+  height="512"
+>
+  <defs>
+    <linearGradient
+      id="metal"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#8d918b"
+      />
+
+      <stop
+        offset="0.45"
+        stop-color="#515650"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#282c29"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="metal-claro"
+      x1="0"
+      y1="0"
+      x2="0"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#b9bcb4"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#777c75"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#474c47"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="metal-escuro"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#414642"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#1e2220"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="porta-amarela"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#d7ae3d"
+      />
+
+      <stop
+        offset="0.52"
+        stop-color="#a87518"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#5f420c"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="porta-vermelha"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#d84b43"
+      />
+
+      <stop
+        offset="0.52"
+        stop-color="#9e2622"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#51100f"
+      />
+    </linearGradient>
+
+    <pattern
+      id="faixa-perigo"
+      width="64"
+      height="64"
+      patternUnits="userSpaceOnUse"
+      patternTransform="rotate(45)"
+    >
+      <rect
+        width="32"
+        height="64"
+        fill="#d6ad35"
+      />
+
+      <rect
+        x="32"
+        width="32"
+        height="64"
+        fill="#252825"
+      />
+    </pattern>
+
+    <filter
+      id="sombra"
+      x="-30%"
+      y="-30%"
+      width="160%"
+      height="160%"
+    >
+      <feDropShadow
+        dx="10"
+        dy="14"
+        stdDeviation="11"
+        flood-color="#000000"
+        flood-opacity="0.6"
+      />
+    </filter>
+
+    <filter
+      id="textura"
+      x="-10%"
+      y="-10%"
+      width="120%"
+      height="120%"
+    >
+      <feTurbulence
+        type="fractalNoise"
+        baseFrequency="0.025"
+        numOctaves="3"
+        seed="19"
+        result="ruido"
+      />
+
+      <feColorMatrix
+        in="ruido"
+        type="saturate"
+        values="0"
+        result="ruido-cinza"
+      />
+
+      <feComponentTransfer
+        in="ruido-cinza"
+        result="ruido-suave"
+      >
+        <feFuncA
+          type="table"
+          tableValues="0 0.16"
+        />
+      </feComponentTransfer>
+
+      <feBlend
+        in="SourceGraphic"
+        in2="ruido-suave"
+        mode="multiply"
+      />
+    </filter>
+  </defs>
+
+  
+        <g filter="url(#sombra)">
+          <rect
+            x="61"
+            y="126"
+            width="390"
+            height="260"
+            rx="22"
+            fill="#171a18"
+          />
+
+          <rect
+            x="79"
+            y="145"
+            width="354"
+            height="222"
+            rx="14"
+            fill="url(#porta-amarela)"
+            stroke="#3e2d0c"
+            stroke-width="15"
+            filter="url(#textura)"
+          />
+
+          <g
+            fill="none"
+            stroke="#704e0c"
+            stroke-width="13"
+          >
+            <rect
+              x="108"
+              y="171"
+              width="134"
+              height="170"
+              rx="9"
+            />
+
+            <rect
+              x="270"
+              y="171"
+              width="134"
+              height="170"
+              rx="9"
+            />
+          </g>
+
+          <line
+            x1="256"
+            y1="153"
+            x2="256"
+            y2="359"
+            stroke="#30260f"
+            stroke-width="18"
+          />
+
+          <g
+            fill="url(#metal-claro)"
+            stroke="#1b1e1c"
+            stroke-width="7"
+          >
+            <circle
+              cx="220"
+              cy="261"
+              r="17"
+            />
+
+            <circle
+              cx="292"
+              cy="261"
+              r="17"
+            />
+          </g>
+
+          <rect
+            x="97"
+            y="113"
+            width="318"
+            height="36"
+            rx="9"
+            fill="url(#metal)"
+            stroke="#161917"
+            stroke-width="8"
+          />
+        </g>
+      
+</svg>

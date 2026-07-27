@@ -1,0 +1,452 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 512 512"
+  width="512"
+  height="512"
+>
+  <defs>
+    <linearGradient
+      id="painel-claro"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#edf3ef"
+      />
+
+      <stop
+        offset="0.48"
+        stop-color="#c2cfca"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#879792"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="painel-escuro"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#526763"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#314743"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#172724"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="faixa-laboratorio"
+      x1="0"
+      y1="0"
+      x2="0"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#54a69f"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#297870"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#155049"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="metal"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#d9e1df"
+      />
+
+      <stop
+        offset="0.48"
+        stop-color="#8f9c99"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#475350"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="metal-escuro"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#485956"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#293936"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#101a18"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="porta-laboratorio"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#dce8e4"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#a2b5af"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#617671"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="porta-contencao"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#dd5b52"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#9e302d"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#501719"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="vidro"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#e5ffff"
+        stop-opacity=".94"
+      />
+
+      <stop
+        offset="0.48"
+        stop-color="#83c8c4"
+        stop-opacity=".72"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#286b6a"
+        stop-opacity=".86"
+      />
+    </linearGradient>
+
+    <radialGradient
+      id="luz-ciano"
+      cx="50%"
+      cy="50%"
+      r="70%"
+    >
+      <stop
+        offset="0"
+        stop-color="#d9ffff"
+        stop-opacity="1"
+      />
+
+      <stop
+        offset="0.42"
+        stop-color="#55d4d1"
+        stop-opacity=".75"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#176264"
+        stop-opacity="0"
+      />
+    </radialGradient>
+
+    <pattern
+      id="placas"
+      width="72"
+      height="72"
+      patternUnits="userSpaceOnUse"
+    >
+      <rect
+        width="72"
+        height="72"
+        fill="url(#painel-claro)"
+      />
+
+      <path
+        d="M0 0H72V72H0Z"
+        fill="none"
+        stroke="#71807c"
+        stroke-width="4"
+        opacity=".58"
+      />
+
+      <circle
+        cx="9"
+        cy="9"
+        r="4"
+        fill="#dce5e2"
+        stroke="#53615e"
+        stroke-width="2"
+      />
+
+      <circle
+        cx="63"
+        cy="63"
+        r="4"
+        fill="#dce5e2"
+        stroke="#53615e"
+        stroke-width="2"
+      />
+    </pattern>
+
+    <pattern
+      id="faixa-perigo"
+      width="64"
+      height="64"
+      patternUnits="userSpaceOnUse"
+      patternTransform="rotate(45)"
+    >
+      <rect
+        width="32"
+        height="64"
+        fill="#d7b33d"
+      />
+
+      <rect
+        x="32"
+        width="32"
+        height="64"
+        fill="#202827"
+      />
+    </pattern>
+
+    <filter
+      id="sombra"
+      x="-30%"
+      y="-30%"
+      width="160%"
+      height="160%"
+    >
+      <feDropShadow
+        dx="9"
+        dy="13"
+        stdDeviation="10"
+        flood-color="#000000"
+        flood-opacity=".56"
+      />
+    </filter>
+
+    <filter
+      id="textura"
+      x="-10%"
+      y="-10%"
+      width="120%"
+      height="120%"
+    >
+      <feTurbulence
+        type="fractalNoise"
+        baseFrequency=".028"
+        numOctaves="3"
+        seed="57"
+        result="ruido"
+      />
+
+      <feColorMatrix
+        in="ruido"
+        type="saturate"
+        values="0"
+        result="ruido-cinza"
+      />
+
+      <feComponentTransfer
+        in="ruido-cinza"
+        result="ruido-suave"
+      >
+        <feFuncA
+          type="table"
+          tableValues="0 .12"
+        />
+      </feComponentTransfer>
+
+      <feBlend
+        in="SourceGraphic"
+        in2="ruido-suave"
+        mode="multiply"
+      />
+    </filter>
+  </defs>
+
+  
+        <g filter="url(#sombra)">
+          <rect
+            x="61"
+            y="121"
+            width="390"
+            height="270"
+            rx="22"
+            fill="#263633"
+          />
+
+          <rect
+            x="79"
+            y="140"
+            width="354"
+            height="232"
+            rx="14"
+            fill="url(#porta-contencao)"
+            stroke="#491719"
+            stroke-width="15"
+            filter="url(#textura)"
+          />
+
+          <rect
+            x="103"
+            y="162"
+            width="306"
+            height="70"
+            rx="8"
+            fill="url(#vidro)"
+            stroke="#3e5f5c"
+            stroke-width="10"
+          />
+
+          <path
+            d="M179 164V230M256 164V230M333 164V230"
+            stroke="#5d8581"
+            stroke-width="8"
+          />
+
+          <rect
+            x="100"
+            y="248"
+            width="312"
+            height="96"
+            rx="9"
+            fill="url(#faixa-perigo)"
+            opacity=".8"
+            stroke="#451516"
+            stroke-width="10"
+          />
+
+          <circle
+            cx="256"
+            cy="292"
+            r="57"
+            fill="#3c1618"
+            stroke="#d0d5d2"
+            stroke-width="10"
+          />
+
+          <circle
+            cx="256"
+            cy="292"
+            r="17"
+            fill="#d6c65e"
+            stroke="#322d10"
+            stroke-width="7"
+          />
+
+          <path
+            d="M256 246V269M219 313L239 301M293 313L273 301"
+            stroke="#d0d5d2"
+            stroke-width="10"
+            stroke-linecap="round"
+          />
+
+          <path
+            d="M232 258C246 245 266 245 280 258"
+            fill="none"
+            stroke="#d0d5d2"
+            stroke-width="10"
+            stroke-linecap="round"
+          />
+
+          <rect
+            x="96"
+            y="108"
+            width="320"
+            height="40"
+            rx="9"
+            fill="url(#painel-escuro)"
+            stroke="#263633"
+            stroke-width="8"
+          />
+
+          <rect
+            x="166"
+            y="112"
+            width="180"
+            height="30"
+            rx="7"
+            fill="#edd8d7"
+            stroke="#7a2928"
+            stroke-width="5"
+          />
+
+          <path
+            d="M191 126H321"
+            stroke="#a62f2c"
+            stroke-width="7"
+            stroke-linecap="round"
+          />
+        </g>
+      
+</svg>

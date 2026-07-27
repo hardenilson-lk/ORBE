@@ -1,0 +1,260 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 512 512"
+  width="512"
+  height="512"
+>
+  <defs>
+    <filter
+      id="sombra"
+      x="-30%"
+      y="-30%"
+      width="160%"
+      height="160%"
+    >
+      <feDropShadow
+        dx="12"
+        dy="16"
+        stdDeviation="13"
+        flood-color="#000000"
+        flood-opacity="0.55"
+      />
+    </filter>
+
+    <filter
+      id="textura"
+      x="-10%"
+      y="-10%"
+      width="120%"
+      height="120%"
+    >
+      <feTurbulence
+        type="fractalNoise"
+        baseFrequency="0.025"
+        numOctaves="3"
+        seed="11"
+        result="ruido"
+      />
+
+      <feColorMatrix
+        in="ruido"
+        type="saturate"
+        values="0"
+        result="ruido-cinza"
+      />
+
+      <feComponentTransfer
+        in="ruido-cinza"
+        result="ruido-suave"
+      >
+        <feFuncA
+          type="table"
+          tableValues="0 0.16"
+        />
+      </feComponentTransfer>
+
+      <feBlend
+        in="SourceGraphic"
+        in2="ruido-suave"
+        mode="multiply"
+      />
+    </filter>
+
+    <linearGradient
+      id="metal"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#858982"
+      />
+
+      <stop
+        offset="0.48"
+        stop-color="#444944"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#262a28"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="metal-claro"
+      x1="0"
+      y1="0"
+      x2="0"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#b9bdb4"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#5d625d"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="madeira"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#bd8042"
+      />
+
+      <stop
+        offset="0.5"
+        stop-color="#824b27"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#4e2c1b"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="amarelo"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#f3c84f"
+      />
+
+      <stop
+        offset="0.55"
+        stop-color="#c98d18"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#76500c"
+      />
+    </linearGradient>
+
+    <linearGradient
+      id="vermelho"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#ef5448"
+      />
+
+      <stop
+        offset="0.55"
+        stop-color="#aa211e"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#5a1110"
+      />
+    </linearGradient>
+  </defs>
+
+  <rect
+    width="512"
+    height="512"
+    fill="transparent"
+  />
+
+  <g filter="url(#sombra)">
+    
+      <rect
+        x="68"
+        y="88"
+        width="376"
+        height="286"
+        rx="28"
+        fill="#151817"
+        opacity="0.9"
+      />
+
+      <rect
+        x="88"
+        y="106"
+        width="336"
+        height="247"
+        rx="19"
+        fill="#242b2d"
+        stroke="#101313"
+        stroke-width="14"
+      />
+
+      <rect
+        x="112"
+        y="131"
+        width="288"
+        height="173"
+        rx="11"
+        fill="#183442"
+        stroke="#0a0e10"
+        stroke-width="10"
+      />
+
+      <path
+        d="M132 282 L263 154 L380 268"
+        fill="none"
+        stroke="#39778a"
+        stroke-width="11"
+        opacity="0.65"
+      />
+
+      <circle
+        cx="167"
+        cy="183"
+        r="28"
+        fill="#6cc7dd"
+        opacity="0.65"
+      />
+
+      <rect
+        x="228"
+        y="345"
+        width="56"
+        height="69"
+        rx="10"
+        fill="url(#metal)"
+        stroke="#171a18"
+        stroke-width="8"
+      />
+
+      <rect
+        x="165"
+        y="401"
+        width="182"
+        height="40"
+        rx="12"
+        fill="url(#metal)"
+        stroke="#171a18"
+        stroke-width="8"
+      />
+
+      <circle
+        cx="378"
+        cy="329"
+        r="9"
+        fill="#41c660"
+      />
+    
+  </g>
+</svg>

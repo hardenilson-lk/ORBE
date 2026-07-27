@@ -36,6 +36,18 @@ function criarObjetoSeguro(valor) {
   return valor;
 }
 
+function criarObjetoOuNulo(valor) {
+  if (
+    !valor ||
+    typeof valor !== "object" ||
+    Array.isArray(valor)
+  ) {
+    return null;
+  }
+
+  return valor;
+}
+
 function limitarNumero(
   valor,
   valorPadrao,
@@ -88,6 +100,16 @@ export function criarMapaArquivosVazio(
   const neblinaRecebida =
     criarObjetoSeguro(
       valores.neblina,
+    );
+
+  const arquiteturaVisualRecebida =
+    criarObjetoOuNulo(
+      valores.arquiteturaVisual,
+    );
+
+  const geradorMapaRecebido =
+    criarObjetoOuNulo(
+      valores.geradorMapa,
     );
 
   return {
@@ -157,7 +179,12 @@ export function criarMapaArquivosVazio(
         true,
 
       unidadeMedida:
-        ["metros", "quadrados"].includes(gridRecebido.unidadeMedida)
+        [
+          "metros",
+          "quadrados",
+        ].includes(
+          gridRecebido.unidadeMedida,
+        )
           ? gridRecebido.unidadeMedida
           : "metros",
 
@@ -170,7 +197,13 @@ export function criarMapaArquivosVazio(
         ),
 
       modoDiagonal:
-        ["euclidiana", "alternada", "quadrados"].includes(gridRecebido.modoDiagonal)
+        [
+          "euclidiana",
+          "alternada",
+          "quadrados",
+        ].includes(
+          gridRecebido.modoDiagonal,
+        )
           ? gridRecebido.modoDiagonal
           : "euclidiana",
     },
@@ -207,6 +240,7 @@ export function criarMapaArquivosVazio(
           fundoRecebido.id ||
             "",
         ),
+
       imagem:
         String(
           fundoRecebido.imagem ||
@@ -303,23 +337,72 @@ export function criarMapaArquivosVazio(
           "",
       ),
 
-    camadas: Object.fromEntries(
-      Object.entries({
-        mapa: { visivel: true, bloqueada: true },
-        objetos: { visivel: true, bloqueada: false },
-        paredes: { visivel: true, bloqueada: false },
-        tokens: { visivel: true, bloqueada: false },
-        efeitos: { visivel: true, bloqueada: false },
-        neblina: { visivel: true, bloqueada: false },
-        interface: { visivel: true, bloqueada: true },
-      }).map(([id, padrao]) => {
-        const recebida = criarObjetoSeguro(criarObjetoSeguro(valores.camadas)[id]);
-        return [id, {
-          visivel: recebida.visivel !== false,
-          bloqueada: recebida.bloqueada === true || (recebida.bloqueada == null && padrao.bloqueada),
-        }];
-      }),
-    ),
+    camadas:
+      Object.fromEntries(
+        Object.entries({
+          mapa: {
+            visivel: true,
+            bloqueada: true,
+          },
+
+          objetos: {
+            visivel: true,
+            bloqueada: false,
+          },
+
+          paredes: {
+            visivel: true,
+            bloqueada: false,
+          },
+
+          tokens: {
+            visivel: true,
+            bloqueada: false,
+          },
+
+          efeitos: {
+            visivel: true,
+            bloqueada: false,
+          },
+
+          neblina: {
+            visivel: true,
+            bloqueada: false,
+          },
+
+          interface: {
+            visivel: true,
+            bloqueada: true,
+          },
+        }).map(
+          ([id, padrao]) => {
+            const recebida =
+              criarObjetoSeguro(
+                criarObjetoSeguro(
+                  valores.camadas,
+                )[id],
+              );
+
+            return [
+              id,
+              {
+                visivel:
+                  recebida.visivel !==
+                  false,
+
+                bloqueada:
+                  recebida.bloqueada ===
+                    true ||
+                  (
+                    recebida.bloqueada ==
+                      null &&
+                    padrao.bloqueada
+                  ),
+              },
+            ];
+          },
+        ),
+      ),
 
     iluminacao: {
       modo:
@@ -343,12 +426,17 @@ export function criarMapaArquivosVazio(
         ),
 
       visaoDinamica:
-        Number(valores.versao || 0) < 3
+        Number(
+          valores.versao ||
+            0,
+        ) < 3
           ? true
-          : iluminacaoRecebida.visaoDinamica === true,
+          : iluminacaoRecebida.visaoDinamica ===
+            true,
 
       previsualizarJogador:
-        iluminacaoRecebida.previsualizarJogador === true,
+        iluminacaoRecebida.previsualizarJogador ===
+        true,
     },
 
     neblina: {
@@ -376,7 +464,8 @@ export function criarMapaArquivosVazio(
         ),
 
       previsualizarJogador:
-        neblinaRecebida.previsualizarJogador === true,
+        neblinaRecebida.previsualizarJogador ===
+        true,
     },
 
     tokens:
@@ -404,6 +493,73 @@ export function criarMapaArquivosVazio(
         valores.luzes,
       ),
 
+    objetosCenario:
+      criarListaSegura(
+        valores.objetosCenario,
+      ),
+
+    areas:
+      criarListaSegura(
+        valores.areas,
+      ),
+
+    arquiteturaVisual:
+      arquiteturaVisualRecebida
+        ? {
+            ...arquiteturaVisualRecebida,
+
+            salas:
+              criarListaSegura(
+                arquiteturaVisualRecebida.salas,
+              ),
+
+            corredores:
+              criarListaSegura(
+                arquiteturaVisualRecebida.corredores,
+              ),
+
+            paredes:
+              criarListaSegura(
+                arquiteturaVisualRecebida.paredes,
+              ),
+
+            portas:
+              criarListaSegura(
+                arquiteturaVisualRecebida.portas,
+              ),
+          }
+        : null,
+
+    mapaAplicadoId:
+      String(
+        valores.mapaAplicadoId ||
+          "",
+      ),
+
+    aplicacaoMapaId:
+      String(
+        valores.aplicacaoMapaId ||
+          "",
+      ),
+
+    versaoMapaAplicada:
+      Number.isFinite(
+        Number(
+          valores.versaoMapaAplicada,
+        ),
+      )
+        ? Number(
+            valores.versaoMapaAplicada,
+          )
+        : null,
+
+    geradorMapa:
+      geradorMapaRecebido
+        ? {
+            ...geradorMapaRecebido,
+          }
+        : null,
+
     guiaVisto:
       valores.guiaVisto ===
       true,
@@ -428,14 +584,9 @@ export function criarSessaoArquivosVazia(
     anotacoesMestre: "",
     volumeTrilha: 70,
     trilhaAtivaId: "",
-    trilhas: [],
-    anotacoes: [],
-    missoes: [],
-    arquivos: [],
-    historicoRolagens: [],
-    jogadores: [],
     criadoEm: "",
     atualizadoEm: "",
+
     ...valores,
 
     trilhas:
@@ -492,19 +643,26 @@ export function carregarSessaoArquivos(
 
   try {
     const conteudo =
-      window.localStorage.getItem(chave);
+      window.localStorage.getItem(
+        chave,
+      );
 
     if (!conteudo) {
       return criarSessaoArquivosVazia();
     }
 
     const sessaoSalva =
-      JSON.parse(conteudo);
+      JSON.parse(
+        conteudo,
+      );
 
     if (
       !sessaoSalva ||
-      typeof sessaoSalva !== "object" ||
-      Array.isArray(sessaoSalva)
+      typeof sessaoSalva !==
+        "object" ||
+      Array.isArray(
+        sessaoSalva,
+      )
     ) {
       return criarSessaoArquivosVazia();
     }
@@ -525,7 +683,9 @@ export function salvarSessaoArquivos(
     new Date().toISOString();
 
   const sessaoAtual =
-    carregarSessaoArquivos(mesaId);
+    carregarSessaoArquivos(
+      mesaId,
+    );
 
   const sessaoNormalizada =
     criarSessaoArquivosVazia({
@@ -535,6 +695,7 @@ export function salvarSessaoArquivos(
       mapa:
         criarMapaArquivosVazio({
           ...sessaoAtual.mapa,
+
           ...criarObjetoSeguro(
             sessaoRecebida.mapa,
           ),
@@ -545,7 +706,8 @@ export function salvarSessaoArquivos(
         sessaoAtual.criadoEm ||
         agora,
 
-      atualizadoEm: agora,
+      atualizadoEm:
+        agora,
     });
 
   if (!storageDisponivel()) {
@@ -553,7 +715,9 @@ export function salvarSessaoArquivos(
   }
 
   const chave =
-    criarChaveStorage(mesaId);
+    criarChaveStorage(
+      mesaId,
+    );
 
   try {
     window.localStorage.setItem(
@@ -566,7 +730,10 @@ export function salvarSessaoArquivos(
     return sessaoNormalizada;
   }
 
-  agendarSessaoPublicaRemota(mesaId, sessaoNormalizada);
+  agendarSessaoPublicaRemota(
+    mesaId,
+    sessaoNormalizada,
+  );
 
   return sessaoNormalizada;
 }
@@ -575,24 +742,52 @@ export function aplicarSessaoArquivosRemota(
   mesaId,
   sessaoRecebida = {},
 ) {
-  const sessaoAtual = carregarSessaoArquivos(mesaId);
-  const sessaoNormalizada = criarSessaoArquivosVazia({
-    ...sessaoAtual,
-    ...(sessaoRecebida || {}),
-    mapa: criarMapaArquivosVazio({
-      ...sessaoAtual.mapa,
-      ...criarObjetoSeguro(sessaoRecebida?.mapa),
-    }),
-    criadoEm: sessaoRecebida?.criadoEm || sessaoAtual.criadoEm,
-    atualizadoEm: sessaoRecebida?.atualizadoEm || sessaoAtual.atualizadoEm || new Date().toISOString(),
-  });
+  const sessaoAtual =
+    carregarSessaoArquivos(
+      mesaId,
+    );
 
-  if (!storageDisponivel()) return sessaoNormalizada;
+  const sessaoNormalizada =
+    criarSessaoArquivosVazia({
+      ...sessaoAtual,
+      ...(sessaoRecebida || {}),
+
+      mapa:
+        criarMapaArquivosVazio({
+          ...sessaoAtual.mapa,
+
+          ...criarObjetoSeguro(
+            sessaoRecebida?.mapa,
+          ),
+        }),
+
+      criadoEm:
+        sessaoRecebida?.criadoEm ||
+        sessaoAtual.criadoEm,
+
+      atualizadoEm:
+        sessaoRecebida?.atualizadoEm ||
+        sessaoAtual.atualizadoEm ||
+        new Date().toISOString(),
+    });
+
+  if (!storageDisponivel()) {
+    return sessaoNormalizada;
+  }
+
   try {
-    window.localStorage.setItem(criarChaveStorage(mesaId), JSON.stringify(sessaoNormalizada));
+    window.localStorage.setItem(
+      criarChaveStorage(
+        mesaId,
+      ),
+      JSON.stringify(
+        sessaoNormalizada,
+      ),
+    );
   } catch {
     return sessaoNormalizada;
   }
+
   return sessaoNormalizada;
 }
 
@@ -601,11 +796,16 @@ export function atualizarSessaoArquivos(
   alteracoes,
 ) {
   const sessaoAtual =
-    carregarSessaoArquivos(mesaId);
+    carregarSessaoArquivos(
+      mesaId,
+    );
 
   const mudancas =
-    typeof alteracoes === "function"
-      ? alteracoes(sessaoAtual)
+    typeof alteracoes ===
+    "function"
+      ? alteracoes(
+          sessaoAtual,
+        )
       : alteracoes;
 
   return salvarSessaoArquivos(
@@ -625,7 +825,9 @@ export function limparSessaoArquivos(
   }
 
   const chave =
-    criarChaveStorage(mesaId);
+    criarChaveStorage(
+      mesaId,
+    );
 
   try {
     window.localStorage.removeItem(
