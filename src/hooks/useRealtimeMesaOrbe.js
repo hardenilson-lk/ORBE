@@ -98,6 +98,7 @@ export default function useRealtimeMesaOrbe({
   aoRolagem,
   aoTokens,
   aoSolicitacoesFichasAlteradas,
+  aoMembrosAlterados,
   aoStatus,
   aoErro,
   usuarioId,
@@ -107,9 +108,11 @@ export default function useRealtimeMesaOrbe({
   const online = orbeOnlineHabilitado() && Boolean(mesaId) && mesaId !== "local";
   const [pronto, setPronto] = useState(!online);
   const [presencas, setPresencas] = useState([]);
+  const [estadoConexao, setEstadoConexao] = useState(online ? "conectando" : "offline");
   const membrosRef = useRef([]);
   const presencasRef = useRef([]);
   const controlePresencaRef = useRef(null);
+  const estadosCanaisRef = useRef({ mesa: online ? "conectando" : "offline", presenca: "offline" });
   const revisaoMapaAplicadoRef = useRef(0);
   const dadosPresencaRef = useRef({
     nome: nomePresenca,
@@ -129,6 +132,7 @@ export default function useRealtimeMesaOrbe({
     aoRolagem,
     aoTokens,
     aoSolicitacoesFichasAlteradas,
+    aoMembrosAlterados,
     aoStatus,
     aoErro,
   });
@@ -140,9 +144,25 @@ export default function useRealtimeMesaOrbe({
     aoRolagem,
     aoTokens,
     aoSolicitacoesFichasAlteradas,
+    aoMembrosAlterados,
     aoStatus,
     aoErro,
   };
+
+  function atualizarEstadoConexao(tipo, status) {
+    const statusNormalizado = String(status || "").toUpperCase();
+    estadosCanaisRef.current[tipo] = statusNormalizado;
+    const esperados = usuarioId ? ["mesa", "presenca"] : ["mesa"];
+    if (esperados.every((canal) => estadosCanaisRef.current[canal] === "SUBSCRIBED")) {
+      setEstadoConexao("online");
+      return;
+    }
+    if (["CHANNEL_ERROR", "TIMED_OUT", "CLOSED", "RECONNECTING"].includes(statusNormalizado)) {
+      setEstadoConexao("reconectando");
+      return;
+    }
+    setEstadoConexao("conectando");
+  }
 
   useEffect(() => {
     if (!online) {
@@ -154,6 +174,7 @@ export default function useRealtimeMesaOrbe({
     let ativo = true;
     let cancelarCanal = () => {};
     let cancelarCanalMapa = () => {};
+    let canalMesaJaConectado = false;
     revisaoMapaAplicadoRef.current = 0;
 
     const aplicarSessao = (dados) => {
@@ -236,6 +257,7 @@ export default function useRealtimeMesaOrbe({
     async function recarregarMembros() {
       try {
         aplicarMembros(await listarMembrosMesaRemotos(mesaId));
+        callbacksRef.current.aoMembrosAlterados?.();
       } catch (erro) {
         callbacksRef.current.aoErro?.(erro);
       }
@@ -282,12 +304,18 @@ export default function useRealtimeMesaOrbe({
         },
       } : {}),
       aoStatus: (status) => {
+        atualizarEstadoConexao("mesa", status);
         if (status === "SUBSCRIBED") callbacksRef.current.aoStatus?.("Tempo real conectado.");
         if (["CHANNEL_ERROR", "TIMED_OUT", "CLOSED"].includes(status)) {
           callbacksRef.current.aoStatus?.("Tempo real desconectado. Tentando recuperar a conexão.");
         }
+        if (status === "SUBSCRIBED" && canalMesaJaConectado) void carregarInicial();
+        if (status === "SUBSCRIBED") canalMesaJaConectado = true;
       },
-      aoErro: (erro) => callbacksRef.current.aoErro?.(erro),
+      aoErro: (erro) => {
+        setEstadoConexao("erro");
+        callbacksRef.current.aoErro?.(erro);
+      },
     });
 
     if (!mestre && GERADOR_MAPAS_SINCRONIZACAO_ATIVA) {
@@ -333,8 +361,21 @@ export default function useRealtimeMesaOrbe({
     }
 
     void carregarInicial();
+    function atualizarConexaoDoNavegador() {
+      if (window.navigator.onLine) {
+        atualizarEstadoConexao("mesa", "RECONNECTING");
+        void carregarInicial();
+      } else {
+        atualizarEstadoConexao("mesa", "CLOSED");
+        setEstadoConexao("offline");
+      }
+    }
+    window.addEventListener("online", atualizarConexaoDoNavegador);
+    window.addEventListener("offline", atualizarConexaoDoNavegador);
     return () => {
       ativo = false;
+      window.removeEventListener("online", atualizarConexaoDoNavegador);
+      window.removeEventListener("offline", atualizarConexaoDoNavegador);
       cancelarCanal();
       cancelarCanalMapa();
     };
@@ -344,6 +385,8 @@ export default function useRealtimeMesaOrbe({
     if (!online || !usuarioId) {
       setPresencas([]);
       presencasRef.current = [];
+      estadosCanaisRef.current.presenca = "offline";
+      if (!online) setEstadoConexao("offline");
       return undefined;
     }
 
@@ -365,7 +408,11 @@ export default function useRealtimeMesaOrbe({
           );
           callbacksRef.current.aoSessao?.(sessao);
         },
-        aoErro: (erro) => callbacksRef.current.aoErro?.(erro),
+        aoStatus: (status) => atualizarEstadoConexao("presenca", status),
+        aoErro: (erro) => {
+          setEstadoConexao("erro");
+          callbacksRef.current.aoErro?.(erro);
+        },
       },
     )
       .then((controle) => {
@@ -383,6 +430,7 @@ export default function useRealtimeMesaOrbe({
 
     return () => {
       ativo = false;
+      estadosCanaisRef.current.presenca = "CLOSED";
       controlePresencaRef.current = null;
       remover();
     };
@@ -403,5 +451,5 @@ export default function useRealtimeMesaOrbe({
     (presenca) => String(presenca.papel || "").toLowerCase() === "mestre",
   );
 
-  return { online, pronto, presencas, mestreOnline };
+  return { online, pronto, presencas, mestreOnline, estadoConexao };
 }

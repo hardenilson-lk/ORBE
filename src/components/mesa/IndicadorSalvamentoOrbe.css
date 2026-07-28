@@ -1,0 +1,22 @@
+.indicador-salvamento-orbe {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  width: fit-content;
+  padding: 5px 8px;
+  border: 1px solid rgba(202, 158, 80, 0.28);
+  background: rgba(0, 0, 0, 0.18);
+  color: #d9c39a;
+  font: 900 0.62rem/1 "Courier Prime", "Courier New", monospace;
+  text-transform: uppercase;
+}
+
+.indicador-salvamento-orbe__ponto { width: 7px; height: 7px; border-radius: 50%; background: #8b8580; }
+.indicador-salvamento-orbe--pendente .indicador-salvamento-orbe__ponto { background: #e0a453; }
+.indicador-salvamento-orbe--salvando .indicador-salvamento-orbe__ponto { background: #cfa65d; animation: indicador-salvamento-pulsar 1s infinite; }
+.indicador-salvamento-orbe--salvo .indicador-salvamento-orbe__ponto { background: #7fcf78; }
+.indicador-salvamento-orbe--erro .indicador-salvamento-orbe__ponto { background: #d35454; }
+.indicador-salvamento-orbe--sem-conexao .indicador-salvamento-orbe__ponto { background: #d35454; }
+.indicador-salvamento-orbe button { border: 0; background: transparent; color: #fff0cb; font: inherit; text-decoration: underline; cursor: pointer; }
+
+@keyframes indicador-salvamento-pulsar { 50% { opacity: 0.35; } }

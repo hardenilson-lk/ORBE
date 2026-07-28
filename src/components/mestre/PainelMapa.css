@@ -468,6 +468,18 @@
   pointer-events: none;
 }
 
+.painel-mapa__finalizacao-ia {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.72;
+  pointer-events: none;
+  user-select: none;
+}
+
 .camada-objetos-cenario-mapa {
   position: absolute;
   z-index: 3;
@@ -485,6 +497,22 @@
   color: rgba(245, 232, 196, 0.88);
   font: 700 18px/1 Georgia, serif;
   transform-origin: center;
+}
+
+.camada-objetos-cenario-mapa__colisao {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 20;
+  box-sizing: border-box;
+  border: 1px dashed rgba(255, 196, 74, 0.9);
+  background: rgba(255, 196, 74, 0.08);
+  pointer-events: none;
+}
+
+.camada-objetos-cenario-mapa__colisao--visao {
+  border-color: rgba(255, 74, 63, 0.95);
+  background: rgba(255, 74, 63, 0.1);
 }
 
 .camada-objetos-cenario-mapa__objeto--sangue,

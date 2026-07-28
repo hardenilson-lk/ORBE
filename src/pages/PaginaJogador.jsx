@@ -30,6 +30,7 @@ import {
   salvarSessaoArquivos,
 } from "../utils/sessoesArquivos.js";
 import useRealtimeMesaOrbe from "../hooks/useRealtimeMesaOrbe.js";
+import IndicadorConexaoMesa from "../components/mesa/IndicadorConexaoMesa.jsx";
 import {
   carregarEstadoMesaRemoto,
   publicarInicioRolagemMesaRealtime,
@@ -102,7 +103,11 @@ function PaginaJogador() {
   const fichaAtivaNome = fichaAtiva?.nome;
   const fichaAtivaJogador = fichaAtiva?.jogador;
 
-  const { online: realtimeOnline, pronto: realtimePronto } = useRealtimeMesaOrbe({
+  const {
+    online: realtimeOnline,
+    pronto: realtimePronto,
+    estadoConexao,
+  } = useRealtimeMesaOrbe({
     mesaId,
     usuarioId: usuarioPortalId,
     nomePresenca: usuarioPortalNome || fichaAtivaNome || "Jogador",
@@ -352,7 +357,7 @@ function PaginaJogador() {
     if (!fichaAtiva) return null;
 
     if (menuAtivo === "ficha") {
-      return <><div className={fichaAtiva.editLocked ? "pagina-jogador__permissao pagina-jogador__permissao--bloqueada" : "pagina-jogador__permissao"}>{fichaAtiva.editLocked ? "Edição bloqueada pelo mestre. Você pode consultar a ficha, mas não salvar alterações." : "Edição liberada pelo mestre. Esta é a mesma ficha compartilhada na sessão."}</div><PainelFichas fichas={[fichaAtiva]} fichaSelecionada={fichaAtiva} aoSalvarFicha={salvarFicha} aoSelecionarFicha={escolherFicha} permitirNovaFicha={false} /></>;
+      return <><div className={fichaAtiva.editLocked ? "pagina-jogador__permissao pagina-jogador__permissao--bloqueada" : "pagina-jogador__permissao"}>{fichaAtiva.editLocked ? "Edição bloqueada pelo mestre. Você pode consultar a ficha, mas não salvar alterações." : "Edição liberada pelo mestre. Esta é a mesma ficha compartilhada na sessão."}</div><PainelFichas fichas={[fichaAtiva]} fichaSelecionada={fichaAtiva} aoSalvarFicha={salvarFicha} aoSelecionarFicha={escolherFicha} permitirNovaFicha={false} chaveRascunho={`orbe:rascunho:v1:${usuarioPortalId || "anonimo"}:${mesaId}:ficha:${fichaAtiva.id}`} /></>;
     }
 
     if (menuAtivo === "inventario") {
@@ -379,7 +384,7 @@ function PaginaJogador() {
     }
 
     if (["anotacoes", "missoes", "arquivos"].includes(menuAtivo)) {
-      return <PaineisJogador tipo={menuAtivo} ficha={fichaAtiva} missoes={sessao.missoes || []} arquivos={sessao.arquivos || []} aoSalvarFicha={salvarFicha} />;
+      return <PaineisJogador tipo={menuAtivo} ficha={fichaAtiva} missoes={sessao.missoes || []} arquivos={sessao.arquivos || []} aoSalvarFicha={salvarFicha} chaveRascunho={`orbe:rascunho:v1:${usuarioPortalId || "anonimo"}:${mesaId}:anotacoes:jogador:${fichaAtiva.id}`} />;
     }
 
     if (sessao.mesaVisivel === false) {
@@ -419,7 +424,7 @@ function PaginaJogador() {
       <main className="pagina-jogador__conteudo">
         <header className="pagina-jogador__topo">
           <div><span>Sistema Arquivos · acesso de agente</span><h1>{TITULOS[menuAtivo]}</h1><p>{nomeCampanha} — {arquivoAtual}</p></div>
-          <div className="pagina-jogador__estado"><span>Status do sistema</span><strong>{mensagemSistema}</strong></div>
+          <div className="pagina-jogador__estado"><span>Status do sistema</span><strong>{mensagemSistema}</strong><IndicadorConexaoMesa estado={estadoConexao} /></div>
         </header>
 
         <div className="pagina-jogador__corpo">

@@ -565,27 +565,19 @@ export async function assinarPresencaMesaOrbe(
 
   let dadosAtuais = { ...dadosPresenca };
   let inscrito = false;
+  let encerrado = false;
+  let tentativaReconexao = 0;
+  let temporizadorReconexao = null;
+  let canalAtual = null;
   const usuarioId = String(user.id);
-  const canal = supabaseOrbe
-    .channel(topicoPresencaMesa(mesaId), {
-      config: {
-        presence: {
-          key: usuarioId,
-        },
-      },
-    })
-    .on("presence", { event: "sync" }, () => {
-      callbacks.aoAlterar?.(normalizarPresencas(canal.presenceState()));
-    })
-    .on("presence", { event: "join" }, () => {
-      callbacks.aoAlterar?.(normalizarPresencas(canal.presenceState()));
-    })
-    .on("presence", { event: "leave" }, () => {
-      callbacks.aoAlterar?.(normalizarPresencas(canal.presenceState()));
-    });
 
-  async function rastrear() {
-    const resultado = await canal.track({
+  function emitirPresencas() {
+    if (!canalAtual) return;
+    callbacks.aoAlterar?.(normalizarPresencas(canalAtual.presenceState()));
+  }
+
+  function dadosParaRastrear() {
+    return {
       user_id: usuarioId,
       nome:
         String(dadosAtuais.nome || user.user_metadata?.nome || user.email || "Investigador"),
@@ -593,21 +585,79 @@ export async function assinarPresencaMesaOrbe(
       ficha_id: dadosAtuais.fichaId ? String(dadosAtuais.fichaId) : "",
       papel: String(dadosAtuais.papel || "jogador").toLowerCase(),
       online_at: new Date().toISOString(),
-    });
+    };
+  }
+
+  async function rastrear() {
+    if (!canalAtual || !inscrito || encerrado) return false;
+    const resultado = await canalAtual.track(dadosParaRastrear());
     return resultado === "ok";
   }
 
-  canal.subscribe((status, erroCanal) => {
-    callbacks.aoStatus?.(status);
-    if (erroCanal) callbacks.aoErro?.(erroCanal);
-    if (status === "SUBSCRIBED") {
-      inscrito = true;
-      void rastrear().catch((falha) => callbacks.aoErro?.(falha));
+  function cancelarReconexao() {
+    if (temporizadorReconexao !== null) {
+      window.clearTimeout(temporizadorReconexao);
+      temporizadorReconexao = null;
     }
-    if (["CHANNEL_ERROR", "TIMED_OUT", "CLOSED"].includes(status)) {
-      inscrito = false;
+  }
+
+  async function removerCanalAtual() {
+    const canalAnterior = canalAtual;
+    canalAtual = null;
+    inscrito = false;
+    if (!canalAnterior) return;
+    try {
+      await canalAnterior.untrack();
+    } catch {
+      // O canal pode ja estar fechado.
     }
-  });
+    await supabaseOrbe.removeChannel(canalAnterior);
+  }
+
+  function agendarReconexao() {
+    if (encerrado || temporizadorReconexao !== null) return;
+    const atraso = Math.min(1000 * 2 ** tentativaReconexao, 15000);
+    tentativaReconexao += 1;
+    callbacks.aoStatus?.("RECONNECTING");
+    temporizadorReconexao = window.setTimeout(() => {
+      temporizadorReconexao = null;
+      void criarCanal();
+    }, atraso);
+  }
+
+  async function criarCanal() {
+    if (encerrado) return;
+    await removerCanalAtual();
+    if (encerrado) return;
+    const canal = supabaseOrbe
+      .channel(topicoPresencaMesa(mesaId), {
+        config: {
+          presence: {
+            key: usuarioId,
+          },
+        },
+      })
+      .on("presence", { event: "sync" }, emitirPresencas)
+      .on("presence", { event: "join" }, emitirPresencas)
+      .on("presence", { event: "leave" }, emitirPresencas);
+    canalAtual = canal;
+    canal.subscribe((status, erroCanal) => {
+      callbacks.aoStatus?.(status);
+      if (erroCanal) callbacks.aoErro?.(erroCanal);
+      if (status === "SUBSCRIBED") {
+        inscrito = true;
+        tentativaReconexao = 0;
+        void rastrear().catch((falha) => callbacks.aoErro?.(falha));
+      }
+      if (["CHANNEL_ERROR", "TIMED_OUT", "CLOSED"].includes(status)) {
+        inscrito = false;
+        emitirPresencas();
+        agendarReconexao();
+      }
+    });
+  }
+
+  void criarCanal();
 
   return {
     atualizar: async (proximosDados = {}) => {
@@ -619,12 +669,9 @@ export async function assinarPresencaMesaOrbe(
       return rastrear();
     },
     remover: () => {
-      void canal
-        .untrack()
-        .catch(() => {})
-        .finally(() => {
-          void supabaseOrbe.removeChannel(canal);
-        });
+      encerrado = true;
+      cancelarReconexao();
+      void removerCanalAtual();
     },
   };
 }
@@ -928,6 +975,12 @@ export async function removerFichaRemota(fichaId) {
 export async function salvarSessaoPublicaRemota(mesaId, sessao) {
   if (!supabaseOrbe) return null;
   const { anotacoesMestre: _segredo, ...dadosPublicos } = sessao || {};
+  if (Array.isArray(dadosPublicos.anotacoes)) {
+    dadosPublicos.anotacoes = dadosPublicos.anotacoes.filter((anotacao) => anotacao?.privada !== true);
+  }
+  if (Array.isArray(dadosPublicos.missoes)) {
+    dadosPublicos.missoes = dadosPublicos.missoes.filter((missao) => missao?.privada !== true);
+  }
   const { data, error } = await supabaseOrbe.from("sessoes_orbe").upsert({
     mesa_id: mesaId,
     dados: dadosPublicos,
@@ -938,6 +991,69 @@ export async function salvarSessaoPublicaRemota(mesaId, sessao) {
     ...(data?.dados || {}),
     atualizadoEm: data?.updated_at || data?.dados?.atualizadoEm,
   };
+}
+
+function normalizarVersaoArquivo(registro) {
+  return {
+    id: String(registro?.id || ""),
+    mesaId: String(registro?.mesa_id || ""),
+    arquivoId: String(registro?.arquivo_id || ""),
+    usuarioId: registro?.usuario_id ? String(registro.usuario_id) : "",
+    numeroVersao: Number(registro?.numero_versao || 0),
+    dados: registro?.dados && typeof registro.dados === "object" ? registro.dados : {},
+    origemVersao: registro?.origem_versao ? Number(registro.origem_versao) : null,
+    criadoEm: registro?.created_at || "",
+    autor: registro?.autor_nome ? { nome: String(registro.autor_nome) } : null,
+  };
+}
+
+export async function listarVersoesArquivoRemotas(mesaId, arquivoId) {
+  if (!supabaseOrbe || !mesaId || !arquivoId || mesaId === "local") return [];
+  const { data, error } = await supabaseOrbe.rpc("listar_versoes_arquivo_orbe", {
+    p_mesa_id: mesaId,
+    p_arquivo_id: String(arquivoId),
+  });
+  if (error) throw error;
+  const versoes = (Array.isArray(data) ? data : []).map(normalizarVersaoArquivo);
+  const ids = [...new Set(versoes.map((versao) => versao.usuarioId).filter(Boolean))];
+  if (!ids.length) return versoes;
+  const perfis = await supabaseOrbe
+    .from("perfis_orbe")
+    .select("id,nome,usuario")
+    .in("id", ids);
+  if (perfis.error) return versoes;
+  const porId = new Map((perfis.data || []).map((perfil) => [String(perfil.id), perfil]));
+  return versoes.map((versao) => ({ ...versao, autor: porId.get(versao.usuarioId) || versao.autor || null }));
+}
+
+export async function registrarVersaoArquivoRemota(
+  mesaId,
+  arquivoId,
+  dados,
+  origemVersao = null,
+  autorNome = null,
+) {
+  if (!supabaseOrbe || !mesaId || !arquivoId || mesaId === "local") return null;
+  const { data, error } = await supabaseOrbe.rpc("registrar_versao_arquivo_orbe", {
+    p_mesa_id: mesaId,
+    p_arquivo_id: String(arquivoId),
+    p_dados: dados,
+    p_origem_versao: origemVersao,
+    p_autor_nome: autorNome,
+  });
+  if (error) throw error;
+  return normalizarVersaoArquivo(data);
+}
+
+export async function restaurarVersaoArquivoRemota(mesaId, arquivoId, numeroVersao) {
+  if (!supabaseOrbe || !mesaId || !arquivoId || mesaId === "local") return null;
+  const { data, error } = await supabaseOrbe.rpc("restaurar_versao_arquivo_orbe", {
+    p_mesa_id: mesaId,
+    p_arquivo_id: String(arquivoId),
+    p_numero_versao: Number(numeroVersao),
+  });
+  if (error) throw error;
+  return data || null;
 }
 
 export async function salvarSegredosMestreRemotos(mesaId, anotacoesMestre) {

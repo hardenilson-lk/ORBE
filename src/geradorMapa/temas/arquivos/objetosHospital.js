@@ -1,17 +1,33 @@
-const objeto = (id, nome, categoria, salas, opcoes = {}) => ({
-  id,
-  nome,
-  categoria,
-  salas,
-  largura: 1,
-  altura: 1,
-  bloqueiaMovimento: false,
-  bloqueiaVisao: false,
-  preferencia: "livre",
-  simbolo: nome.slice(0, 1).toUpperCase(),
-  peso: 2,
-  ...opcoes,
-});
+const objeto = (id, nome, categoria, salas, opcoes = {}) => {
+  const tipoObstaculo = opcoes.tipoObstaculo
+    || (opcoes.bloqueiaVisao ? "alto" : opcoes.bloqueiaMovimento ? "baixo" : "chao");
+  const padroes = {
+    alto: { bloqueiaMovimento: true, bloqueiaVisao: true },
+    baixo: { bloqueiaMovimento: true, bloqueiaVisao: false },
+    chao: { bloqueiaMovimento: false, bloqueiaVisao: false },
+    transparente: { bloqueiaMovimento: true, bloqueiaVisao: false },
+    personalizado: { bloqueiaMovimento: false, bloqueiaVisao: false },
+  }[tipoObstaculo] || { bloqueiaMovimento: false, bloqueiaVisao: false };
+  return {
+    id,
+    nome,
+    categoria,
+    salas,
+    largura: 1,
+    altura: 1,
+    ...padroes,
+    tipoObstaculo,
+    formaColisao: "retangulo",
+    larguraColisao: null,
+    alturaColisao: null,
+    deslocamentoColisaoX: 0,
+    deslocamentoColisaoY: 0,
+    preferencia: "livre",
+    simbolo: nome.slice(0, 1).toUpperCase(),
+    peso: 2,
+    ...opcoes,
+  };
+};
 
 const QUALQUER_SALA = ["*"];
 

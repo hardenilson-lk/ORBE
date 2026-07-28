@@ -446,6 +446,7 @@ function esconderImagemComErro(
 export default function CamadaObjetosCenarioMapa({
   objetos = [],
   temaId = "generico-arquivos",
+  mostrarColisoes = false,
 }) {
   if (!objetos.length) {
     return null;
@@ -728,6 +729,18 @@ export default function CamadaObjetosCenarioMapa({
                   objeto,
                 )}
               </span>
+              {mostrarColisoes ? (
+                <span
+                  className={`camada-objetos-cenario-mapa__colisao ${objeto.bloqueiaVisao ? "camada-objetos-cenario-mapa__colisao--visao" : "camada-objetos-cenario-mapa__colisao--movimento"}`}
+                  style={{
+                    width: `${Math.max(1, Number(objeto.larguraColisao) || Number(objeto.largura) || 1)}px`,
+                    height: `${Math.max(1, Number(objeto.alturaColisao) || Number(objeto.altura) || 1)}px`,
+                    left: `${(Number(objeto.largura) || 1) / 2 + (Number(objeto.deslocamentoColisaoX) || 0) - (Number(objeto.larguraColisao) || Number(objeto.largura) || 1) / 2}px`,
+                    top: `${(Number(objeto.altura) || 1) / 2 + (Number(objeto.deslocamentoColisaoY) || 0) - (Number(objeto.alturaColisao) || Number(objeto.altura) || 1) / 2}px`,
+                    borderRadius: objeto.formaColisao === "circulo" ? "50%" : "2px",
+                  }}
+                />
+              ) : null}
             </div>
           );
         },

@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import "./PaineisDossie.css";
+import "./HistoricoArquivo.css";
+import { lerBackupCampanha } from "../../utils/backupCampanhaOrbe.js";
 
 const ARQUIVO_VAZIO = {
   titulo: "",
@@ -29,10 +31,18 @@ function dataLocal(data = new Date()) {
   return ajustada.toISOString().slice(0, 10);
 }
 
-function PainelArquivos({ arquivos = [], arquivoSelecionado = null, aoAdicionarArquivo, aoSelecionarArquivo, aoAtualizarArquivo, aoRemoverArquivo }) {
+function PainelArquivos({ arquivos = [], arquivoSelecionado = null, aoAdicionarArquivo, aoSelecionarArquivo, aoAtualizarArquivo, aoRemoverArquivo, mesaId = "local", aoListarHistorico, aoRestaurarArquivo, aoExportarBackup, aoImportarBackup }) {
   const [novoArquivo, setNovoArquivo] = useState(ARQUIVO_VAZIO);
   const [arquivosLocais, setArquivosLocais] = useState(arquivos);
   const [arquivoAtivo, setArquivoAtivo] = useState(arquivoSelecionado);
+  const [historico, setHistorico] = useState([]);
+  const [historicoAberto, setHistoricoAberto] = useState(false);
+  const [carregandoHistorico, setCarregandoHistorico] = useState(false);
+  const [versaoPrevia, setVersaoPrevia] = useState(null);
+  const [restaurando, setRestaurando] = useState(false);
+  const [importacao, setImportacao] = useState(null);
+  const [importando, setImportando] = useState(false);
+  const inputBackupRef = useRef(null);
 
   useEffect(() => setArquivosLocais(Array.isArray(arquivos) ? arquivos : []), [arquivos]);
   useEffect(() => setArquivoAtivo(arquivoSelecionado || null), [arquivoSelecionado]);
@@ -93,6 +103,59 @@ function PainelArquivos({ arquivos = [], arquivoSelecionado = null, aoAdicionarA
     aoRemoverArquivo?.(arquivo);
   }
 
+  async function alternarHistorico() {
+    if (!arquivoAtivo || !aoListarHistorico || mesaId === "local") return;
+    if (historicoAberto) {
+      setHistoricoAberto(false);
+      return;
+    }
+    setCarregandoHistorico(true);
+    try {
+      setHistorico(await aoListarHistorico(mesaId, arquivoAtivo.id));
+      setHistoricoAberto(true);
+    } catch {
+      setHistorico([]);
+    } finally {
+      setCarregandoHistorico(false);
+    }
+  }
+
+  async function restaurarVersao(versao) {
+    if (!aoRestaurarArquivo || !arquivoAtivo) return;
+    setRestaurando(true);
+    try {
+      await aoRestaurarArquivo(arquivoAtivo, versao);
+      setHistoricoAberto(false);
+      setVersaoPrevia(null);
+    } finally {
+      setRestaurando(false);
+    }
+  }
+
+  async function selecionarBackup(evento) {
+    const arquivo = evento.target.files?.[0];
+    evento.target.value = "";
+    if (!arquivo) return;
+    try {
+      const texto = await arquivo.text();
+      const backup = lerBackupCampanha(texto);
+      setImportacao({ texto, backup });
+    } catch (erro) {
+      setImportacao({ erro: erro?.message || "Backup invalido." });
+    }
+  }
+
+  async function confirmarImportacao(modo) {
+    if (!importacao?.texto || !aoImportarBackup) return;
+    setImportando(true);
+    try {
+      await aoImportarBackup({ texto: importacao.texto, modo });
+      setImportacao(null);
+    } finally {
+      setImportando(false);
+    }
+  }
+
   const liberados = arquivosLocais.filter(estaLiberado).length;
 
   return (
@@ -103,7 +166,15 @@ function PainelArquivos({ arquivos = [], arquivoSelecionado = null, aoAdicionarA
           <div className="painel-dossie__resumo"><span>Registrados</span><strong>{arquivosLocais.length}</strong></div>
           <div className="painel-dossie__resumo"><span>Liberados</span><strong>{liberados}</strong></div>
         </div>
+        <div className="backup-arquivos__acoes">
+          <button type="button" disabled={!aoExportarBackup} onClick={aoExportarBackup}>Exportar backup</button>
+          <button type="button" onClick={() => inputBackupRef.current?.click()}>Importar backup</button>
+          <input ref={inputBackupRef} className="backup-arquivos__input" type="file" accept=".json,.orbe.json,application/json" onChange={selecionarBackup} />
+        </div>
       </header>
+      {importacao ? <section className="backup-arquivos__dialog">
+        {importacao.erro ? <><strong>Backup recusado</strong><p>{importacao.erro}</p><button type="button" onClick={() => setImportacao(null)}>Fechar</button></> : <><strong>Backup pronto para importar</strong><p>{importacao.backup.manifesto.quantidadeArquivos} Arquivo(s) e {importacao.backup.manifesto.quantidadeVersoes} versao(oes) encontradas.</p><div><button type="button" disabled={importando} onClick={() => confirmarImportacao("nova")}>Nova campanha</button><button type="button" disabled={importando} onClick={() => confirmarImportacao("mesclar")}>Mesclar nesta campanha</button><button type="button" disabled={importando} onClick={() => confirmarImportacao("substituir")}>Substituir Arquivos</button><button type="button" disabled={importando} onClick={() => setImportacao(null)}>Cancelar</button></div></>}
+      </section> : null}
 
       <form className="painel-dossie__formulario" onSubmit={adicionarArquivo}>
         <h3>Criar novo arquivo</h3>
@@ -145,8 +216,19 @@ function PainelArquivos({ arquivos = [], arquivoSelecionado = null, aoAdicionarA
       {arquivoAtivo ? <section className="painel-dossie__conteudo arquivo-aberto">
         <header className="arquivo-aberto__cabecalho">
           <div><span>{arquivoAtivo.codigo}</span><h3>{arquivoAtivo.titulo}</h3><small>{estaLiberado(arquivoAtivo) ? "Visível para os jogadores" : "Restrito ao mestre"}</small></div>
-          <select aria-label="Status do arquivo" value={arquivoAtivo.status} onChange={(e) => atualizarArquivoAtivo("status", e.target.value)}><option value="aberto">Aberto</option><option value="andamento">Em andamento</option><option value="encerrado">Encerrado</option><option value="arquivado">Arquivado</option></select>
+          <div className="arquivo-aberto__controles"><select aria-label="Status do arquivo" value={arquivoAtivo.status} onChange={(e) => atualizarArquivoAtivo("status", e.target.value)}><option value="aberto">Aberto</option><option value="andamento">Em andamento</option><option value="encerrado">Encerrado</option><option value="arquivado">Arquivado</option></select><button type="button" disabled={carregandoHistorico || mesaId === "local"} onClick={alternarHistorico}>{carregandoHistorico ? "Carregando..." : historicoAberto ? "Fechar historico" : "Ver historico"}</button></div>
         </header>
+        {historicoAberto ? <aside className="historico-arquivo">
+          <header><div><span>Registro persistente</span><h4>Versoes do Arquivo</h4></div><small>{historico.length} versao(oes)</small></header>
+          {historico.length ? <div className="historico-arquivo__lista">{historico.map((versao, indice) => {
+            const atual = indice === 0;
+            return <article key={versao.id || `${versao.numeroVersao}-${versao.criadoEm}`} className={atual ? "historico-arquivo__item historico-arquivo__item--atual" : "historico-arquivo__item"}>
+              <div><strong>Versao {versao.numeroVersao}</strong>{atual ? <em>Versao atual</em> : null}<small>{versao.criadoEm ? new Date(versao.criadoEm).toLocaleString("pt-BR") : "Data nao informada"}</small><small>Autor: {versao.autor?.nome || versao.usuarioId || "Registro anterior"}</small><p>{versao.dados?.titulo || "Sem titulo"} · {versao.dados?.status || "aberto"}</p></div>
+              <div className="historico-arquivo__acoes"><button type="button" onClick={() => setVersaoPrevia(versao)}>Visualizar</button>{!atual ? <button type="button" disabled={restaurando} onClick={() => restaurarVersao(versao)}>Restaurar</button> : null}</div>
+            </article>;
+          })}</div> : <p>Nenhuma versao persistida ainda.</p>}
+          {versaoPrevia ? <div className="historico-arquivo__previa"><header><strong>Previa da versao {versaoPrevia.numeroVersao}</strong><button type="button" onClick={() => setVersaoPrevia(null)}>Fechar</button></header><pre>{JSON.stringify(versaoPrevia.dados, null, 2)}</pre></div> : null}
+        </aside> : null}
         <div className="arquivo-aberto__campos">
           <label>Título<input maxLength="80" value={arquivoAtivo.titulo} onChange={(e) => atualizarArquivoAtivo("titulo", e.target.value)} /></label>
           <label>Data da sessão<input type="date" value={arquivoAtivo.data || ""} onChange={(e) => atualizarArquivoAtivo("data", e.target.value)} /></label>

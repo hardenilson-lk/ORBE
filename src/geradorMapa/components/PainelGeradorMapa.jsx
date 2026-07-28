@@ -27,6 +27,7 @@ import PreviewGeradorMapa from "./PreviewGeradorMapa.jsx";
 import ProgressoGeracaoMapa from "./ProgressoGeracaoMapa.jsx";
 import SeletorModoGeracao from "./SeletorModoGeracao.jsx";
 import PainelPersistenciaMapa from "./PainelPersistenciaMapa.jsx";
+import BotaoFinalizarComIA from "./BotaoFinalizarComIA.jsx";
 import "../styles/geradorMapa.css";
 
 function criarSeed(sistema, tema) {
@@ -72,6 +73,18 @@ export default function PainelGeradorMapa({
   const [editorAberto, setEditorAberto] = useState(false);
   const [mapaEditor, setMapaEditor] = useState(() => mapaInicial);
   const mapaEmUso = mapaEditor || mapaGerado;
+
+  function aplicarFinalizacaoIA(finalizacao) {
+    setMapaGerado((atual) => atual ? { ...atual, finalizacaoIA: finalizacao } : atual);
+    setMapaEditor((atual) => atual ? { ...atual, finalizacaoIA: finalizacao } : atual);
+    setMensagem("Mapa finalizado visualmente. A imagem não altera a geometria nem a colisão.");
+    setTipoMensagem("sucesso");
+  }
+
+  function removerFinalizacaoIA() {
+    setMapaGerado((atual) => atual ? { ...atual, finalizacaoIA: null } : atual);
+    setMapaEditor((atual) => atual ? { ...atual, finalizacaoIA: null } : atual);
+  }
 
   useEffect(() => {
     function fecharComEscape(evento) {
@@ -260,6 +273,15 @@ export default function PainelGeradorMapa({
             <div className="gerador-mapa__conteudo">
               <ConfiguracoesGeradorMapa configuracoes={configuracoes} temas={temas} aoAlterar={alterar} aoAlterarTamanho={alterarTamanho} aoGerarSeed={() => alterar("seed", criarSeed(sistema.id, temas.find((item) => item.id === configuracoes.tema)))} />
               <PreviewGeradorMapa largura={configuracoes.largura} altura={configuracoes.altura} mapaGerado={mapaEmUso} desatualizado={configuracoesAlteradas} />
+              {mapaEmUso?.validacaoEstrutural?.valido ? (
+                <BotaoFinalizarComIA
+                  mapa={mapaEmUso}
+                  tema={mapaEmUso.tema || configuracoes.tema}
+                  finalizacao={mapaEmUso.finalizacaoIA}
+                  aoAplicarFinalizacao={aplicarFinalizacaoIA}
+                  aoRemoverFinalizacao={removerFinalizacaoIA}
+                />
+              ) : null}
             </div>
             {mapaEmUso?.paredes?.length ? <PainelValidacaoMapa validacao={mapaEmUso.validacaoEstrutural} aoCorrigir={corrigirAutomaticamente} /> : null}
             {mapaEmUso?.validacaoEstrutural?.valido ? (

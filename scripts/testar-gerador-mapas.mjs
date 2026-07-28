@@ -7,6 +7,14 @@ import {
   removerMapaGeradoDoGrid,
 } from "../src/geradorMapa/integracao/adaptarMapaGeradoParaGrid.js";
 import { avaliarMovimentoTokenMapa } from "../src/components/mestre/mapa/politicaMovimentoTokenMapa.js";
+import { segmentoCruzaBarreiraMapa } from "../src/components/mestre/mapa/politicaMovimentoTokenMapa.js";
+import {
+  criarSegmentosVisaoDosObjetos,
+  normalizarObjetoCenario,
+  obterFormaColisaoObjeto,
+} from "../src/components/mestre/mapa/geometriaObjetosCenario.js";
+import { calcularPoligonoVisao } from "../src/components/mestre/mapa/visaoMapa.js";
+import { obterObjetoHospital } from "../src/geradorMapa/temas/arquivos/objetosHospital.js";
 import {
   calcularHashMapa,
   criarVisaoJogadorDoMapa,
@@ -155,6 +163,73 @@ assert.equal(avaliarMovimentoTokenMapa({
   papelAtual: "jogador", possuiPermissao: true, token: tokenTeste,
   origem: { x: 64, y: 64 }, destino: { x: 192, y: 64 }, mapa: mapaColisao,
 }).permitido, false, "Jogador e prévia do jogador devem validar o trajeto.");
+
+const objetoBloqueador = normalizarObjetoCenario({
+  id: "armario-teste",
+  x: 128,
+  y: 64,
+  largura: 64,
+  altura: 64,
+  bloqueiaMovimento: true,
+  bloqueiaVisao: true,
+});
+assert.equal(objetoBloqueador.tipoObstaculo, "alto");
+assert.equal(obterFormaColisaoObjeto(objetoBloqueador).forma, "retangulo");
+assert.equal(criarSegmentosVisaoDosObjetos([objetoBloqueador]).length, 4);
+assert.equal(avaliarMovimentoTokenMapa({
+  papelAtual: "jogador", possuiPermissao: true, token: tokenTeste,
+  origem: { x: 64, y: 64 }, destino: { x: 192, y: 64 },
+  mapa: { ...mapaColisao, paredes: [], objetosCenario: [objetoBloqueador] },
+}).motivo, "objeto", "Objeto sólido deve bloquear o jogador.");
+assert.equal(normalizarObjetoCenario({ id: "decoracao" }).bloqueiaMovimento, false, "Objeto legado sem flags permanece livre.");
+
+const armarioCatalogo = obterObjetoHospital("armario");
+assert.equal(armarioCatalogo.tipoObstaculo, "alto", "Armário precisa nascer como obstáculo alto.");
+assert.equal(armarioCatalogo.bloqueiaVisao, true, "Armário do catálogo precisa bloquear visão.");
+const mapaEmCelulas = {
+  id: "mapa-escala",
+  largura: 10,
+  altura: 10,
+  objetos: [{
+    id: "armario-escala",
+    tipo: "armario",
+    nome: "Armário",
+    x: 2,
+    y: 3,
+    largura: 2,
+    altura: 1,
+    larguraColisao: 2,
+    alturaColisao: 1,
+    tipoObstaculo: "alto",
+  }],
+  paredes: [],
+  portas: [],
+  salas: [],
+  corredores: [],
+  luzes: [],
+};
+const mapaGridEscala = adaptarMapaGeradoParaGrid(mapaEmCelulas, { grid: { tamanhoCelula: 64 } });
+const objetoGridEscala = mapaGridEscala.objetosCenario[0];
+assert.deepEqual(
+  { x: objetoGridEscala.x, y: objetoGridEscala.y, largura: objetoGridEscala.largura, altura: objetoGridEscala.altura },
+  { x: 128, y: 192, largura: 128, altura: 64 },
+  "Objeto em células precisa chegar ao grid em pixels.",
+);
+assert.equal(objetoGridEscala.larguraColisao, 128, "Largura de colisão não pode ser multiplicada duas vezes.");
+assert.equal(objetoGridEscala.alturaColisao, 64, "Altura de colisão precisa usar a escala do grid uma vez.");
+const segmentosArmario = criarSegmentosVisaoDosObjetos([objetoGridEscala]);
+assert.equal(segmentosArmario.length, 4, "Retângulo alto precisa gerar quatro segmentos.");
+assert.equal(segmentosArmario[0].objetoId, "gerador-armario-escala");
+assert.equal(segmentosArmario[0].origem, "objeto-cenario");
+assert.equal(segmentosArmario.some((segmento) => segmentoCruzaBarreiraMapa({ x: 64, y: 224 }, { x: 320, y: 224 }, segmento)), true);
+const poligonoComArmario = calcularPoligonoVisao({ x: 64, y: 224 }, 320, segmentosArmario, 64);
+assert.ok(poligonoComArmario[0].x <= 130, "A visão precisa parar na borda do objeto alto.");
+const objetoBaixo = normalizarObjetoCenario({ id: "mesa", x: 128, y: 192, largura: 128, altura: 64, tipoObstaculo: "baixo" });
+assert.equal(objetoBaixo.bloqueiaMovimento, true);
+assert.equal(objetoBaixo.bloqueiaVisao, false);
+assert.equal(criarSegmentosVisaoDosObjetos([objetoBaixo]).length, 0, "Mesa baixa não pode criar barreira de visão.");
+assert.equal(avaliarMovimentoTokenMapa({ papelAtual: "jogador", possuiPermissao: true, token: tokenTeste, origem: { x: 64, y: 224 }, destino: { x: 320, y: 224 }, mapa: { ...mapaColisao, paredes: [], objetosCenario: [objetoBaixo] } }).motivo, "objeto");
+assert.equal(normalizarMapaParaPersistencia({ ...mapaEmCelulas, objetos: [objetoBaixo] }).objetos[0].tipoObstaculo, "baixo", "Persistência precisa conservar o tipo do objeto.");
 
 for (const tema of temas) {
   const configuracao = {

@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
 import {
-  assinarSolicitacoesEntradaRealtime,
   configurarAprovacaoConvitesRemota,
   listarSolicitacoesEntradaRemotas,
   orbeOnlineHabilitado,
@@ -14,6 +13,7 @@ export default function SolicitacoesEntradaMesa({
   mesaId,
   exigirAprovacaoInicial = true,
   aoMesaAtualizada,
+  atualizacaoParticipantes = 0,
 }) {
   const [solicitacoes, setSolicitacoes] = useState([]);
   const [exigirAprovacao, setExigirAprovacao] = useState(
@@ -42,23 +42,7 @@ export default function SolicitacoesEntradaMesa({
   useEffect(() => {
     if (!online) return undefined;
     void carregar();
-    const cancelarCanal = assinarSolicitacoesEntradaRealtime(
-      mesaId,
-      carregar,
-      (erro) =>
-        setMensagem(
-          erro?.message || "A atualização das solicitações foi interrompida.",
-        ),
-    );
-    const intervalo = window.setInterval(() => {
-      void carregar();
-    }, 5000);
-
-    return () => {
-      window.clearInterval(intervalo);
-      cancelarCanal();
-    };
-  }, [carregar, mesaId, online]);
+  }, [carregar, mesaId, online, atualizacaoParticipantes]);
 
   async function alternarAprovacao() {
     const proximo = !exigirAprovacao;

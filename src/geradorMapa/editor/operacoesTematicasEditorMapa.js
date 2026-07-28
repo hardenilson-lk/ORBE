@@ -129,6 +129,12 @@ export function criarObjetoManual(mapa, tipoId, ponto) {
     rotacao: 0,
     bloqueiaMovimento: catalogo.bloqueiaMovimento,
     bloqueiaVisao: catalogo.bloqueiaVisao,
+    tipoObstaculo: catalogo.tipoObstaculo,
+    formaColisao: catalogo.formaColisao,
+    larguraColisao: catalogo.larguraColisao,
+    alturaColisao: catalogo.alturaColisao,
+    deslocamentoColisaoX: catalogo.deslocamentoColisaoX,
+    deslocamentoColisaoY: catalogo.deslocamentoColisaoY,
     decorativo: ["decoracao", "sinalizacao"].includes(catalogo.categoria),
     interativo: false,
     tema: mapa.tema,
@@ -148,9 +154,17 @@ export function criarObjetoManual(mapa, tipoId, ponto) {
 export function alterarObjetoManual(mapa, objetoId, alteracoes) {
   const atual = (mapa.objetos || []).find(({ id }) => id === objetoId);
   if (!atual) return { sucesso: false, erro: "Objeto não encontrado." };
+  const comportamento = {
+    alto: { bloqueiaMovimento: true, bloqueiaVisao: true },
+    baixo: { bloqueiaMovimento: true, bloqueiaVisao: false },
+    chao: { bloqueiaMovimento: false, bloqueiaVisao: false },
+    transparente: { bloqueiaMovimento: true, bloqueiaVisao: false },
+  };
+  const flagsDoTipo = comportamento[alteracoes.tipoObstaculo] || {};
   const proximo = {
     ...atual,
     ...alteracoes,
+    ...flagsDoTipo,
     x: Math.round(alteracoes.x ?? atual.x),
     y: Math.round(alteracoes.y ?? atual.y),
   };
@@ -177,6 +191,12 @@ export function alterarTipoObjetoManual(mapa, objetoId, tipoId) {
     altura: catalogo.altura,
     bloqueiaMovimento: catalogo.bloqueiaMovimento,
     bloqueiaVisao: catalogo.bloqueiaVisao,
+    tipoObstaculo: catalogo.tipoObstaculo,
+    formaColisao: catalogo.formaColisao,
+    larguraColisao: catalogo.larguraColisao,
+    alturaColisao: catalogo.alturaColisao,
+    deslocamentoColisaoX: catalogo.deslocamentoColisaoX,
+    deslocamentoColisaoY: catalogo.deslocamentoColisaoY,
     decorativo: ["decoracao", "sinalizacao"].includes(catalogo.categoria),
   });
 }

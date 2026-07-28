@@ -1,0 +1,69 @@
+.arquivo-aberto__controles {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.arquivo-aberto__controles button,
+.historico-arquivo button {
+  min-height: 34px;
+  padding: 6px 10px;
+  border: 1px solid rgba(54, 38, 25, 0.68);
+  border-radius: 0;
+  background: #241811;
+  color: #ead7b4;
+  font: 900 0.68rem "Courier Prime", "Courier New", monospace;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.arquivo-aberto__controles button:disabled,
+.historico-arquivo button:disabled { cursor: not-allowed; opacity: 0.55; }
+
+.historico-arquivo {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid rgba(139, 31, 31, 0.62);
+  background: rgba(33, 21, 14, 0.08);
+}
+
+.historico-arquivo > header,
+.historico-arquivo__previa > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.historico-arquivo header span,
+.historico-arquivo header small,
+.historico-arquivo__item small {
+  display: block;
+  color: #6d432b;
+  font: 0.7rem "Courier Prime", "Courier New", monospace;
+}
+
+.historico-arquivo h4 { margin: 3px 0 0; color: #25170f; text-transform: uppercase; }
+.historico-arquivo__lista { display: grid; gap: 8px; max-height: 420px; overflow: auto; }
+.historico-arquivo__item { display: flex; justify-content: space-between; gap: 12px; padding: 10px; border: 1px solid rgba(54, 38, 25, 0.28); background: rgba(255, 247, 221, 0.3); }
+.historico-arquivo__item--atual { border-color: #8b1f1f; background: rgba(139, 31, 31, 0.12); }
+.historico-arquivo__item strong { display: inline-block; margin-right: 8px; color: #25170f; }
+.historico-arquivo__item em { color: #8b1f1f; font: 900 0.62rem "Courier Prime", "Courier New", monospace; text-transform: uppercase; }
+.historico-arquivo__item p { margin: 5px 0 0; color: #3c2f20; font: 0.72rem "Courier Prime", "Courier New", monospace; }
+.historico-arquivo__acoes { display: flex; align-items: center; gap: 6px; }
+.historico-arquivo__previa { display: grid; gap: 8px; padding-top: 10px; border-top: 1px dashed rgba(54, 38, 25, 0.45); }
+.historico-arquivo__previa pre { max-height: 300px; margin: 0; overflow: auto; padding: 10px; background: #21150e; color: #ead7b4; font: 0.68rem/1.4 "Courier Prime", "Courier New", monospace; white-space: pre-wrap; }
+
+@media (max-width: 700px) {
+  .arquivo-aberto__controles,
+  .historico-arquivo__item { align-items: stretch; flex-direction: column; }
+}
+
+.backup-arquivos__acoes { display: flex; align-items: center; gap: 6px; grid-column: 1 / -1; }
+.backup-arquivos__acoes button,
+.backup-arquivos__dialog button { min-height: 34px; padding: 6px 10px; border: 1px solid rgba(54, 38, 25, 0.68); background: #241811; color: #ead7b4; font: 900 0.68rem "Courier Prime", "Courier New", monospace; text-transform: uppercase; cursor: pointer; }
+.backup-arquivos__input { display: none; }
+.backup-arquivos__dialog { display: grid; gap: 8px; padding: 14px; border: 2px solid #8b1f1f; background: rgba(139, 31, 31, 0.1); }
+.backup-arquivos__dialog p { margin: 0; color: #3c2f20; font: 0.78rem "Courier Prime", "Courier New", monospace; }
+.backup-arquivos__dialog > div { display: flex; flex-wrap: wrap; gap: 6px; }

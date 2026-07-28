@@ -42,7 +42,16 @@ import {
 
 import {
   lerMesasSalvas,
+  salvarMesasLocal,
+  gerarIdMesa,
+  aplicarMesaRemota,
 } from "../utils/mesas.js";
+import {
+  criarBackupCampanha,
+  lerBackupCampanha,
+  nomeArquivoBackup,
+  prepararArquivosImportados,
+} from "../utils/backupCampanhaOrbe.js";
 
 import {
   carregarSessaoArquivos,
@@ -51,16 +60,25 @@ import {
 } from "../utils/sessoesArquivos.js";
 import {
   carregarEstadoMesaRemoto,
+  criarMesaRemota,
   listarSolicitacoesMigracaoFichaRemotas,
   moderarMembroMesaRemoto,
   publicarInicioRolagemMesaRealtime,
   publicarRolagemMesaRealtime,
   publicarTokensMesaRealtime,
   revisarMigracaoFichaRemota,
+  listarVersoesArquivoRemotas,
+  registrarVersaoArquivoRemota,
+  restaurarVersaoArquivoRemota,
+  orbeOnlineHabilitado,
   salvarSegredosMestreRemotos,
   sincronizarSessaoPublicaAgora,
 } from "../services/supabaseOrbe.js";
 import useRealtimeMesaOrbe from "../hooks/useRealtimeMesaOrbe.js";
+import useSalvamentoAutomaticoOrbe from "../hooks/useSalvamentoAutomaticoOrbe.js";
+import IndicadorConexaoMesa from "../components/mesa/IndicadorConexaoMesa.jsx";
+import IndicadorSalvamentoOrbe from "../components/mesa/IndicadorSalvamentoOrbe.jsx";
+import { removerRascunhoOrbe } from "../utils/rascunhosOrbe.js";
 
 import "./PaginaMestre.css";
 
@@ -136,6 +154,7 @@ function PaginaMestre() {
   ] = useState(
     "Alterações salvas automaticamente.",
   );
+  const [atualizacaoParticipantes, setAtualizacaoParticipantes] = useState(0);
 
   const [
     sessao,
@@ -170,6 +189,68 @@ function PaginaMestre() {
         String(mesaId),
     ) || null,
   );
+
+  const dadosArquivosEditaveis = {
+    arquivos: sessao.arquivos || [],
+    arquivoAtivoId: sessao.arquivoAtivoId || "",
+    arquivoAtual: sessao.arquivoAtual || "",
+  };
+  const arquivosSalvosRef = useRef(
+    new Map((sessao.arquivos || []).map((arquivo) => [String(arquivo.id), JSON.stringify(arquivo)])),
+  );
+  useEffect(() => {
+    arquivosSalvosRef.current = new Map(
+      (carregarSessaoArquivos(mesaId).arquivos || []).map((arquivo) => [String(arquivo.id), JSON.stringify(arquivo)]),
+    );
+  }, [mesaId]);
+  const salvarArquivosAutomaticamente = useCallback(async (dados) => {
+    const sessaoAtual = carregarSessaoArquivos(mesaId);
+    await sincronizarSessaoPublicaAgora(mesaId, {
+      ...sessaoAtual,
+      ...dados,
+    });
+    for (const arquivo of dados.arquivos || []) {
+      const arquivoId = String(arquivo.id || "");
+      const fotografia = JSON.stringify(arquivo);
+      if (!arquivoId || arquivosSalvosRef.current.get(arquivoId) === fotografia) continue;
+      try {
+        await registrarVersaoArquivoRemota(mesaId, arquivoId, arquivo);
+        arquivosSalvosRef.current.set(arquivoId, fotografia);
+      } catch (erro) {
+        console.warn("Nao foi possivel registrar a versao do Arquivo.", erro);
+      }
+    }
+  }, [mesaId]);
+  const salvamentoArquivos = useSalvamentoAutomaticoOrbe({
+    valor: dadosArquivosEditaveis,
+    chave: `orbe:rascunho:v1:${usuario?.id || "anonimo"}:${mesaId}:arquivos`,
+    aoSalvar: salvarArquivosAutomaticamente,
+  });
+  const dadosMapaEditaveis = sessao.mapa || {};
+  const salvarMapaAutomaticamente = useCallback(async (mapa) => {
+    const sessaoAtual = carregarSessaoArquivos(mesaId);
+    await sincronizarSessaoPublicaAgora(mesaId, {
+      ...sessaoAtual,
+      mapa,
+    });
+  }, [mesaId]);
+  const salvamentoMapa = useSalvamentoAutomaticoOrbe({
+    valor: dadosMapaEditaveis,
+    chave: `orbe:rascunho:v1:${usuario?.id || "anonimo"}:${mesaId}:mapa:${dadosMapaEditaveis.fundoAtivoId || "principal"}`,
+    habilitado: Boolean(mesaId && mesaId !== "local" && usuario?.id),
+    aoSalvar: salvarMapaAutomaticamente,
+  });
+  const [conflitoMapa, setConflitoMapa] = useState(null);
+  const receberSessaoRealtime = useCallback((sessaoRemota) => {
+    const mapaRemoto = sessaoRemota?.mapa;
+    if (salvamentoMapa.pendente && mapaRemoto && JSON.stringify(mapaRemoto) !== JSON.stringify(sessao.mapa)) {
+      const conflito = { local: sessao.mapa, remoto: mapaRemoto, sessaoRemota, atualizadoEm: sessaoRemota.atualizadoEm };
+      setConflitoMapa(conflito);
+      salvamentoMapa.sinalizarConflito(conflito);
+      return;
+    }
+    setSessao(sessaoRemota);
+  }, [salvamentoMapa, sessao]);
 
   useEffect(() => {
     const sessaoCarregada =
@@ -232,7 +313,7 @@ function PaginaMestre() {
     void carregarSolicitacoesFichas();
   }, [carregarSolicitacoesFichas]);
 
-  const { mestreOnline } =
+  const { mestreOnline, estadoConexao } =
     useRealtimeMesaOrbe({
     mesaId,
     mestre: true,
@@ -242,7 +323,7 @@ function PaginaMestre() {
       usuario?.email?.split("@")[0] ||
       "Mestre",
     aoMesa: setMesaAtual,
-    aoSessao: setSessao,
+    aoSessao: receberSessaoRealtime,
     aoFichas: setFichas,
     aoSolicitacoesFichasAlteradas: carregarSolicitacoesFichas,
     aoInicioRolagem: (configuracao) => {
@@ -274,6 +355,7 @@ function PaginaMestre() {
       );
     },
     aoStatus: setMensagemSistema,
+    aoMembrosAlterados: () => setAtualizacaoParticipantes((atual) => atual + 1),
     aoErro: (erro) => {
       console.warn("Sincronização em tempo real da mesa indisponível.", erro);
       setMensagemSistema("A mesa continua local, mas perdeu a atualização em tempo real.");
@@ -330,6 +412,7 @@ function PaginaMestre() {
 
   function persistirSessao(
     alteracoes,
+    opcoes = {},
   ) {
     setSessao(
       (sessaoAnterior) => {
@@ -356,6 +439,7 @@ function PaginaMestre() {
         return salvarSessaoArquivos(
           mesaId,
           proximaSessao,
+          opcoes,
         );
       },
     );
@@ -630,6 +714,7 @@ function PaginaMestre() {
             novaLista,
         };
       },
+      nomeColecao === "arquivos" ? { agendarRemoto: false } : {},
     );
   }
 
@@ -883,6 +968,11 @@ function PaginaMestre() {
     );
 
     try {
+      const autosaveConcluido = await salvamentoArquivos.salvarAgora();
+      if (autosaveConcluido) {
+        setMensagemSistema("Arquivo salvo e sincronizado.");
+        return;
+      }
       const sessaoConfirmada =
         await sincronizarSessaoPublicaAgora(
           mesaId,
@@ -929,6 +1019,7 @@ function PaginaMestre() {
         arquivoAtual:
           arquivo.codigo,
       }),
+      { agendarRemoto: false },
     );
   }
 
@@ -941,7 +1032,7 @@ function PaginaMestre() {
 
       arquivoAtual:
         arquivo.codigo,
-    });
+    }, { agendarRemoto: false });
   }
 
   function atualizarArquivo(
@@ -994,7 +1085,136 @@ function PaginaMestre() {
                   .arquivoAtual,
         };
       },
+      { agendarRemoto: false },
     );
+  }
+
+  async function restaurarArquivo(arquivo, versao) {
+    if (!arquivo?.id || !versao?.numeroVersao) return;
+    const confirmado = window.confirm(
+      `Restaurar a versao ${versao.numeroVersao} de ${arquivo.codigo || "este Arquivo"}? A versao atual nao sera apagada.`,
+    );
+    if (!confirmado) return;
+    try {
+      salvamentoArquivos.descartarPendente();
+      const resultado = await restaurarVersaoArquivoRemota(
+        mesaId,
+        arquivo.id,
+        versao.numeroVersao,
+      );
+      const sessaoAtual = carregarSessaoArquivos(mesaId);
+      const arquivos = (sessaoAtual.arquivos || []).map((item) =>
+        String(item.id) === String(arquivo.id) ? resultado?.arquivo || versao.dados : item,
+      );
+      const sessaoRestaurada = salvarSessaoArquivos(
+        mesaId,
+        { ...sessaoAtual, arquivos },
+        { agendarRemoto: false },
+      );
+      arquivosSalvosRef.current.set(String(arquivo.id), JSON.stringify(resultado?.arquivo || versao.dados));
+      removerRascunhoOrbe(`orbe:rascunho:v1:${usuario?.id || "anonimo"}:${mesaId}:arquivos`);
+      setSessao(sessaoRestaurada);
+      setMensagemSistema(`Versao ${versao.numeroVersao} restaurada como novo estado.`);
+    } catch (erro) {
+      setMensagemSistema(erro?.message || "Nao foi possivel restaurar esta versao.");
+    }
+  }
+
+  async function exportarBackupCampanha() {
+    const historicos = {};
+    for (const arquivo of sessao.arquivos || []) {
+      try {
+        historicos[arquivo.id] = await listarVersoesArquivoRemotas(mesaId, arquivo.id);
+      } catch (erro) {
+        console.warn("Historico indisponivel para exportacao.", erro);
+        historicos[arquivo.id] = [];
+      }
+    }
+    const backup = criarBackupCampanha({ mesa: mesaAtual, arquivos: sessao.arquivos || [], historicos });
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = nomeArquivoBackup(nomeCampanha);
+    link.click();
+    URL.revokeObjectURL(url);
+    setMensagemSistema("Backup da campanha exportado.");
+  }
+
+  async function registrarHistoricoImportado(idDestino, historico) {
+    if (!orbeOnlineHabilitado() || !idDestino) return;
+    for (const [arquivoId, versoes] of Object.entries(historico || {})) {
+      for (const versao of versoes || []) {
+        try {
+          await registrarVersaoArquivoRemota(
+            idDestino,
+            arquivoId,
+            versao.dados,
+            versao.origemVersao,
+            versao.autorNome,
+          );
+        } catch (erro) {
+          console.warn("Nao foi possivel importar uma versao historica.", erro);
+        }
+      }
+    }
+  }
+
+  async function importarBackupCampanha({ texto, modo }) {
+    try {
+      const backup = lerBackupCampanha(texto);
+      const preparados = prepararArquivosImportados(backup);
+      const titulosExistentes = new Set((sessao.arquivos || []).map((arquivo) => String(arquivo.titulo || "").toLowerCase()));
+      const arquivosImportados = preparados.arquivos.map((arquivo) => {
+        if (modo === "substituir" || modo === "nova") return arquivo;
+        const titulo = String(arquivo.titulo || "").toLowerCase();
+        if (!titulosExistentes.has(titulo)) return arquivo;
+        return { ...arquivo, titulo: `${arquivo.titulo || "Arquivo"} (importado)` };
+      });
+
+      if (modo === "nova") {
+        const novoId = gerarIdMesa();
+        const novaMesa = {
+          id: novoId,
+          ownerId: usuario?.id || "",
+          criadaPorId: usuario?.id || "",
+          nomeCampanha: `${backup.campanha.nomeCampanha || "Campanha"} (importada)`,
+          descricao: backup.campanha.descricao || "",
+          arquivoInicial: backup.campanha.arquivoInicial || "ARQUIVO 0001",
+          criadaEm: new Date().toISOString(),
+        };
+        if (orbeOnlineHabilitado()) aplicarMesaRemota(await criarMesaRemota(novaMesa));
+        else salvarMesasLocal([novaMesa, ...lerMesasSalvas()]);
+        const sessaoImportada = salvarSessaoArquivos(novoId, {
+          arquivos: arquivosImportados,
+          arquivoAtivoId: arquivosImportados[0]?.id || "",
+          arquivoAtual: arquivosImportados[0]?.codigo || novaMesa.arquivoInicial,
+        }, { agendarRemoto: false });
+        if (orbeOnlineHabilitado()) {
+          await sincronizarSessaoPublicaAgora(novoId, sessaoImportada);
+          await registrarHistoricoImportado(novoId, preparados.historico);
+        }
+        navegar(`/arquivos/mesa/${novoId}`);
+        return;
+      }
+
+      const sessaoAtual = carregarSessaoArquivos(mesaId);
+      const arquivosFinais = modo === "substituir"
+        ? arquivosImportados
+        : [...(sessaoAtual.arquivos || []), ...arquivosImportados];
+      const sessaoImportada = salvarSessaoArquivos(mesaId, { ...sessaoAtual, arquivos: arquivosFinais }, { agendarRemoto: false });
+      arquivosSalvosRef.current = new Map(arquivosFinais.map((arquivo) => [String(arquivo.id), JSON.stringify(arquivo)]));
+      salvamentoArquivos.descartarPendente();
+      removerRascunhoOrbe(`orbe:rascunho:v1:${usuario?.id || "anonimo"}:${mesaId}:arquivos`);
+      if (orbeOnlineHabilitado()) {
+        await sincronizarSessaoPublicaAgora(mesaId, sessaoImportada);
+        await registrarHistoricoImportado(mesaId, preparados.historico);
+      }
+      setSessao(sessaoImportada);
+      setMensagemSistema(modo === "substituir" ? "Arquivos substituidos pelo backup." : "Arquivos mesclados com o backup.");
+    } catch (erro) {
+      setMensagemSistema(erro?.message || "Nao foi possivel importar o backup.");
+    }
   }
 
   function renderizarPainel() {
@@ -1060,6 +1280,7 @@ function PaginaMestre() {
           aoSalvarFicha={
             salvarFicha
           }
+          chaveRascunho={`orbe:rascunho:v1:${usuario?.id || "anonimo"}:${mesaId}:ficha:${fichaAtiva?.id || "nova"}`}
           aoCriarFicha={() =>
             persistirSessao({
               fichaAtivaId: "",
@@ -1211,6 +1432,11 @@ function PaginaMestre() {
               anotacao,
             )
           }
+          aoSalvarLista={(lista) => {
+            persistirSessao({ anotacoes: lista }, { agendarRemoto: false });
+            return sincronizarSessaoPublicaAgora(mesaId, { ...carregarSessaoArquivos(mesaId), anotacoes: lista });
+          }}
+          chaveRascunho={`orbe:rascunho:v1:${usuario?.id || "anonimo"}:${mesaId}:anotacoes:mestre`}
         />
       );
     }
@@ -1256,6 +1482,11 @@ function PaginaMestre() {
               missao,
             )
           }
+          aoSalvarLista={(lista) => {
+            persistirSessao({ missoes: lista }, { agendarRemoto: false });
+            return sincronizarSessaoPublicaAgora(mesaId, { ...carregarSessaoArquivos(mesaId), missoes: lista });
+          }}
+          chaveRascunho={`orbe:rascunho:v1:${usuario?.id || "anonimo"}:${mesaId}:missoes`}
           aoAdicionarArquivo={
             adicionarArquivo
           }
@@ -1288,6 +1519,11 @@ function PaginaMestre() {
           aoRemoverArquivo={
             removerArquivo
           }
+          mesaId={mesaId}
+          aoListarHistorico={listarVersoesArquivoRemotas}
+          aoRestaurarArquivo={restaurarArquivo}
+          aoExportarBackup={exportarBackupCampanha}
+          aoImportarBackup={importarBackupCampanha}
         />
       );
     }
@@ -1305,7 +1541,7 @@ function PaginaMestre() {
             arquivoInicial={arquivoAtual}
             mapa={sessao.mapa}
             fichas={fichas}
-            aoAlterarMapa={(mapaAtualizado) => persistirSessao({ mapa: mapaAtualizado })}
+            aoAlterarMapa={(mapaAtualizado) => persistirSessao({ mapa: mapaAtualizado }, { agendarRemoto: false })}
             aoAlterarMensagem={setMensagemSistema}
           />
         ) : (
@@ -1317,7 +1553,23 @@ function PaginaMestre() {
             mapa={sessao.mapa}
             fichas={fichas}
             aoAtualizarFicha={salvarFicha}
-            aoAlterarMapa={(mapaAtualizado) => persistirSessao({ mapa: mapaAtualizado })}
+            aoAlterarMapa={(mapaAtualizado) => persistirSessao({ mapa: mapaAtualizado }, { agendarRemoto: false })}
+            estadoSalvamentoMapa={salvamentoMapa.estado}
+            rascunhoMapaDisponivel={salvamentoMapa.rascunhoDisponivel}
+            aoRecuperarRascunhoMapa={salvamentoMapa.recuperarRascunho}
+            conflitoMapa={conflitoMapa}
+            aoCarregarServidorMapa={() => {
+              if (!conflitoMapa) return;
+              salvamentoMapa.resolverConflitoServidor(conflitoMapa.remoto);
+              setSessao(conflitoMapa.sessaoRemota);
+              setConflitoMapa(null);
+            }}
+            aoManterLocalMapa={() => {
+              if (!conflitoMapa || !window.confirm("Manter suas alterações pode substituir a versão remota. Continuar?")) return;
+              void salvamentoMapa.salvarValor(conflitoMapa.local);
+              setConflitoMapa(null);
+            }}
+            aoFecharConflitoMapa={() => setConflitoMapa(null)}
             aoAlterarMensagem={setMensagemSistema}
             aoAbrirMiniFicha={(referencia) => {
               setMiniFichaEscudo(referencia);
@@ -1466,6 +1718,13 @@ function PaginaMestre() {
             <strong>
               {mensagemSistema}
             </strong>
+
+            <IndicadorConexaoMesa estado={estadoConexao} />
+            <IndicadorSalvamentoOrbe
+              estado={salvamentoArquivos.estado}
+              rascunhoDisponivel={salvamentoArquivos.rascunhoDisponivel}
+              aoRecuperar={salvamentoArquivos.recuperarRascunho}
+            />
           </div>
         </header>
 
@@ -1610,6 +1869,7 @@ function PaginaMestre() {
               mesaId={mesaId}
               exigirAprovacaoInicial={mesa?.exigeAprovacaoConvite}
               aoMesaAtualizada={setMesaAtual}
+              atualizacaoParticipantes={atualizacaoParticipantes}
             />
 
             <BarraLateralMesa

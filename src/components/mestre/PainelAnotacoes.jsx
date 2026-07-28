@@ -3,6 +3,10 @@ import {
   useState,
 } from "react";
 
+import useSalvamentoAutomaticoOrbe from "../../hooks/useSalvamentoAutomaticoOrbe.js";
+import IndicadorSalvamentoOrbe from "../mesa/IndicadorSalvamentoOrbe.jsx";
+import ConflitoEdicaoOrbe from "../mesa/ConflitoEdicaoOrbe.jsx";
+
 import "./PaineisDossie.css";
 
 const ANOTACAO_VAZIA = {
@@ -17,14 +21,30 @@ function PainelAnotacoes({
   aoAdicionarAnotacao,
   aoAtualizarAnotacao,
   aoRemoverAnotacao,
+  aoSalvarLista,
+  chaveRascunho = "",
 }) {
   const [novaAnotacao, setNovaAnotacao] =
     useState(ANOTACAO_VAZIA);
 
   const [anotacoesLocais, setAnotacoesLocais] =
     useState(anotacoes);
+  const [conflitoAnotacoes, setConflitoAnotacoes] = useState(null);
+
+  const salvamentoAnotacoes = useSalvamentoAutomaticoOrbe({
+    valor: anotacoesLocais,
+    chave: chaveRascunho || "orbe:rascunho:v1:anotacoes-local",
+    habilitado: Boolean(aoSalvarLista),
+    aoSalvar: (valor) => aoSalvarLista?.(valor),
+  });
 
   useEffect(() => {
+    if (salvamentoAnotacoes.pendente && JSON.stringify(anotacoesLocais) !== JSON.stringify(anotacoes)) {
+      const conflito = { local: anotacoesLocais, remoto: anotacoes };
+      setConflitoAnotacoes(conflito);
+      salvamentoAnotacoes.sinalizarConflito(conflito);
+      return;
+    }
     setAnotacoesLocais(
       Array.isArray(anotacoes)
         ? anotacoes
@@ -79,6 +99,7 @@ function PainelAnotacoes({
       ...ANOTACAO_VAZIA,
     });
 
+    if (aoSalvarLista) return;
     if (
       typeof aoAdicionarAnotacao ===
       "function"
@@ -110,6 +131,7 @@ function PainelAnotacoes({
         ),
     );
 
+    if (aoSalvarLista) return;
     if (
       typeof aoAtualizarAnotacao ===
       "function"
@@ -121,6 +143,7 @@ function PainelAnotacoes({
   }
 
   function removerAnotacao(anotacao) {
+    if (!window.confirm(`Excluir a anotação ${anotacao.titulo || "selecionada"}?`)) return;
     setAnotacoesLocais(
       (listaAnterior) =>
         listaAnterior.filter(
@@ -130,6 +153,7 @@ function PainelAnotacoes({
         ),
     );
 
+    if (aoSalvarLista) return;
     if (
       typeof aoRemoverAnotacao ===
       "function"
@@ -162,6 +186,11 @@ function PainelAnotacoes({
           <strong>
             {anotacoesLocais.length}
           </strong>
+          <IndicadorSalvamentoOrbe
+            estado={salvamentoAnotacoes.estado}
+            rascunhoDisponivel={salvamentoAnotacoes.rascunhoDisponivel}
+            aoRecuperar={salvamentoAnotacoes.recuperarRascunho}
+          />
         </div>
       </header>
 
@@ -279,6 +308,25 @@ function PainelAnotacoes({
           Salvar anotação
         </button>
       </form>
+
+      {conflitoAnotacoes ? (
+        <ConflitoEdicaoOrbe
+          registro="Anotações da campanha"
+          local={conflitoAnotacoes.local}
+          remoto={conflitoAnotacoes.remoto}
+          aoCarregarServidor={() => {
+            salvamentoAnotacoes.resolverConflitoServidor(conflitoAnotacoes.remoto);
+            setAnotacoesLocais(conflitoAnotacoes.remoto);
+            setConflitoAnotacoes(null);
+          }}
+          aoManterLocal={() => {
+            if (!window.confirm("Manter suas alterações pode substituir a versão remota. Continuar?")) return;
+            void salvamentoAnotacoes.salvarValor(conflitoAnotacoes.local);
+            setConflitoAnotacoes(null);
+          }}
+          aoFechar={() => setConflitoAnotacoes(null)}
+        />
+      ) : null}
 
       <section className="painel-dossie__conteudo">
         <h3>Anotações registradas</h3>

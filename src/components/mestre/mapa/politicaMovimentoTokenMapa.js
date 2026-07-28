@@ -1,3 +1,9 @@
+import {
+  caminhoCruzaFormaColisao,
+  obterFormaColisaoObjeto,
+  normalizarObjetoCenario,
+} from "./geometriaObjetosCenario.js";
+
 export function segmentoCruzaBarreiraMapa(origem, destino, barreira) {
   const rx = destino.x - origem.x;
   const ry = destino.y - origem.y;
@@ -12,25 +18,9 @@ export function segmentoCruzaBarreiraMapa(origem, destino, barreira) {
   return t > 0.025 && t <= 1 && u >= 0 && u <= 1;
 }
 
-function pontoDentroObjeto(ponto, objeto) {
-  return ponto.x >= objeto.x
-    && ponto.x <= objeto.x + objeto.largura
-    && ponto.y >= objeto.y
-    && ponto.y <= objeto.y + objeto.altura;
-}
-
 function caminhoCruzaObjeto(origem, destino, objeto, tamanhoCelula) {
-  const distancia = Math.hypot(destino.x - origem.x, destino.y - origem.y);
-  const passos = Math.max(1, Math.ceil(distancia / Math.max(8, tamanhoCelula / 3)));
-  for (let indice = 1; indice <= passos; indice += 1) {
-    const progresso = indice / passos;
-    const ponto = {
-      x: origem.x + (destino.x - origem.x) * progresso,
-      y: origem.y + (destino.y - origem.y) * progresso,
-    };
-    if (pontoDentroObjeto(ponto, objeto)) return true;
-  }
-  return false;
+  const forma = obterFormaColisaoObjeto(normalizarObjetoCenario(objeto));
+  return caminhoCruzaFormaColisao(origem, destino, forma, tamanhoCelula / 2, Math.max(8, tamanhoCelula / 3));
 }
 
 export function avaliarMovimentoTokenMapa({
@@ -83,4 +73,3 @@ export function avaliarMovimentoTokenMapa({
 
   return { permitido: true, modo: "movimento-limitado" };
 }
-

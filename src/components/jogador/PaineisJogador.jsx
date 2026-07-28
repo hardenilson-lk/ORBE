@@ -1,4 +1,7 @@
+import { useEffect, useState } from "react";
 import PainelRituais from "../mestre/PainelRituais.jsx";
+import useSalvamentoAutomaticoOrbe from "../../hooks/useSalvamentoAutomaticoOrbe.js";
+import IndicadorSalvamentoOrbe from "../mesa/IndicadorSalvamentoOrbe.jsx";
 
 import "./PaineisJogador.css";
 
@@ -26,7 +29,22 @@ function ListaVazia({
 function PainelAnotacoes({
   ficha,
   aoSalvar,
+  chaveRascunho = "",
 }) {
+  const [anotacoes, setAnotacoes] = useState(ficha?.anotacoes || "");
+  const salvamentoAnotacoes = useSalvamentoAutomaticoOrbe({
+    valor: anotacoes,
+    chave: chaveRascunho || "orbe:rascunho:v1:anotacoes-jogador-local",
+    habilitado: Boolean(ficha?.id),
+    aoSalvar: async (valor) => {
+      const resultado = await aoSalvar?.({ ...ficha, anotacoes: valor });
+      if (resultado === null) throw new Error("A anotação não foi confirmada pelo servidor.");
+      return resultado;
+    },
+  });
+
+  useEffect(() => setAnotacoes(ficha?.anotacoes || ""), [ficha?.id, ficha?.anotacoes]);
+
   return (
     <section className="painel-jogador">
       <header className="painel-jogador__cabecalho">
@@ -60,18 +78,15 @@ function PainelAnotacoes({
         <textarea
           id="anotacoes-jogador"
           rows="20"
-          value={
-            ficha?.anotacoes || ""
-          }
+          value={anotacoes}
           placeholder="Escreva suas pistas, teorias, nomes e lembretes..."
-          onChange={(evento) =>
-            aoSalvar({
-              ...ficha,
+          onChange={(evento) => setAnotacoes(evento.target.value)}
+        />
 
-              anotacoes:
-                evento.target.value,
-            })
-          }
+        <IndicadorSalvamentoOrbe
+          estado={salvamentoAnotacoes.estado}
+          rascunhoDisponivel={salvamentoAnotacoes.rascunhoDisponivel}
+          aoRecuperar={salvamentoAnotacoes.recuperarRascunho}
         />
 
         <small>
@@ -401,6 +416,7 @@ function PaineisJogador({
   missoes = [],
   arquivos = [],
   aoSalvarFicha,
+  chaveRascunho = "",
 }) {
   if (tipo === "rituais") {
     return (
@@ -417,6 +433,7 @@ function PaineisJogador({
         aoSalvar={
           aoSalvarFicha
         }
+        chaveRascunho={chaveRascunho}
       />
     );
   }

@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
 
+import useSalvamentoAutomaticoOrbe from "../../hooks/useSalvamentoAutomaticoOrbe.js";
+import IndicadorSalvamentoOrbe from "../mesa/IndicadorSalvamentoOrbe.jsx";
+import ConflitoEdicaoOrbe from "../mesa/ConflitoEdicaoOrbe.jsx";
+
 import "./PaineisDossie.css";
 
 const MISSAO_VAZIA = { titulo: "", descricao: "", status: "ativa", prioridade: "normal", privada: false };
@@ -70,15 +74,32 @@ function dataLocal(data = new Date()) {
   return ajustada.toISOString().slice(0, 10);
 }
 
-function PainelMissoes({ missoes = [], arquivos = [], aoAdicionarMissao, aoAtualizarMissao, aoRemoverMissao, aoAdicionarArquivo }) {
+function PainelMissoes({ missoes = [], arquivos = [], aoAdicionarMissao, aoAtualizarMissao, aoRemoverMissao, aoAdicionarArquivo, aoSalvarLista, chaveRascunho = "" }) {
   const [novaMissao, setNovaMissao] = useState(MISSAO_VAZIA);
   const [missoesLocais, setMissoesLocais] = useState(missoes);
   const [categoriaGerador, setCategoriaGerador] = useState("qualquer");
+  const [conflitoMissoes, setConflitoMissoes] = useState(null);
+  const salvamentoMissoes = useSalvamentoAutomaticoOrbe({
+    valor: missoesLocais,
+    chave: chaveRascunho || "orbe:rascunho:v1:missoes-local",
+    habilitado: Boolean(aoSalvarLista),
+    aoSalvar: (valor) => aoSalvarLista?.(valor),
+  });
 
-  useEffect(() => setMissoesLocais(Array.isArray(missoes) ? missoes : []), [missoes]);
+  useEffect(() => {
+    const remotas = Array.isArray(missoes) ? missoes : [];
+    if (salvamentoMissoes.pendente && JSON.stringify(missoesLocais) !== JSON.stringify(remotas)) {
+      const conflito = { local: missoesLocais, remoto: remotas };
+      setConflitoMissoes(conflito);
+      salvamentoMissoes.sinalizarConflito(conflito);
+      return;
+    }
+    setMissoesLocais(remotas);
+  }, [missoes]);
 
   function registrarMissao(missao) {
     setMissoesLocais((lista) => [missao, ...lista]);
+    if (aoSalvarLista) return;
     aoAdicionarMissao?.(missao);
   }
 
@@ -144,12 +165,13 @@ function PainelMissoes({ missoes = [], arquivos = [], aoAdicionarMissao, aoAtual
   function alterarMissao(missao, nomeCampo, valor) {
     const atualizada = { ...missao, [nomeCampo]: valor };
     setMissoesLocais((lista) => lista.map((item) => item.id === missao.id ? atualizada : item));
-    aoAtualizarMissao?.(atualizada);
+    if (!aoSalvarLista) aoAtualizarMissao?.(atualizada);
   }
 
   function removerMissao(missao) {
+    if (!window.confirm(`Excluir a missão ${missao.titulo || "selecionada"}?`)) return;
     setMissoesLocais((lista) => lista.filter((item) => item.id !== missao.id));
-    aoRemoverMissao?.(missao);
+    if (!aoSalvarLista) aoRemoverMissao?.(missao);
   }
 
   const missoesAtivas = missoesLocais.filter((missao) => missao.status === "ativa").length;
@@ -158,7 +180,7 @@ function PainelMissoes({ missoes = [], arquivos = [], aoAdicionarMissao, aoAtual
     <section className="painel-dossie painel-missoes-configurado">
       <header className="painel-dossie__cabecalho">
         <div><span>Objetivos da campanha</span><h2>Missões</h2><p>Prepare objetivos, pistas e ameaças para cada investigação.</p></div>
-        <div className="painel-dossie__resumo"><span>Missões ativas</span><strong>{missoesAtivas}</strong></div>
+        <div className="painel-dossie__resumo"><span>Missões ativas</span><strong>{missoesAtivas}</strong><IndicadorSalvamentoOrbe estado={salvamentoMissoes.estado} rascunhoDisponivel={salvamentoMissoes.rascunhoDisponivel} aoRecuperar={salvamentoMissoes.recuperarRascunho} /></div>
       </header>
 
       <section className="gerador-missao" aria-labelledby="gerador-missao-titulo">
@@ -184,6 +206,25 @@ function PainelMissoes({ missoes = [], arquivos = [], aoAdicionarMissao, aoAtual
         <label className="missoes-arquivos__privada"><input type="checkbox" checked={novaMissao.privada} onChange={(e) => setNovaMissao((anterior) => ({ ...anterior, privada: e.target.checked }))} /> Somente o mestre pode ver</label>
         <button className="painel-dossie__botao-principal" type="submit">Adicionar missão</button>
       </form>
+
+      {conflitoMissoes ? (
+        <ConflitoEdicaoOrbe
+          registro="Missões da campanha"
+          local={conflitoMissoes.local}
+          remoto={conflitoMissoes.remoto}
+          aoCarregarServidor={() => {
+            salvamentoMissoes.resolverConflitoServidor(conflitoMissoes.remoto);
+            setMissoesLocais(conflitoMissoes.remoto);
+            setConflitoMissoes(null);
+          }}
+          aoManterLocal={() => {
+            if (!window.confirm("Manter suas alterações pode substituir a versão remota. Continuar?")) return;
+            void salvamentoMissoes.salvarValor(conflitoMissoes.local);
+            setConflitoMissoes(null);
+          }}
+          aoFechar={() => setConflitoMissoes(null)}
+        />
+      ) : null}
 
       <section className="painel-dossie__conteudo">
         <h3>Quadro de missões</h3>

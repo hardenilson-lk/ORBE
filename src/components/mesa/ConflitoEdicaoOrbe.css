@@ -1,0 +1,11 @@
+.conflito-edicao-orbe { position: relative; z-index: 20; margin: 10px 0; padding: 12px; border: 1px solid #9e3030; background: #171414; color: #eee7db; box-shadow: 0 8px 24px #0008; }
+.conflito-edicao-orbe header, .conflito-edicao-orbe footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.conflito-edicao-orbe header span, .conflito-edicao-orbe small { color: #d18d8d; font-size: .72rem; }
+.conflito-edicao-orbe h3 { margin: 2px 0 0; }
+.conflito-edicao-orbe header button { border: 0; background: transparent; color: #eee7db; font-size: 1.25rem; cursor: pointer; }
+.conflito-edicao-orbe__versoes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 10px 0; }
+.conflito-edicao-orbe__versoes article { min-width: 0; padding: 8px; border: 1px solid #4a4140; background: #211d1b; }
+.conflito-edicao-orbe pre { max-height: 150px; overflow: auto; margin: 6px 0 0; color: #d9d0c4; font: .72rem/1.35 ui-monospace, monospace; white-space: pre-wrap; }
+.conflito-edicao-orbe footer { justify-content: flex-end; flex-wrap: wrap; }
+.conflito-edicao-orbe footer button { padding: 7px 10px; border: 1px solid #8a2929; background: #2b1717; color: #f5e8dc; cursor: pointer; }
+@media (max-width: 700px) { .conflito-edicao-orbe__versoes { grid-template-columns: 1fr; } }

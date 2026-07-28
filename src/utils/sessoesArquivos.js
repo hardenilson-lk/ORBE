@@ -678,6 +678,7 @@ export function carregarSessaoArquivos(
 export function salvarSessaoArquivos(
   mesaId,
   sessaoRecebida = {},
+  { agendarRemoto = true } = {},
 ) {
   const agora =
     new Date().toISOString();
@@ -730,10 +731,12 @@ export function salvarSessaoArquivos(
     return sessaoNormalizada;
   }
 
-  agendarSessaoPublicaRemota(
-    mesaId,
-    sessaoNormalizada,
-  );
+  if (agendarRemoto) {
+    agendarSessaoPublicaRemota(
+      mesaId,
+      sessaoNormalizada,
+    );
+  }
 
   return sessaoNormalizada;
 }

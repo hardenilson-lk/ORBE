@@ -40,6 +40,19 @@ export default function PreviewGeradorMapa({
               </pattern>
             </defs>
             <rect width={mapaGerado.largura} height={mapaGerado.altura} className="gerador-mapa__fundo-planta" />
+            {mapaGerado.finalizacaoIA?.imagem ? (
+              <image
+                href={mapaGerado.finalizacaoIA.imagem}
+                x="0"
+                y="0"
+                width={mapaGerado.largura}
+                height={mapaGerado.altura}
+                preserveAspectRatio="xMidYMid slice"
+                opacity="0.72"
+                pointerEvents="none"
+                aria-hidden="true"
+              />
+            ) : null}
             <rect width={mapaGerado.largura} height={mapaGerado.altura} fill="url(#grade-gerador-mapa)" />
             {celulasCorredores.map((celula) => (
               <rect

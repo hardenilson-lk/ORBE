@@ -58,9 +58,6 @@ export default function RotaJogadorMesa() {
     }
 
     void verificar();
-    const intervalo = window.setInterval(() => {
-      void verificar();
-    }, 5000);
     void assinarMesasUsuarioRealtime(verificar).then((cancelar) => {
       if (!ativo) cancelar();
       else cancelarCanal = cancelar;
@@ -68,7 +65,6 @@ export default function RotaJogadorMesa() {
 
     return () => {
       ativo = false;
-      window.clearInterval(intervalo);
       cancelarCanal();
     };
   }, [mesaId]);

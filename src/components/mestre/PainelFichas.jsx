@@ -39,6 +39,9 @@ import {
 } from "../../utils/categoriasItens.js";
 
 import PainelDanoCura from "./PainelDanoCura.jsx";
+import IndicadorSalvamentoOrbe from "../mesa/IndicadorSalvamentoOrbe.jsx";
+import ConflitoEdicaoOrbe from "../mesa/ConflitoEdicaoOrbe.jsx";
+import useSalvamentoAutomaticoOrbe from "../../hooks/useSalvamentoAutomaticoOrbe.js";
 
 import PainelHabilidades, {
   normalizarHabilidadesFicha,
@@ -166,6 +169,7 @@ function PainelFichas({
   aoCriarFicha,
   aoSelecionarFicha,
   permitirNovaFicha = true,
+  chaveRascunho = "",
 }) {
   const [ficha, setFicha] =
     useState(() =>
@@ -188,13 +192,38 @@ function PainelFichas({
   ] = useState("");
 
   const [mensagemDistribuicao, setMensagemDistribuicao] = useState("");
+  const [conflitoFicha, setConflitoFicha] = useState(null);
+
+  const salvamentoFicha = useSalvamentoAutomaticoOrbe({
+    valor: ficha,
+    chave: chaveRascunho || "orbe:rascunho:v1:ficha-local",
+    habilitado: Boolean(fichaSelecionada?.id),
+    aoSalvar: async (valor) => {
+      const fichaParaSalvar = recalcularFichaArquivos({
+        ...valor,
+        pericias: criarValoresPericiasArquivos(valor.pericias),
+        ataques: normalizarAtaquesFicha(valor.ataques),
+        habilidades: normalizarHabilidadesFicha(valor.habilidades),
+        rituais: normalizarRituaisFicha(valor.rituais),
+        id: valor.id || `ficha-${Date.now()}`,
+      });
+      const resultado = await aoSalvarFicha?.(fichaParaSalvar);
+      if (resultado === null) throw new Error("A ficha não foi confirmada pelo servidor.");
+      return resultado;
+    },
+  });
 
   useEffect(() => {
     if (fichaSelecionada) {
+      const fichaRemota = prepararFichaParaTela(fichaSelecionada);
+      if (salvamentoFicha.pendente && fichaRemota.atualizadoEm && fichaRemota.atualizadoEm !== ficha.atualizadoEm) {
+        const conflito = { local: ficha, remoto: fichaRemota, atualizadoEm: fichaRemota.atualizadoEm };
+        setConflitoFicha(conflito);
+        salvamentoFicha.sinalizarConflito(conflito);
+        return;
+      }
       setFicha(
-        prepararFichaParaTela(
-          fichaSelecionada,
-        ),
+        fichaRemota,
       );
 
       return;
@@ -606,9 +635,7 @@ function PainelFichas({
       typeof aoSalvarFicha ===
       "function"
     ) {
-      aoSalvarFicha(
-        fichaParaSalvar,
-      );
+      void salvamentoFicha.salvarValor(fichaParaSalvar);
     }
   }
 
@@ -1445,6 +1472,11 @@ function PainelFichas({
         </label>
 
         <footer className="ficha-arquivos__acoes" data-assistente="ficha-salvar">
+          <IndicadorSalvamentoOrbe
+            estado={salvamentoFicha.estado}
+            rascunhoDisponivel={salvamentoFicha.rascunhoDisponivel}
+            aoRecuperar={salvamentoFicha.recuperarRascunho}
+          />
           <button
             className="ficha-arquivos__salvar"
             type="submit"
@@ -1460,6 +1492,26 @@ function PainelFichas({
           </button>
         </footer>
       </form>
+
+      {conflitoFicha ? (
+        <ConflitoEdicaoOrbe
+          registro={`Ficha ${ficha.nome || "selecionada"}`}
+          local={conflitoFicha.local}
+          remoto={conflitoFicha.remoto}
+          atualizadoEm={conflitoFicha.atualizadoEm}
+          aoCarregarServidor={() => {
+            salvamentoFicha.resolverConflitoServidor(conflitoFicha.remoto);
+            setFicha(conflitoFicha.remoto);
+            setConflitoFicha(null);
+          }}
+          aoManterLocal={() => {
+            if (!window.confirm("Manter suas alterações pode substituir a versão remota. Continuar?")) return;
+            void salvamentoFicha.salvarValor(conflitoFicha.local);
+            setConflitoFicha(null);
+          }}
+          aoFechar={() => setConflitoFicha(null)}
+        />
+      ) : null}
 
       {catalogoEquipamentosAberto ? (
         <div

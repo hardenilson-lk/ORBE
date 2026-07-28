@@ -1,0 +1,26 @@
+.indicador-conexao-mesa {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  width: fit-content;
+  padding: 5px 8px;
+  border: 1px solid rgba(202, 158, 80, 0.32);
+  background: rgba(0, 0, 0, 0.22);
+  color: #d9c39a;
+  font: 900 0.62rem/1 "Courier Prime", "Courier New", monospace;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.indicador-conexao-mesa__ponto {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #cfa65d;
+  box-shadow: 0 0 7px currentColor;
+}
+
+.indicador-conexao-mesa--online .indicador-conexao-mesa__ponto { background: #7fcf78; color: #7fcf78; }
+.indicador-conexao-mesa--reconectando .indicador-conexao-mesa__ponto { background: #e0a453; color: #e0a453; }
+.indicador-conexao-mesa--offline .indicador-conexao-mesa__ponto { background: #8b8580; color: #8b8580; }
+.indicador-conexao-mesa--erro .indicador-conexao-mesa__ponto { background: #d35454; color: #d35454; }

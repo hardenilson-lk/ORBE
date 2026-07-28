@@ -78,6 +78,28 @@ function PropriedadesObjeto({ objeto, aoExecutar }) {
       <button type="button" onClick={() => aoExecutar("rotacionar-objeto")}>Rotacionar 90° <kbd>Q</kbd></button>
       <label><input type="checkbox" checked={objeto.bloqueiaMovimento} onChange={(evento) => aoExecutar("alterar-objeto", { bloqueiaMovimento: evento.target.checked })} /> Bloqueia movimento</label>
       <label><input type="checkbox" checked={objeto.bloqueiaVisao} onChange={(evento) => aoExecutar("alterar-objeto", { bloqueiaVisao: evento.target.checked })} /> Bloqueia visão</label>
+      <fieldset>
+        <legend>Comportamento no grid</legend>
+        <label><span>Tipo de obstáculo</span>
+          <select value={objeto.tipoObstaculo || "chao"} onChange={(evento) => aoExecutar("alterar-objeto", { tipoObstaculo: evento.target.value })}>
+            <option value="alto">Alto</option>
+            <option value="baixo">Baixo</option>
+            <option value="chao">Chão</option>
+            <option value="transparente">Transparente</option>
+            <option value="personalizado">Personalizado</option>
+          </select>
+        </label>
+        <label><span>Forma da colisão</span>
+          <select value={objeto.formaColisao || "retangulo"} onChange={(evento) => aoExecutar("alterar-objeto", { formaColisao: evento.target.value })}>
+            <option value="retangulo">Retângulo</option>
+            <option value="circulo">Círculo</option>
+          </select>
+        </label>
+        <CampoNumero nome="Largura da colisão" valor={objeto.larguraColisao || objeto.largura} minimo={1} aoAlterar={(valor) => aoExecutar("alterar-objeto", { larguraColisao: valor })} />
+        <CampoNumero nome="Altura da colisão" valor={objeto.alturaColisao || objeto.altura} minimo={1} aoAlterar={(valor) => aoExecutar("alterar-objeto", { alturaColisao: valor })} />
+        <CampoNumero nome="Deslocamento X" valor={objeto.deslocamentoColisaoX || 0} aoAlterar={(valor) => aoExecutar("alterar-objeto", { deslocamentoColisaoX: valor })} />
+        <CampoNumero nome="Deslocamento Y" valor={objeto.deslocamentoColisaoY || 0} aoAlterar={(valor) => aoExecutar("alterar-objeto", { deslocamentoColisaoY: valor })} />
+      </fieldset>
       <button type="button" className="editor-mapa__perigo" onClick={() => aoExecutar("excluir")}>Excluir objeto</button>
     </>
   );

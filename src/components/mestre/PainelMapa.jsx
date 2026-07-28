@@ -1,6 +1,8 @@
 import { Fragment, useEffect, useMemo, useRef, useState, } from "react";
 import { createPortal } from "react-dom";
 import EditorTokenMapa from "./mapa/EditorTokenMapa.jsx";
+import IndicadorSalvamentoOrbe from "../mesa/IndicadorSalvamentoOrbe.jsx";
+import ConflitoEdicaoOrbe from "../mesa/ConflitoEdicaoOrbe.jsx";
 import MenuContextualToken from "./mapa/MenuContextualToken.jsx";
 import MiniFichaToken from "./mapa/MiniFichaToken.jsx";
 import PainelNpcsMapa from "./mapa/PainelNpcsMapa.jsx";
@@ -24,6 +26,10 @@ import {
   avaliarMovimentoTokenMapa,
   segmentoCruzaBarreiraMapa,
 } from "./mapa/politicaMovimentoTokenMapa.js";
+import {
+  criarSegmentosVisaoDosObjetos,
+  normalizarObjetoCenario,
+} from "./mapa/geometriaObjetosCenario.js";
 import PainelGeradorMapa from "../../geradorMapa/components/PainelGeradorMapa.jsx";
 import { removerMapaGeradoDoGrid } from "../../geradorMapa/integracao/adaptarMapaGeradoParaGrid.js";
 import { GERADOR_MAPAS_ATIVO } from "../../config/recursosOrbe.js";
@@ -342,6 +348,7 @@ function normalizarMapa(mapaRecebido) {
         })),
         paredes: criarListaSegura(mapaSeguro.paredes).map((item, indice) => normalizarEstrutura(item, indice, "parede")),
         portas: criarListaSegura(mapaSeguro.portas).map((item, indice) => normalizarEstrutura(item, indice, item?.tipoEstrutura === "janela" ? "janela" : "porta")),
+        objetosCenario: criarListaSegura(mapaSeguro.objetosCenario).map((item, indice) => normalizarObjetoCenario(item, indice)),
     };
 }
 function hexParaRgba(cor, opacidade) {
@@ -458,7 +465,7 @@ async function compactarImagemMapa(arquivo) {
         alturaOriginal: imagem.naturalHeight,
     };
 }
-function PainelMapa({ arquivoInicial = "ARQUIVO 0001", sistemaCampanha = "arquivos", mesaId = "local", mapa = null, fichas = [], papelAtual = "mestre", jogadorAtualId = "", aoAtualizarFicha, aoAlterarMapa, aoAlterarMensagem, aoAbrirMiniFicha, }) {
+function PainelMapa({ arquivoInicial = "ARQUIVO 0001", sistemaCampanha = "arquivos", mesaId = "local", mapa = null, fichas = [], papelAtual = "mestre", jogadorAtualId = "", aoAtualizarFicha, aoAlterarMapa, aoAlterarMensagem, aoAbrirMiniFicha, estadoSalvamentoMapa = "salvo", rascunhoMapaDisponivel, aoRecuperarRascunhoMapa, conflitoMapa, aoCarregarServidorMapa, aoManterLocalMapa, aoFecharConflitoMapa, }) {
     const viewportRef = useRef(null);
     const arquivoFundoRef = useRef(null);
     const arrasteMapaRef = useRef(null);
@@ -492,6 +499,7 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", sistemaCampanha = "arquiv
     const [posicaoPainel, setPosicaoPainel] = useState(null);
     const [menuFerramentasAberto, setMenuFerramentasAberto] = useState(false);
     const [geradorMapaAberto, setGeradorMapaAberto] = useState(false);
+    const [mostrarColisoesObjetos, setMostrarColisoesObjetos] = useState(false);
     const [guiaAberto, setGuiaAberto,] = useState(false);
     const [arrastandoMapa, setArrastandoMapa,] = useState(false);
     const [arrastandoFundo, setArrastandoFundo,] = useState(false);
@@ -677,6 +685,7 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", sistemaCampanha = "arquiv
     const barreirasVisao = [
         ...mapaLocal.paredes,
         ...mapaLocal.portas.filter((estrutura) => estrutura.bloqueiaVisao),
+        ...criarSegmentosVisaoDosObjetos(mapaLocal.objetosCenario),
     ];
     const tokensDoJogador = papelEfetivo === "jogador"
         ? tokens.filter((token) => podeControlarTokenMapa({
@@ -1827,6 +1836,15 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", sistemaCampanha = "arquiv
             y: evento.clientY,
         });
     }
+    const controlarRodaRef = useRef(null);
+    controlarRodaRef.current = controlarRoda;
+    useEffect(() => {
+        const viewport = viewportRef.current;
+        if (!viewport) return undefined;
+        const listener = (evento) => controlarRodaRef.current?.(evento);
+        viewport.addEventListener("wheel", listener, { passive: false });
+        return () => viewport.removeEventListener("wheel", listener);
+    }, []);
     function controlarScroll() {
         const viewport = viewportRef.current;
         if (viewport) {
@@ -3594,6 +3612,13 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", sistemaCampanha = "arquiv
           {arquivoInicial} —
           Arquivo inicial
         </strong>
+        {papelEfetivo === "mestre" ? (
+          <IndicadorSalvamentoOrbe
+            estado={estadoSalvamentoMapa}
+            rascunhoDisponivel={rascunhoMapaDisponivel}
+            aoRecuperar={aoRecuperarRascunhoMapa}
+          />
+        ) : null}
         {papelEfetivo === "mestre" && mapaLocal.mapaAplicadoId ? (
           <button
             type="button"
@@ -3606,6 +3631,18 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", sistemaCampanha = "arquiv
           </button>
         ) : null}
       </header>
+
+      {papelEfetivo === "mestre" && conflitoMapa ? (
+        <ConflitoEdicaoOrbe
+          registro="Estado persistente do mapa"
+          local={conflitoMapa.local}
+          remoto={conflitoMapa.remoto}
+          atualizadoEm={conflitoMapa.atualizadoEm}
+          aoCarregarServidor={aoCarregarServidorMapa}
+          aoManterLocal={aoManterLocalMapa}
+          aoFechar={aoFecharConflitoMapa}
+        />
+      ) : null}
 
       <div className="painel-mapa__ferramentas">
         <button
@@ -3633,6 +3670,7 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", sistemaCampanha = "arquiv
           <button type="button" title="Configurar grid" disabled={papelEfetivo !== "mestre"} aria-pressed={painelGrid} onClick={() => alternarPainel("grid")}><i aria-hidden="true">▦</i><span>Grid</span></button>
           <button type="button" title="Imagens do cenário" disabled={papelEfetivo !== "mestre"} aria-pressed={painelFundo} onClick={() => alternarPainel("fundo")}><i aria-hidden="true">▧</i><span>Fundo</span></button>
           <button type="button" title="Organizar camadas" disabled={papelEfetivo !== "mestre"} aria-pressed={painelCamadas} onClick={() => alternarPainel("camadas")}><i aria-hidden="true">▤</i><span>Camadas</span></button>
+          <button type="button" title="Mostrar formas de colisão dos objetos" aria-pressed={mostrarColisoesObjetos} onClick={() => setMostrarColisoesObjetos((visivel) => !visivel)}><i aria-hidden="true">â–§</i><span>Colisões</span></button>
           {GERADOR_MAPAS_ATIVO && papelEfetivo === "mestre" ? (
             <button type="button" title="Abrir Gerador de Mapas" aria-pressed={geradorMapaAberto} onClick={() => { setGeradorMapaAberto(true); setMenuFerramentasAberto(false); }}><i aria-hidden="true">⌗</i><span>Gerador</span></button>
           ) : null}
@@ -4122,7 +4160,7 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", sistemaCampanha = "arquiv
       <div className="painel-mapa__moldura">
         <div ref={viewportRef} data-assistente="mapa-area" className={arrastandoMapa
             ? "painel-mapa__area painel-mapa__area--arrastando"
-            : "painel-mapa__area"} onPointerDown={iniciarArrasteMapa} onPointerMove={moverArrasteMapa} onPointerUp={finalizarArrasteMapa} onPointerCancel={finalizarArrasteMapa} onWheel={controlarRoda} onScroll={controlarScroll}>
+            : "painel-mapa__area"} onPointerDown={iniciarArrasteMapa} onPointerMove={moverArrasteMapa} onPointerUp={finalizarArrasteMapa} onPointerCancel={finalizarArrasteMapa} onScroll={controlarScroll}>
           <div className="painel-mapa__canvas" style={{
             width: `${larguraCanvas}px`,
             height: `${alturaCanvas}px`,
@@ -4183,6 +4221,16 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", sistemaCampanha = "arquiv
               })}
               </div>) : null}
 
+              {mapaLocal.camadas.mapa.visivel && mapaLocal.arquiteturaVisual?.imagemFinalizada ? (
+                <img
+                  className="painel-mapa__finalizacao-ia"
+                  src={mapaLocal.arquiteturaVisual.imagemFinalizada}
+                  alt=""
+                  aria-hidden="true"
+                  draggable="false"
+                />
+              ) : null}
+
               <CamadaArquiteturaGeradaMapa
                 arquitetura={mapaLocal.arquiteturaVisual}
                 tamanhoCelula={grid.tamanhoCelula}
@@ -4200,7 +4248,7 @@ function PainelMapa({ arquivoInicial = "ARQUIVO 0001", sistemaCampanha = "arquiv
 
               <div className="painel-mapa__sombra-camada"/>
 
-              <CamadaObjetosCenarioMapa objetos={mapaLocal.objetosCenario || []} />
+              <CamadaObjetosCenarioMapa objetos={mapaLocal.objetosCenario || []} mostrarColisoes={papelEfetivo === "mestre" && mostrarColisoesObjetos} />
 
               {mapaLocal.camadas.interface.visivel ? (<CamadaMedicaoMapa
                 ativa={painelMedicao}
